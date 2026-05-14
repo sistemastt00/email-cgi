@@ -39,6 +39,8 @@ async def create_contact(fields: dict) -> dict:
     return await api_call("crm.contact.add", {"fields": fields})
 
 
+# ─── Leads ────────────────────────────────────────────────────────────────────
+
 async def create_lead(fields: dict) -> dict:
     """Crea un lead CRM. Devuelve {result: id}."""
     return await api_call("crm.lead.add", {"fields": fields})
@@ -51,17 +53,6 @@ async def create_crm_item(entity_type_id: int, fields: dict) -> dict:
         "fields": fields,
     })
 
-
-async def search_leads_by_email(email: str) -> list[dict]:
-    """Busca leads cuyo EMAIL coincida."""
-    data = await api_call("crm.lead.list", {
-        "filter": {"EMAIL": email},
-        "select": ["ID", "TITLE", "NAME", "LAST_NAME", "EMAIL", "PHONE", "ASSIGNED_BY_ID"],
-    })
-    return data.get("result", [])
-
-
-# ─── Leads ────────────────────────────────────────────────────────────────────
 
 async def update_lead(lead_id: str | int, fields: dict) -> dict:
     """Actualiza campos de un lead."""
@@ -89,19 +80,3 @@ async def add_timeline_comment(
             "COMMENT":     comment,
         }
     })
-
-
-# ─── Tareas ───────────────────────────────────────────────────────────────────
-
-async def create_task(fields: dict) -> dict:
-    """Crea una tarea en Bitrix24."""
-    return await api_call("tasks.task.add", {"fields": fields})
-
-
-# ─── Usuarios ─────────────────────────────────────────────────────────────────
-
-async def get_user(user_id: str | int) -> dict:
-    """Obtiene datos de un usuario por ID."""
-    data = await api_call("user.get", {"ID": user_id})
-    result = data.get("result", [])
-    return result[0] if result else {}

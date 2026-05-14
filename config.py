@@ -37,8 +37,13 @@ OPENAI_MODEL = "gpt-4.1"
 CLASIFICACION_TO   = ["iacgi@tutrastero.com", "sistemas@tutrastero.com"]
 CLASIFICACION_FROM = "cgi@tutrastero.com"
 
-# ─── Poller Gmail ─────────────────────────────────────────────────────────────
-POLL_INTERVAL = 60   # segundos entre cada ciclo de lectura
+# ─── Gmail Push Notifications (Pub/Sub) ──────────────────────────────────────
+PUBSUB_TOPIC   = os.getenv("PUBSUB_TOPIC", "")   # projects/{project_id}/topics/{topic_name}
+PUBSUB_TOKEN   = os.getenv("PUBSUB_TOKEN", "")   # token de verificación opcional
+
+# ─── Poller Gmail (respaldo cuando no hay Pub/Sub configurado) ────────────────
+POLL_INTERVAL        = 60    # segundos — ciclo normal sin Pub/Sub
+POLL_INTERVAL_BACKUP = 300   # segundos — ciclo de respaldo cuando Pub/Sub está activo
 
 # ─── Filtro de remitentes — correos que nunca se procesan ─────────────────────
 EMAIL_BLACKLIST_CONTAINS = [
@@ -52,4 +57,5 @@ EMAIL_BLACKLIST_CONTAINS = [
     "info@necesitasrespirar.com",
     "@norauto.es",
     "noreply.",
+    "Dimitri@lcd-phone.com",
 ]

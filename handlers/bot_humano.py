@@ -18,29 +18,11 @@ Lógica:
 import logging
 import config
 from services import gmail, airtable, bitrix
+from handlers import email_templates
 
 logger = logging.getLogger("email-cgi")
 
 _TICKET_BCC = ["iacgi@tutrastero.com", "sistemas@tutrastero.com"]
-
-
-def _ticket_html(nombre: str, lead_id: str) -> str:
-    return f"""<!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8"></head>
-<body style="font-family:Arial,sans-serif;font-size:14px;color:#333">
-  <p>Estimado/a {nombre or "cliente"},</p>
-  <p>Hemos recibido su correo y hemos generado un ticket de seguimiento con el número
-     <strong>#{lead_id}</strong>.</p>
-  <p>Un miembro de nuestro equipo revisará su solicitud y se pondrá en contacto con
-     usted a la brevedad posible.</p>
-  <p>Gracias por ponerse en contacto con Tu Trastero.</p>
-  <br>
-  <p style="color:#666;font-size:12px">
-    Tu Trastero &mdash; cgi@tutrastero.com
-  </p>
-</body>
-</html>"""
 
 
 async def run(args: dict) -> dict:
@@ -73,7 +55,7 @@ async def run(args: dict) -> dict:
     await gmail.send_email(
         to        = [from_email],
         subject   = ticket_subject,
-        body      = _ticket_html(nombre, lead_id),
+        body      = email_templates.ticket_email(nombre, lead_id),
         body_type = "html",
         bcc       = _TICKET_BCC,
     )

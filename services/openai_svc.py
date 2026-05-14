@@ -122,7 +122,11 @@ async def classify_bot_humano(
         "seguridad, una situación emocional) que un bot no podría gestionar con el matiz adecuado.\n\n"
         "Referencia a un fallo previo del bot: \"El bot no pudo ayudarme\", \"ya he intentado la "
         "solución automática\".\n\n"
-        f"#EJEMPLOS DE CLASIFICACIÓN\n{examples_text}"
+        f"#EJEMPLOS DE CLASIFICACIÓN\n{examples_text}\n\n"
+        "#FORMATO DE RESPUESTA\n"
+        "Elige solo:\n"
+        "-bot\n"
+        "-humano"
     )
 
     result = await extract_structured_data(
@@ -131,7 +135,7 @@ async def classify_bot_humano(
         parameters=[{
             "name": "bot_humano",
             "type": "string",
-            "description": "Tu respuesta debe ser únicamente una palabra \"bot\" o \"humano\"",
+            "description": "La respuesta es uno de los valores: \"bot\" o \"humano\"",
             "isRequired": False,
         }],
         model=model,

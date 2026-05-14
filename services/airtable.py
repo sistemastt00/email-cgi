@@ -52,17 +52,6 @@ async def search_records(
     return records
 
 
-async def get_record(table_id: str, record_id: str) -> dict:
-    """Obtiene un registro por su ID."""
-    async with httpx.AsyncClient(timeout=_TIMEOUT) as client:
-        r = await client.get(
-            f"{_BASE_URL}/{table_id}/{record_id}",
-            headers=_headers(),
-        )
-        r.raise_for_status()
-        return r.json()
-
-
 async def create_record(table_id: str, fields: dict) -> dict:
     """Crea un nuevo registro. Devuelve el record creado."""
     async with httpx.AsyncClient(timeout=_TIMEOUT) as client:

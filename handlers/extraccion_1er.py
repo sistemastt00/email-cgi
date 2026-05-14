@@ -79,7 +79,7 @@ def _datos_extraidos_fields(args: dict, gpt: dict, lead_id: str,
     return {
         "fldD5UfZHBGw8VnB9": args.get("categoria_correo", ""),
         "fldGQIcSIN49d4OzB": subject,
-        "fldGQUW9FLFW7glj9": args.get("categoria_correo", ""),
+        "fldGQUW9FLFW7glj9": args.get("categoria_correo_api", ""),
         "fldHgTlccdFZMzHUU": gpt.get("nombre", ""),
         "fldI9gglSHnvp0ptM": args.get("thread_id", ""),
         "fldPeM5wlULywrkmD": args.get("tipo_correo", ""),

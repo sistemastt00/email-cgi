@@ -22,7 +22,11 @@
       "Bash(Get-ChildItem -Recurse \"C:\\\\Users\\\\Sistemas\\\\Documents\\\\FastAPI\\\\FastAPI - Email CGI\")",
       "Bash(Select-Object FullName, Length, LastWriteTime)",
       "Bash(Sort-Object FullName)",
-      "Bash(powershell -Command ' *)"
+      "Bash(powershell -Command ' *)",
+      "Bash(cat)",
+      "Bash(chmod +x \"/mnt/c/Users/Sistemas/Documents/FastAPI/FastAPI - Email CGI/deploy.sh\")",
+      "Bash(cat > *)",
+      "Bash(./deploy.sh \"fix: blacklist dimitri lowercase + gate otros_servicios solo bot+requerimiento\")"
     ]
   }
 }

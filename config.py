@@ -57,5 +57,5 @@ EMAIL_BLACKLIST_CONTAINS = [
     "info@necesitasrespirar.com",
     "@norauto.es",
     "noreply.",
-    "Dimitri@lcd-phone.com",
+    "dimitri@lcd-phone.com",
 ]

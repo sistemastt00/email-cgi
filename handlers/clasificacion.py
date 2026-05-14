@@ -255,8 +255,10 @@ async def _process_email_inner(msg_stub: dict):
                 except Exception as exc:
                     logger.error(f"[1] Error en area_cliente email: {exc}", exc_info=True)
 
-        # otros_servicios: rutas especiales sin restricción de gate
-        if categoria in _OTROS_SERVICIOS_CATS or categoria_api in _OTROS_SERVICIOS_CATS:
+        # otros_servicios: mismo gate que area_general/area_cliente
+        if bot_humano_result == "bot" and (is_req or cliente) and (
+            categoria in _OTROS_SERVICIOS_CATS or categoria_api in _OTROS_SERVICIOS_CATS
+        ):
             try:
                 await _send_otros_servicios_email(
                     categoria=categoria, categoria_api=categoria_api,

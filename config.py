@@ -65,4 +65,5 @@ EMAIL_BLACKLIST_CONTAINS = [
     "mailer-daemon@googlemail.com",
     "raquel.diaz-malaguilla.gonzalez@showheroes.com",
     "marketing@navarroynavarro.es",
+    "info@infofranquicias.com",
 ]

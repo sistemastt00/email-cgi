@@ -312,9 +312,10 @@ async def _process_email_inner(msg_stub: dict):
     _nombre  = extrac_result.get("nombre", "") if is_new_thread else existing_fields.get("nombre", "")
     _lead_id = extrac_result.get("lead_id", "") if is_new_thread else existing_fields.get("lead_id", "")
 
+    _sent_to_client = bot_humano_result == "bot" and (is_req or cliente)
     if bot_humano_result == "humano":
         resultado = "Ticket enviado al cliente + lead → HUMANO"
-    elif is_new_thread and bot_humano_result == "bot":
+    elif is_new_thread and _sent_to_client:
         resultado = "Respuesta automática CTA enviada"
     elif not is_new_thread:
         resultado = "Cadena: clasificado + 1.5/1.2"

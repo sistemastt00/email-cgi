@@ -12,9 +12,12 @@ import collections
 import datetime
 import json
 import logging
+import os
+import signal
+import subprocess
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, BackgroundTasks
 from fastapi.responses import HTMLResponse, JSONResponse
 
 import base64
@@ -172,6 +175,33 @@ async def pubsub_push(request: Request):
     # Procesar en background para responder 200 inmediatamente
     asyncio.create_task(clasificacion.process_new_emails())
     return {"status": "ok"}
+
+
+@app.post("/deploy")
+async def deploy(request: Request, background_tasks: BackgroundTasks):
+    """Hace git pull y reinicia el servicio via SIGTERM (systemd lo relanza)."""
+    token = request.query_params.get("token", "")
+    if not config.DEPLOY_TOKEN or token != config.DEPLOY_TOKEN:
+        raise HTTPException(status_code=403, detail="Token inválido")
+
+    if not config.DEPLOY_DIR:
+        raise HTTPException(status_code=500, detail="DEPLOY_DIR no configurado")
+
+    result = subprocess.run(
+        ["git", "-C", config.DEPLOY_DIR, "pull"],
+        capture_output=True, text=True, timeout=30,
+    )
+    output = (result.stdout + result.stderr).strip()
+    logger.info(f"[deploy] git pull → {output}")
+
+    background_tasks.add_task(_restart_after_delay)
+    return {"status": "ok", "git": output}
+
+
+async def _restart_after_delay():
+    await asyncio.sleep(1)
+    logger.info("[deploy] Reiniciando proceso para aplicar cambios…")
+    os.kill(os.getpid(), signal.SIGTERM)
 
 
 @app.get("/monitor", response_class=HTMLResponse)

@@ -41,6 +41,10 @@ CLASIFICACION_FROM = "cgi@tutrastero.com"
 PUBSUB_TOPIC   = os.getenv("PUBSUB_TOPIC", "")   # projects/{project_id}/topics/{topic_name}
 PUBSUB_TOKEN   = os.getenv("PUBSUB_TOKEN", "")   # token de verificación opcional
 
+# ─── Deploy webhook ───────────────────────────────────────────────────────────
+DEPLOY_TOKEN = os.getenv("DEPLOY_TOKEN", "")   # token secreto para /deploy
+DEPLOY_DIR   = os.getenv("DEPLOY_DIR",   "")   # ej: /opt/fastapi-email-cgi
+
 # ─── Poller Gmail (respaldo cuando no hay Pub/Sub configurado) ────────────────
 POLL_INTERVAL        = 60    # segundos — ciclo normal sin Pub/Sub
 POLL_INTERVAL_BACKUP = 300   # segundos — ciclo de respaldo cuando Pub/Sub está activo

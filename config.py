@@ -62,4 +62,7 @@ EMAIL_BLACKLIST_CONTAINS = [
     "@norauto.es",
     "noreply.",
     "dimitri@lcd-phone.com",
+    "mailer-daemon@googlemail.com",
+    "raquel.diaz-malaguilla.gonzalez@showheroes.com",
+    "marketing@navarroynavarro.es",
 ]

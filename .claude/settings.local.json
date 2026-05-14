@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -E '\"id\": [0-9]+,$')",
+      "Bash(python3 -c ' *)",
+      "Bash(git init *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git remote *)",
+      "Bash(git push *)",
+      "Bash(.venv/Scripts/uvicorn main:app --port 8004 --reload)",
+      "PowerShell(Get-NetTCPConnection -LocalPort 8004 -ErrorAction SilentlyContinue | ForEach-Object { Get-Process -Id $_.OwningProcess -ErrorAction SilentlyContinue } | Select-Object Id, Name)",
+      "PowerShell(Get-Process python -ErrorAction SilentlyContinue)",
+      "PowerShell(Start-Job -ScriptBlock { Set-Location \"C:\\\\Users\\\\Sistemas\\\\Documents\\\\FastAPI\\\\FastAPI - Email CGI\"; .\\\\.venv\\\\Scripts\\\\uvicorn.exe main:app --port 8004 })",
+      "Read(//mnt/c/Users/Sistemas/Documents/FastAPI/**)",
+      "Bash(.venv/Scripts/uvicorn main:app --port 8004)",
+      "Bash(curl -s http://localhost:8004/)",
+      "Bash(systemctl --version)",
+      "PowerShell(wsl -e bash -c \"whoami && echo $HOME && python3 --version && systemctl --version | head -1\")",
+      "Bash(wsl bash *)",
+      "Bash(powershell -Command \"Select-String -Pattern '\\\\\"id\\\\\":\\\\s*\\\\\"\\(25|28|31|33|35|39|37|43|44|45|46|47|18\\)\\\\\"' -Path '1.4. Respuestas Área General.blueprint.json' | select -First 20\")",
+      "Bash(Get-ChildItem -Recurse \"C:\\\\Users\\\\Sistemas\\\\Documents\\\\FastAPI\\\\FastAPI - Email CGI\")",
+      "Bash(Select-Object FullName, Length, LastWriteTime)",
+      "Bash(Sort-Object FullName)",
+      "Bash(powershell -Command ' *)"
+    ]
+  }
+}

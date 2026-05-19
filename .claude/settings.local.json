@@ -29,7 +29,9 @@
       "Bash(./deploy.sh \"fix: blacklist dimitri lowercase + gate otros_servicios solo bot+requerimiento\")",
       "Bash(Get-Content \"C:\\\\Users\\\\Sistemas\\\\.claude\\\\projects\\\\C--Users-Sistemas-Documents-FastAPI\\\\f616d92d-b61a-429a-8ecf-f21251ee8577.jsonl\")",
       "Bash(Measure-Object -Line)",
-      "Bash(Select-Object -ExpandProperty Lines)"
+      "Bash(Select-Object -ExpandProperty Lines)",
+      "Bash(python -c \"from handlers import email_templates; print\\('OK — import sin errores'\\)\")",
+      "Bash(python -c ' *)"
     ]
   }
 }

@@ -8,100 +8,104 @@
   body { background: #0f0f1a; color: #eee; font-family: monospace; padding: 20px; }
   h1   { color: #e94560; margin-bottom: 4px; }
   p    { color: #888; font-size: .85em; margin-bottom: 20px; }
+  .meta { color: #555; font-size:.75em; margin-bottom:16px; }
   .mermaid { background: #fff; border-radius: 10px; padding: 20px; }
 </style>
 </head>
 <body>
 <h1>📧 Flujo Email CGI — árbol de decisiones completo</h1>
 <p>Todos los filtros activos en el código Python. Para comparar con blueprints de Make.com.</p>
+<div class="meta">Última actualización: 19/05/2026 · commit 796c3f2 · 15 entradas en blacklist</div>
 
 <div class="mermaid">
 flowchart TD
     A([📨 Email recibido\nPoller Gmail / PubSub]) --> B
 
-    B{"🔴 BLACKLIST\nfrom_email.lower() contiene:\n@telefacil.com · noreply@ · no-reply@\n@e.fundacionmapfre.org · @alcobendas.org\n@hyperionup.com · newsletter\ninfo@necesitasrespirar.com · @norauto.es\nnoreply. · dimitri@lcd-phone.com\nmailer-daemon@googlemail.com\nraquel.diaz-malaguilla.gonzalez@showheroes.com\nmarketing@navarroynavarro.es"}
-    B -- SÍ --> BLOC([🚫 Marcar leído\nIgnorado blacklist\nFIN])
+    B{"🔴 BLACKLIST\nfrom_email.lower() contiene alguno de:\n─────────────────────────────\n@telefacil.com · noreply@ · no-reply@\n@e.fundacionmapfre.org · @alcobendas.org\n@hyperionup.com · newsletter · noreply.\n@norauto.es · info@necesitasrespirar.com\ndimitri@lcd-phone.com\nmailer-daemon@googlemail.com\nraquel.diaz-malaguilla.gonzalez@showheroes.com\nmarketing@navarroynavarro.es\ninfo@infofranquicias.com\n─────────────────────────────\n15 patrones activos"}
+    B -- SÍ --> BLOC([🚫 Marcar leído\nIgnorado blacklist · FIN])
     B -- NO --> C
 
     C[🤖 GPT: bot_humano\nbot · humano] --> D
-    D[🤖 GPT: categoria + tipo\nRequerimiento · Informativo · etc] --> E
-    E[📋 Crear registro Clasificación\nAirtable] --> F
-    F[✅ Marcar email como leído] --> G
+    D[🤖 GPT: categoria + categoria_api + tipo] --> E
+    E[📋 Airtable: crear registro Clasificación] --> F
+    F[✅ Gmail: marcar email como leído] --> G
 
-    G{"¿Hilo NUEVO?\nNo existe thread_id\nen Datos extraídos"}
-    G -- SÍ → NUEVO --> H
-    G -- NO → CADENA --> Z1
+    G{"¿Hilo NUEVO?\n¿No existe thread_id\nen Datos extraídos?"}
+    G -- SÍ --> H
+    G -- NO → cadena --> Z1
 
     %% ── RAMA NUEVO ──────────────────────────────────────────
     subgraph NUEVO ["🆕 HILO NUEVO"]
       direction TB
 
       H{"[1.1] GATE\ntipo == Requerimiento?"}
-      H -- NO\nInformativo/etc --> H0([skip → status ok])
+      H -- NO\nInformativo / etc --> H0([⏭ skip → status ok])
       H -- SÍ --> H1
 
       H1{"categoria == Franquicia?"}
-      H1 -- SÍ --> HF[🤖 GPT Franquicia\ncrear Contact Bitrix\ncrear CRM item pipeline 169\ncrear Datos extraídos Airtable]
+      H1 -- SÍ --> HF["🤖 GPT Franquicia\n→ crear Contact Bitrix\n→ crear CRM item pipeline 169\n→ crear Datos extraídos Airtable\ncliente = True"]
       H1 -- NO --> H2
 
-      H2[🤖 GPT extrae datos\nnombre · apellido · dni · telefono\nn_contrato · n_modulo · centro] --> H3
+      H2["🤖 GPT extrae:\nnombre · apellido · dni · telefono\nn_contrato · n_modulo · centro"] --> H3
 
-      H3{"¿Contacto en Bitrix\npor from_email?"}
-      H3 -- SÍ\ncliente=True --> H4[Crear Lead con contacto\ncrear Datos extraídos]
-      H3 -- NO\ncliente=False --> H5[Crear Contact + Lead\ncrear Datos extraídos]
+      H3{"¿Existe contacto en Bitrix\npor from_email?"}
+      H3 -- SÍ\ncliente = True --> H4["Crear Lead vinculado al contacto\ncrear Datos extraídos Airtable"]
+      H3 -- NO\ncliente = False --> H5["Crear Contact + Lead en Bitrix\ncrear Datos extraídos Airtable"]
 
       H4 & H5 & HF --> I
 
-      I["[1.0] SIEMPRE\nCalcular asunto-clasif\nActualizar Airtable Clasificación\nEnviar correo interno\n→ iacgi@ · sistemas@"] --> J
+      I["[1.0] SIEMPRE — sin filtro\n─────────────────────────\nCalcula asunto-clasif\nActualiza Airtable Clasificación\nEnvía correo interno al equipo\n→ iacgi@tutrastero.com\n→ sistemas@tutrastero.com\n─────────────────────────\nContenido: email original\nAsunto: Clasificación CGI-(cat-tipo-bot)"] --> J
 
-      J{"GATE 1.5\ntipo==Requerimiento\nAND categoria!=Franquicia\nOR cliente==True"}
-      J -- NO\nInformativo/Franquicia sin cliente --> JEND([📋 Solo clasificación\nCorreo interno enviado\nFIN])
+      J{"GATE nodo 24\ntipo == Requerimiento\nAND categoria != Franquicia\n──── OR ────\ncliente == True"}
+      J -- NO\nInformativo / Franquicia sin cliente --> JEND(["📋 Clasificado\nSolo correo interno enviado · FIN"])
       J -- SÍ --> K
 
-      K{"[1.5] bot_humano\n== humano?"}
-      K -- SÍ → HUMANO --> L
-      K -- NO → BOT --> M
+      K{"[1.5] bot_humano == humano?"}
+      K -- SÍ --> L
+      K -- NO → bot --> M
 
-      L["Buscar contacto Bitrix\nEnviar 📧 TICKET al cliente\nNúmero de Ticket #lead_id\nActualizar Lead STAGE=UC_BZJ6XN\nComentario timeline Bitrix\nActualizar Clasificación\n→ Se deriva con gestor / humano"]
-      L --> LEND([🧑 HUMANO\nFIN])
+      L["Buscar contacto Bitrix por from_email\nEnviar 📧 TICKET al cliente\n  Asunto: Número de Ticket #lead_id\nActualizar Lead:\n  STAGE_ID = UC_BZJ6XN\n  TITLE = CGI - Requiere HUMANO\nComentario en timeline Bitrix\nActualizar Clasificación:\n  acciones_1 = Se deriva con gestor\n  humano_bot = humano"]
+      L --> LEND([🧑 HUMANO · FIN])
 
-      M{"GATE ROUTING\nbot_humano == bot\nAND\ntipo==Requerimiento OR cliente==True"}
-      M -- NO --> MEND([FIN sin email cliente])
+      M{"GATE router 25\nbot_humano == bot\nAND\ntipo == Requerimiento OR cliente == True"}
+      M -- NO --> MEND([⏭ FIN sin email al cliente])
 
-      M -- SÍ --> N{"categoria in\nÁREA GENERAL?"}
-      N -- SÍ --> O["[1.4] Respuestas Área General\nActualizar Airtable Clasificación\nActualizar Lead Bitrix\nComentario timeline\nEnviar 📧 email CTA al cliente\n─────────────────\nAgendar Visita\nReservar Tu Trastero\nNotificar Incidencia\nHacer Valoración · Hacer Inventario\nAutorizar a Terceros\nActualizar Tus Datos\nPresupuesto\nCambio de trastero → ticket + STAGE"]
-      O --> OEND([✅ CTA enviada\nFIN])
+      M -- SÍ --> N
+
+      N{"categoria in\nÁREA GENERAL?"}
+      N -- SÍ --> O["[1.4] Respuestas Área General\n─────────────────────────\nActualizar Airtable Clasificación\nActualizar Lead Bitrix + timeline\nEnviar 📧 email CTA al cliente\n─────────────────────────\nAgendar Visita\nReservar Tu Trastero\nNotificar Incidencia\nHacer Valoración\nHacer Inventario\nAutorizar a Terceros\nActualizar Tus Datos\nPresupuesto\nCambio de trastero → ticket STAGE=UC_M25V3A"]
+      O --> OEND([✅ CTA área general · FIN])
 
       N -- NO --> P{"categoria in\nÁREA CLIENTE?"}
-      P -- SÍ --> Q["Enviar 📧 email área cliente\nActualizar Lead Bitrix\nComentario timeline\nActualizar Clasificación\n─────────────────\nMis Documentos\nDocumentos Generales\nClaves de Acceso\nPagar Facturas · Ver Facturas\nRenueve Promocion\nCancelar Tu Trastero"]
-      Q --> QEND([✅ Área cliente enviada\nFIN])
+      P -- SÍ --> Q["Enviar 📧 email área cliente\nActualizar Lead Bitrix + timeline\nActualizar Clasificación\n─────────────────────────\nMis Documentos\nDocumentos Generales\nClaves de Acceso\nPagar Facturas · Ver Facturas\nRenueve Promocion\nCancelar Tu Trastero"]
+      Q --> QEND([✅ CTA área cliente · FIN])
 
       P -- NO --> R{"categoria in\nOTROS SERVICIOS?"}
-      R -- SÍ --> S{"¿Cuál categoría?"}
-      R -- NO --> REND([FIN sin email cliente])
+      R -- NO --> REND([⏭ FIN sin email al cliente])
+      R -- SÍ --> S{"¿Qué categoría?"}
 
-      S -- Mudanza --> S1["📧 email Mudanza\nActualizar Lead EXITOSA\nActualizar Clasificación\n→ Se deriva · humano"]
-      S -- Materiales de embalaje --> S2["📧 email Materiales\nActualizar Lead\nActualizar Clasificación\n→ Enlace a web · bot"]
-      S -- Otros --> S3["📧 email Ticket Otros\n#lead_id\nActualizar Lead STAGE=UC_M25V3A\nActualizar Clasificación\n→ Se deriva · humano"]
-      S -- Reseña google --> S4["📧 email Reseña Ticket\n#lead_id\nActualizar Clasificación\n→ Se deriva · humano"]
-      S -- Moroso --> S5["📧 email Moroso\nActualizar Clasificación\n→ Enlace a web · bot"]
-      S -- Desestima Oferta --> S6["📧 email Desestima\nActualizar Clasificación\n→ Enlace a web · bot"]
-      S -- Foto Salida --> S7["📧 email Foto Ticket\n#lead_id\nActualizar Clasificación\n→ Se deriva · humano"]
-      S1 & S2 & S3 & S4 & S5 & S6 & S7 --> SEND([✅ Otros servicios\nFIN])
+      S -- Mudanza --> S1["📧 email Mudanza\nActualizar Lead EXITOSA\nClasif: Se deriva · humano"]
+      S -- Materiales de embalaje --> S2["📧 email Materiales\nActualizar Lead\nClasif: Enlace a web · bot"]
+      S -- Otros --> S3["📧 email Ticket Otros #lead_id\nLead STAGE = UC_M25V3A\nClasif: Se deriva · humano"]
+      S -- Reseña google --> S4["📧 email Reseña Ticket #lead_id\nClasif: Se deriva · humano"]
+      S -- Moroso --> S5["📧 email Moroso\nClasif: Enlace a web · bot"]
+      S -- Desestima Oferta --> S6["📧 email Desestima\nClasif: Enlace a web · bot"]
+      S -- Foto Salida --> S7["📧 email Foto Ticket #lead_id\nClasif: Se deriva · humano"]
+      S1 & S2 & S3 & S4 & S5 & S6 & S7 --> SEND([✅ Otros servicios · FIN])
     end
 
     %% ── RAMA CADENA ──────────────────────────────────────────
     subgraph CADENA ["🔄 HILO EXISTENTE (CADENA)"]
       direction TB
 
-      Z1["Recuperar datos existentes\nnombre · lead_id · categoria_api · tipo\nde Airtable Datos extraídos"]
+      Z1["Recuperar de Airtable Datos extraídos:\nnombre · lead_id · categoria_api · tipo"]
 
-      Z1 --> Z2["[1.5] SIEMPRE\ncon datos del registro existente\nbot_humano == humano?\n→ enviar ticket email\n→ actualizar Lead + Airtable\nbot_humano == bot?\n→ solo status ok"]
+      Z1 --> Z2["[1.5] SIEMPRE con datos existentes\n────────────────────────\nbot == humano → enviar ticket email\n  actualizar Lead + Airtable\nbot == bot → status ok"]
 
-      Z2 --> Z3{"GATE [1.2]\nbot_humano != bot\nAND\nex_tipo == Requerimiento"}
-      Z3 -- NO --> Z3END([FIN sin extracción])
-      Z3 -- SÍ --> Z4["[1.2] GPT extrae DNI del correo\nUpsert campo dni\nen Airtable Datos extraídos\nComentario timeline Bitrix\n→ DNI CORREGIDO"]
-      Z4 --> Z4END([🔄 Cadena completada\nFIN])
+      Z2 --> Z3{"GATE [1.2]\nbot_humano != bot\nAND ex_tipo == Requerimiento"}
+      Z3 -- NO --> Z3END([⏭ FIN])
+      Z3 -- SÍ --> Z4["[1.2] GPT extrae DNI del cuerpo\nUpsert campo dni en Airtable\nComentario Bitrix: DNI CORREGIDO"]
+      Z4 --> Z4END([🔄 Cadena completada · FIN])
     end
 
     %% ── ESTILOS ──────────────────────────────────────────────
@@ -109,14 +113,14 @@ flowchart TD
     classDef action  fill:#16213e,stroke:#3498db,color:#ccc
     classDef end_ok  fill:#0d2b1a,stroke:#2ecc71,color:#2ecc71
     classDef end_hum fill:#2d0a0a,stroke:#e74c3c,color:#e74c3c
-    classDef end_bl  fill:#1a1a1a,stroke:#555,color:#555
+    classDef end_bl  fill:#1a1a1a,stroke:#555,color:#666
     classDef start   fill:#1a0a2e,stroke:#9b59b6,color:#eee
 
     class B,G,H,H1,H3,J,K,M,N,P,R,S,Z3 gate
     class C,D,E,F,H2,HF,H4,H5,I,L,O,Q,S1,S2,S3,S4,S5,S6,S7,Z1,Z2,Z4 action
     class OEND,QEND,SEND,Z4END end_ok
     class LEND end_hum
-    class BLOC,JEND,MEND,REND,Z3END end_bl
+    class BLOC,H0,JEND,MEND,REND,Z3END end_bl
     class A start
 </div>
 

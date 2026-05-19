@@ -1,4 +1,5 @@
 """handlers/email_templates.py — Blueprint-exact branded email HTML builder."""
+import re
 from pathlib import Path
 
 _CDN  = "https://holcqv.stripocdn.email/content/guids/"
@@ -381,149 +382,121 @@ a[x-apple-data-detectors],#MessageViewBody a {{color:inherit!important;text-deco
 _TEMPLATES_DIR = Path(__file__).parent.parent / "templates" / "emails"
 
 
-def _load_body(filename: str, **kwargs) -> str:
-    """Load an HTML fragment from templates/emails/ and substitute {placeholders}."""
+def _load_template(filename: str, **kwargs) -> tuple:
+    """Load body, cta_html, after_html from a template file.
+
+    CTA format:   <!-- cta-dark: https://url/ | Button text -->
+                  <!-- cta-light: https://url/ | Button text -->
+    After format: <!-- after --> ... <!-- /after -->
+    """
     content = (_TEMPLATES_DIR / filename).read_text(encoding="utf-8")
     for key, val in kwargs.items():
         content = content.replace(f"{{{key}}}", str(val))
-    return content.strip()
+
+    after_m = re.search(r'<!--\s*after\s*-->(.*?)<!--\s*/after\s*-->', content, re.DOTALL)
+    after = after_m.group(1).strip() if after_m else ""
+
+    cta_m = re.search(r'<!--\s*cta-(dark|light):\s*(.+?)\s*\|\s*(.+?)\s*-->', content)
+    if cta_m:
+        style, url, text = cta_m.group(1), cta_m.group(2).strip(), cta_m.group(3).strip()
+        cta = dark_btn(url, text) if style == "dark" else light_btn(url, text)
+    else:
+        cta = ""
+
+    body = re.sub(r'<!--\s*cta-(?:dark|light):.*?-->\n?', '', content)
+    body = re.sub(r'<!--\s*after\s*-->.*?<!--\s*/after\s*-->\n?', '', body, flags=re.DOTALL)
+    body = re.sub(r'<!--.*?-->\n?', '', body)
+    return body.strip(), cta, after
 
 
 def ticket_email(nombre: str, lead_id: str) -> str:
     """Generic humano/ticket — bot_humano.py and Otros."""
-    body = _load_body("ticket.html", nombre=nombre or "cliente", lead_id=lead_id)
-    return build("CGI OtrosGen&#233;rico - tutrastero", BANNER_TICKET, body, is_ticket=True)
+    body, cta, after = _load_template("ticket.html", nombre=nombre or "cliente", lead_id=lead_id)
+    return build("CGI OtrosGen&#233;rico - tutrastero", BANNER_TICKET, body, cta, after, is_ticket=True)
 
 
 def cambio_trastero_email(nombre: str, lead_id: str) -> str:
-    body = _load_body("cambio_trastero.html", nombre=nombre or "cliente", lead_id=lead_id)
-    return build("CGI OtrosGen&#233;rico - tutrastero", BANNER_TICKET, body, is_ticket=True)
+    body, cta, after = _load_template("cambio_trastero.html", nombre=nombre or "cliente", lead_id=lead_id)
+    return build("CGI OtrosGen&#233;rico - tutrastero", BANNER_TICKET, body, cta, after, is_ticket=True)
 
 
 def resena_ticket_email(nombre: str, lead_id: str) -> str:
-    body = _load_body("resena_ticket.html", nombre=nombre or "cliente", lead_id=lead_id)
-    return build("CGI OtrosGen&#233;rico - tutrastero", BANNER_TICKET, body, is_ticket=True)
+    body, cta, after = _load_template("resena_ticket.html", nombre=nombre or "cliente", lead_id=lead_id)
+    return build("CGI OtrosGen&#233;rico - tutrastero", BANNER_TICKET, body, cta, after, is_ticket=True)
 
 
 def otros_ticket_email(nombre: str, lead_id: str) -> str:
-    body = _load_body("otros_ticket.html", nombre=nombre or "cliente", lead_id=lead_id)
-    return build("CGI OtrosGen&#233;rico - tutrastero", BANNER_TICKET, body, is_ticket=True)
+    body, cta, after = _load_template("otros_ticket.html", nombre=nombre or "cliente", lead_id=lead_id)
+    return build("CGI OtrosGen&#233;rico - tutrastero", BANNER_TICKET, body, cta, after, is_ticket=True)
 
 
 def foto_salida_ticket_email(nombre: str, lead_id: str) -> str:
-    body = _load_body("foto_salida_ticket.html", nombre=nombre or "cliente", lead_id=lead_id)
-    return build("CGI OtrosGen&#233;rico - tutrastero", BANNER_TICKET, body, is_ticket=True)
+    body, cta, after = _load_template("foto_salida_ticket.html", nombre=nombre or "cliente", lead_id=lead_id)
+    return build("CGI OtrosGen&#233;rico - tutrastero", BANNER_TICKET, body, cta, after, is_ticket=True)
 
 
 def area_cliente_email(nombre: str) -> str:
-    body = _load_body("area_cliente.html", nombre=nombre or "cliente")
-    btn = dark_btn("https://administracion.tutrastero.com/validate-client", "&#193;rea de cliente")
-    after = (
-        f'<p {_P}>Si usted no ha realizado esta solicitud o tiene problemas para acceder, '
-        f'por favor, contacte con su asesor comercial en el 900 902 791.</p>'
-    )
-    return build("CGI &#193;rea Cliente - tutrastero", BANNER_AREA_CLI, body, btn, after)
+    body, cta, after = _load_template("area_cliente.html", nombre=nombre or "cliente")
+    return build("CGI &#193;rea Cliente - tutrastero", BANNER_AREA_CLI, body, cta, after)
 
 
 def mudanza_email(nombre: str) -> str:
-    body = _load_body("mudanza.html", nombre=nombre or "cliente")
-    btn = light_btn(_MUDANZA_URL, "&#161;Solicite su mudanza aqu&#237;!")
-    return build("CGI Mudanza - tutrastero", BANNER_MUDANZA_IMG, body, btn)
+    body, cta, after = _load_template("mudanza.html", nombre=nombre or "cliente")
+    return build("CGI Mudanza - tutrastero", BANNER_MUDANZA_IMG, body, cta, after)
 
 
 def materiales_email(nombre: str) -> str:
-    body = _load_body("materiales.html", nombre=nombre or "cliente")
-    btn = light_btn("https://www.tucaja.com/", "&#161;Compre aqu&#237;!")
-    return build("CGI Materiales Embalaje - tutrastero", BANNER_MUDANZA_IMG, body, btn)
+    body, cta, after = _load_template("materiales.html", nombre=nombre or "cliente")
+    return build("CGI Materiales Embalaje - tutrastero", BANNER_MUDANZA_IMG, body, cta, after)
 
 
 def moroso_email(nombre: str) -> str:
-    body = _load_body("moroso.html", nombre=nombre or "cliente")
-    btn = dark_btn("https://administracion.tutrastero.com/validate-client", "&#193;rea de Cliente")
-    after = (
-        f'<p {_PL}>Quedamos a su disposici&#243;n.</p>'
-        f'<p {_PL}><br></p>'
-        f'<p {_PL}>Atentamente,</p>'
-        f'<p {_PL}><br></p>'
-        f'<p {_PL}><strong>El equipo de Tu Trastero.</strong></p>'
-        f'<p {_PL}><strong><br></strong></p>'
-        f'<p {_PL}><strong> </strong><em>Nota: Si usted ya ha realizado la gesti&#243;n o el pago en las &#250;ltimas horas, '
-        f'por favor, haga caso omiso a este mensaje; el sistema se actualizar&#225; en breve.</em><strong> </strong></p>'
-    )
-    return build("CGI Moroso - tutrastero", BANNER_MOROSO, body, btn, after)
+    body, cta, after = _load_template("moroso.html", nombre=nombre or "cliente")
+    return build("CGI Moroso - tutrastero", BANNER_MOROSO, body, cta, after)
 
 
 def desestima_email(nombre: str) -> str:
-    body = _load_body("desestima.html", nombre=nombre or "cliente")
-    _reservar_url = (
-        "https://administracion.tutrastero.com/form/contratacion-online"
-        "?utm_campaign=Contrataci%C3%B3n+Online&utm_medium=bitly"
-        "&utm_source=Web+%3E+Servicios+Online+%3E+Reservar+Tu+Trastero"
-    )
-    btn = dark_btn(_reservar_url, "Retomar mi contrataci&#243;n")
-    after = (
-        f'<p {_PL}>Un cordial saludo,</p>'
-        f'<p {_PL}><br></p>'
-        f'<p {_PL}><strong>El equipo de Tu Trastero&#174;</strong></p>'
-    )
-    return build("CGI Desestima Oferta - tutrastero", BANNER_DESESTIMA, body, btn, after)
+    body, cta, after = _load_template("desestima.html", nombre=nombre or "cliente")
+    return build("CGI Desestima Oferta - tutrastero", BANNER_DESESTIMA, body, cta, after)
 
 
 # ── Área General CTA emails ───────────────────────────────────────────────────
 
 def agendar_visita_email(nombre: str) -> str:
-    body = _load_body("agendar_visita.html", nombre=nombre or "cliente")
-    btn = dark_btn("https://tutrastero.com/es/agendar-visita/", "Agendar mi visita ahora")
-    return build("CGI Agendar Visita - tutrastero", BANNER_AGENDAR, body, btn)
+    body, cta, after = _load_template("agendar_visita.html", nombre=nombre or "cliente")
+    return build("CGI Agendar Visita - tutrastero", BANNER_AGENDAR, body, cta, after)
 
 
 def reservar_trastero_email(nombre: str) -> str:
-    body = _load_body("reservar_trastero.html", nombre=nombre or "cliente")
-    _url = (
-        "https://administracion.tutrastero.com/form/contratacion-online"
-        "?utm_campaign=Contrataci%C3%B3n+Online&utm_medium=bitly"
-        "&utm_source=Web+%3E+Servicios+Online+%3E+Reservar+Tu+Trastero"
-    )
-    btn = dark_btn(_url, "Reservar y asegurar mi trastero")
-    return build("CGI Reservar Tu Trastero - tutrastero", BANNER_RESERVAR, body, btn)
+    body, cta, after = _load_template("reservar_trastero.html", nombre=nombre or "cliente")
+    return build("CGI Reservar Tu Trastero - tutrastero", BANNER_RESERVAR, body, cta, after)
 
 
 def notificar_incidencia_email(nombre: str) -> str:
-    body = _load_body("notificar_incidencia.html", nombre=nombre or "cliente")
-    btn = dark_btn("https://tutrastero.com/es/servicios-online/gestion-incidencias/", "Reportar incidencia")
-    return build("CGI Notificar Incidencia - tutrastero", BANNER_INCIDENCIA, body, btn)
+    body, cta, after = _load_template("notificar_incidencia.html", nombre=nombre or "cliente")
+    return build("CGI Notificar Incidencia - tutrastero", BANNER_INCIDENCIA, body, cta, after)
 
 
 def autorizar_terceros_email(nombre: str) -> str:
-    body = _load_body("autorizar_terceros.html", nombre=nombre or "cliente")
-    btn = dark_btn("https://tutrastero.com/es/servicios-online/autorizacion-de-terceros/", "Gestionar mis accesos")
-    return build("CGI Autorizar Terceros - tutrastero", BANNER_AUTORIZAR, body, btn)
+    body, cta, after = _load_template("autorizar_terceros.html", nombre=nombre or "cliente")
+    return build("CGI Autorizar Terceros - tutrastero", BANNER_AUTORIZAR, body, cta, after)
 
 
 def actualizar_datos_email(nombre: str) -> str:
-    body = _load_body("actualizar_datos.html", nombre=nombre or "cliente")
-    btn = dark_btn("https://tutrastero.com/es/servicios-online/actualizar/", "Actualizar mis datos")
-    after = (
-        f'<p {_P}>Una vez dentro, podr&#225; modificar su tel&#233;fono, email, m&#233;todo de pago y m&#225;s.</p>'
-        f'<p {_P}><br></p>'
-        f'<p {_P}>Si no ha solicitado esta acci&#243;n o encuentra alguna dificultad, por favor, contacte con su asesor comercial.</p>'
-    )
-    return build("CGI Actualizar Datos - tutrastero", BANNER_ACTUALIZAR, body, btn, after)
+    body, cta, after = _load_template("actualizar_datos.html", nombre=nombre or "cliente")
+    return build("CGI Actualizar Datos - tutrastero", BANNER_ACTUALIZAR, body, cta, after)
 
 
 def hacer_inventario_email(nombre: str) -> str:
-    body = _load_body("hacer_inventario.html", nombre=nombre or "cliente")
-    btn = dark_btn("https://tutrastero.com/es/servicios-online/inventario/", "Hacer inventario")
-    return build("CGI Hacer Inventario - tutrastero", BANNER_INVENTARIO, body, btn)
+    body, cta, after = _load_template("hacer_inventario.html", nombre=nombre or "cliente")
+    return build("CGI Hacer Inventario - tutrastero", BANNER_INVENTARIO, body, cta, after)
 
 
 def hacer_valoracion_email(nombre: str) -> str:
-    body = _load_body("hacer_valoracion.html", nombre=nombre or "cliente")
-    btn = dark_btn("https://tutrastero.com/es/servicios-online/declaracion-de-valor/", "Indicar el valor de mis bienes")
-    return build("CGI Hacer Valoraci&#243;n - tutrastero", BANNER_VALORACION, body, btn)
+    body, cta, after = _load_template("hacer_valoracion.html", nombre=nombre or "cliente")
+    return build("CGI Hacer Valoraci&#243;n - tutrastero", BANNER_VALORACION, body, cta, after)
 
 
 def presupuesto_email(nombre: str) -> str:
-    body = _load_body("presupuesto.html", nombre=nombre or "cliente")
-    btn = dark_btn("https://tutrastero.com/es/solicitud-de-presupuesto/", "Quiero mi presupuesto")
-    return build("CGI Presupuesto - tutrastero", BANNER_PRESUPUESTO, body, btn)
+    body, cta, after = _load_template("presupuesto.html", nombre=nombre or "cliente")
+    return build("CGI Presupuesto - tutrastero", BANNER_PRESUPUESTO, body, cta, after)

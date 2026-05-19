@@ -1,4 +1,5 @@
 """handlers/email_templates.py — Blueprint-exact branded email HTML builder."""
+from pathlib import Path
 
 _CDN  = "https://holcqv.stripocdn.email/content/guids/"
 _C919 = _CDN + "CABINET_919ce8fd7f58c2840e854953c4ed3c482eae34e1c2343e5f2a9178c0f557e6ec/images/"
@@ -377,84 +378,45 @@ a[x-apple-data-detectors],#MessageViewBody a {{color:inherit!important;text-deco
 # Per-category template functions
 # ─────────────────────────────────────────────────────────────────────────────
 
+_TEMPLATES_DIR = Path(__file__).parent.parent / "templates" / "emails"
+
+
+def _load_body(filename: str, **kwargs) -> str:
+    """Load an HTML fragment from templates/emails/ and substitute {placeholders}."""
+    content = (_TEMPLATES_DIR / filename).read_text(encoding="utf-8")
+    for key, val in kwargs.items():
+        content = content.replace(f"{{{key}}}", str(val))
+    return content.strip()
+
+
 def ticket_email(nombre: str, lead_id: str) -> str:
     """Generic humano/ticket — bot_humano.py and Otros."""
-    n = nombre or "cliente"
-    body = (
-        f'<p {_P}>Estimado/a {n}<br><br></p>'
-        f'<p {_PT}>Hemos recibido su correo y se ha generado el siguiente n&#250;mero de ticket '
-        f'<strong class="es-text-mobile-size-18" style="font-size:18px">#{lead_id}</strong>'
-        f'<span style="line-height:200%">.<br><br>'
-        f'A continuaci&#243;n uno de nuestros gestores se comunicar&#225; con usted para brindarle una atenci&#243;n personalizada. '
-        f'Agradecemos su confianza.</span></p>'
-    )
+    body = _load_body("ticket.html", nombre=nombre or "cliente", lead_id=lead_id)
     return build("CGI OtrosGen&#233;rico - tutrastero", BANNER_TICKET, body, is_ticket=True)
 
 
 def cambio_trastero_email(nombre: str, lead_id: str) -> str:
-    n = nombre or "cliente"
-    body = (
-        f'<p {_P}>Estimado/a {n}<br><br></p>'
-        f'<p {_PT}>Hemos recibido su solicitud de cambio de trastero y se ha generado el siguiente n&#250;mero de ticket '
-        f'<strong class="es-text-mobile-size-18" style="font-size:18px"> #{lead_id}</strong>'
-        f'<span style="line-height:200%">.<br><br>'
-        f'A continuaci&#243;n uno de nuestros gestores se comunicar&#225; con usted para brindarle una atenci&#243;n personalizada. '
-        f'Agradecemos su confianza.</span></p>'
-    )
+    body = _load_body("cambio_trastero.html", nombre=nombre or "cliente", lead_id=lead_id)
     return build("CGI OtrosGen&#233;rico - tutrastero", BANNER_TICKET, body, is_ticket=True)
 
 
 def resena_ticket_email(nombre: str, lead_id: str) -> str:
-    n = nombre or "cliente"
-    body = (
-        f'<p {_P}>Estimado/a {n} <br><br></p>'
-        f'<p {_PT}>Gracias por compartir su experiencia con nosotros. Para una mejor gesti&#243;n de su caso '
-        f'hemos generado el siguiente n&#250;mero de ticket '
-        f'<strong class="es-text-mobile-size-18" style="font-size:18px">#{lead_id}</strong>'
-        f'<span style="line-height:200%">.<br><br>'
-        f'A continuaci&#243;n uno de nuestros gestores se comunicar&#225; con usted para brindarle una atenci&#243;n personalizada. '
-        f'Agradecemos su confianza.</span></p>'
-    )
+    body = _load_body("resena_ticket.html", nombre=nombre or "cliente", lead_id=lead_id)
     return build("CGI OtrosGen&#233;rico - tutrastero", BANNER_TICKET, body, is_ticket=True)
 
 
 def otros_ticket_email(nombre: str, lead_id: str) -> str:
-    n = nombre or "cliente"
-    body = (
-        f'<p {_P}>Estimado/a {n}<br><br></p>'
-        f'<p {_PT}>Hemos recibido su consulta y se ha generado el siguiente n&#250;mero de ticket '
-        f'<strong class="es-text-mobile-size-18" style="font-size:18px">#{lead_id}</strong>'
-        f'<span style="line-height:200%">.<br><br>'
-        f'A continuaci&#243;n uno de nuestros gestores se comunicar&#225; con usted para brindarle una atenci&#243;n personalizada. '
-        f'Agradecemos su confianza.</span></p>'
-    )
+    body = _load_body("otros_ticket.html", nombre=nombre or "cliente", lead_id=lead_id)
     return build("CGI OtrosGen&#233;rico - tutrastero", BANNER_TICKET, body, is_ticket=True)
 
 
 def foto_salida_ticket_email(nombre: str, lead_id: str) -> str:
-    n = nombre or "cliente"
-    body = (
-        f'<p {_P}>Estimado/a {n}<br><br></p>'
-        f'<p {_PT}>Hemos recibido su requerimiento y se ha generado el siguiente n&#250;mero de ticket '
-        f'<strong class="es-text-mobile-size-18" style="font-size:18px">#{lead_id} </strong>'
-        f'<span style="line-height:200%">.<br><br>'
-        f'A continuaci&#243;n uno de nuestros gestores se comunicar&#225; con usted para brindarle una atenci&#243;n personalizada. '
-        f'Agradecemos su confianza.</span></p>'
-    )
+    body = _load_body("foto_salida_ticket.html", nombre=nombre or "cliente", lead_id=lead_id)
     return build("CGI OtrosGen&#233;rico - tutrastero", BANNER_TICKET, body, is_ticket=True)
 
 
 def area_cliente_email(nombre: str) -> str:
-    n = nombre or "cliente"
-    body = (
-        f'<p {_P}>Estimado/a {n}</p>'
-        f'<p {_P}><br></p>'
-        f'<p {_P}>Hemos recibido su solicitud correctamente.</p>'
-        f'<p {_P}><br></p>'
-        f'<p {_P}>Para continuar, por favor,&nbsp; '
-        f'<strong style="font-weight:700 !important">acceda a su &#193;rea de Cliente a trav&#233;s del siguiente bot&#243;n</strong>. '
-        f'Desde all&#237; podr&#225; finalizar la gesti&#243;n.</p>'
-    )
+    body = _load_body("area_cliente.html", nombre=nombre or "cliente")
     btn = dark_btn("https://administracion.tutrastero.com/validate-client", "&#193;rea de cliente")
     after = (
         f'<p {_P}>Si usted no ha realizado esta solicitud o tiene problemas para acceder, '
@@ -464,58 +426,19 @@ def area_cliente_email(nombre: str) -> str:
 
 
 def mudanza_email(nombre: str) -> str:
-    n = nombre or "cliente"
-    body = (
-        f'<p {_P}>Estimado/a {n}</p>'
-        f'<p {_P}><br></p>'
-        f'<p {_P}>Hemos recibido su consulta y le agradecemos su inter&#233;s en nuestros servicios.</p>'
-        f'<p {_P}><br></p>'
-        f'<p {_P}>Descubra nuestro<strong>&nbsp;servicio de mudanzas nacionales en toda Espa&#241;a&nbsp;</strong>y'
-        f'<strong>&nbsp;locales</strong>&nbsp;a&nbsp;<strong>particulares&nbsp;</strong>y&nbsp;<strong>oficinas</strong>. '
-        f'Un servicio completo de embalaje profesional y transporte con nuestras&nbsp;<strong>cajas mudanza</strong>&nbsp;y'
-        f'<strong>&nbsp;material de embalaje</strong>&nbsp;s&#250;per resistentes.</p>'
-    )
+    body = _load_body("mudanza.html", nombre=nombre or "cliente")
     btn = light_btn(_MUDANZA_URL, "&#161;Solicite su mudanza aqu&#237;!")
     return build("CGI Mudanza - tutrastero", BANNER_MUDANZA_IMG, body, btn)
 
 
 def materiales_email(nombre: str) -> str:
-    n = nombre or "cliente"
-    body = (
-        f'<p {_P}>Estimado/a {n}<br><br></p>'
-        f'<p {_P}>Gracias por comunicarse con nosotros.</p>'
-        f'<p {_P}><br></p>'
-        f'<p {_P}>Descubra el top ventas de las&nbsp;<strong>cajas de cart&#243;n</strong>&nbsp;para mudanzas de gran&nbsp;'
-        f'<strong>calidad</strong>,&nbsp;<strong>sostenibles</strong>, al&nbsp;<strong>mejor precio</strong>&nbsp;y de&nbsp;'
-        f'<strong>varios tama&#241;os</strong>.</p>'
-        f'<p {_P}><br></p>'
-        f'<p {_P}>Descubra el top ventas de&nbsp;<strong>material de embalaje</strong>&nbsp;necesario para embalar '
-        f'y transportar sus cosas con total protecci&#243;n.</p>'
-        f'<p {_P}><br></p>'
-        f'<p {_P}>Descubra todos los&nbsp;<strong>accesorios</strong>&nbsp;necesarios&nbsp;<strong>para embalar</strong>, '
-        f'transportar&nbsp;<strong>y almacenar</strong> sus cosas como un profesional.</p>'
-        f'<p {_P}><br></p>'
-        f'<p {_P}>Consiga todo esto y m&#225;s en nuestra tienda virtual.</p>'
-    )
+    body = _load_body("materiales.html", nombre=nombre or "cliente")
     btn = light_btn("https://www.tucaja.com/", "&#161;Compre aqu&#237;!")
     return build("CGI Materiales Embalaje - tutrastero", BANNER_MUDANZA_IMG, body, btn)
 
 
 def moroso_email(nombre: str) -> str:
-    n = nombre or "cliente"
-    body = (
-        f'<p {_P}>Estimado/a {n}</p>'
-        f'<p {_P}><br></p>'
-        f'<p {_PL}>Le informamos de que, al constar una factura pendiente, su acceso '
-        f'<strong>quedar&#225; inhabilitado temporalmente</strong>.</p>'
-        f'<p {_PL}><br></p>'
-        f'<p {_PL}>Entendemos que puede tratarse de un descuido administrativo, pero para evitar la interrupci&#243;n '
-        f'del servicio y gastos de gesti&#243;n innecesarios, es necesario que '
-        f'<strong>regularice su situaci&#243;n lo antes posible</strong>.</p>'
-        f'<p {_PL}><br></p>'
-        f'<p {_PL}>Puede realizar el pago de forma inmediata y segura entrando en su <strong>&#193;rea de Cliente</strong>:</p>'
-        f'<p {_PL}><strong><br></strong></p>'
-    )
+    body = _load_body("moroso.html", nombre=nombre or "cliente")
     btn = dark_btn("https://administracion.tutrastero.com/validate-client", "&#193;rea de Cliente")
     after = (
         f'<p {_PL}>Quedamos a su disposici&#243;n.</p>'
@@ -531,18 +454,7 @@ def moroso_email(nombre: str) -> str:
 
 
 def desestima_email(nombre: str) -> str:
-    n = nombre or "cliente"
-    body = (
-        f'<p {_P}>Estimado/a {n}</p>'
-        f'<p {_P}><br></p>'
-        f'<p {_PL}>Gracias por su inter&#233;s en <strong>Tu Trastero&#174;</strong>.</p>'
-        f'<p {_PL}><br></p>'
-        f'<p {_PL}>Entendemos que los planes pueden cambiar, por lo que simplemente queremos recordarle '
-        f'que seguimos a su disposici&#243;n.</p>'
-        f'<p {_PL}><br></p>'
-        f'<p {_PL}>Si en el futuro decide retomar su gesti&#243;n, puede <strong>reservar o contratar su trastero</strong> '
-        f'c&#243;modamente desde nuestra web:</p>'
-    )
+    body = _load_body("desestima.html", nombre=nombre or "cliente")
     _reservar_url = (
         "https://administracion.tutrastero.com/form/contratacion-online"
         "?utm_campaign=Contrataci%C3%B3n+Online&utm_medium=bitly"
@@ -560,32 +472,13 @@ def desestima_email(nombre: str) -> str:
 # ── Área General CTA emails ───────────────────────────────────────────────────
 
 def agendar_visita_email(nombre: str) -> str:
-    n = nombre or "cliente"
-    body = (
-        f'<p {_P}>Estimado/a {n}</p>'
-        f'<p {_P}><br></p>'
-        f'<p {_P}>Gracias por su inter&#233;s. Para facilitar la coordinaci&#243;n de su visita, le invitamos a usar '
-        f'nuestro sistema de reservas online. En &#233;l podr&#225; seleccionar el '
-        f'<strong>centro de su preferencia</strong>, as&#237; como la<strong> fecha y hora</strong> que mejor le convengan.</p>'
-        f'<p {_P}><br></p>'
-        f'<p {_P}>El proceso es r&#225;pido y sencillo. Solo tiene que hacer clic en el siguiente bot&#243;n para comenzar:</p>'
-    )
+    body = _load_body("agendar_visita.html", nombre=nombre or "cliente")
     btn = dark_btn("https://tutrastero.com/es/agendar-visita/", "Agendar mi visita ahora")
     return build("CGI Agendar Visita - tutrastero", BANNER_AGENDAR, body, btn)
 
 
 def reservar_trastero_email(nombre: str) -> str:
-    n = nombre or "cliente"
-    body = (
-        f'<p {_P}>Estimado/a {n}</p>'
-        f'<p {_P}><br></p>'
-        f'<p {_P}>Gracias por su inter&#233;s en Tu Trastero. Est&#225; a un solo paso de tener el trastero perfecto para usted.</p>'
-        f'<p {_P}><br></p>'
-        f'<p {_P}>Le invitamos a completar su reserva a trav&#233;s de nuestro portal seguro. Al hacerlo, podr&#225; '
-        f'<strong>garantizar la disponibilidad inmediata del espacio, el tama&#241;o y las fechas</strong> que necesita.</p>'
-        f'<p {_P}><br></p>'
-        f'<p {_P}>Para finalizar el proceso, por favor, haga clic en el siguiente bot&#243;n:</p>'
-    )
+    body = _load_body("reservar_trastero.html", nombre=nombre or "cliente")
     _url = (
         "https://administracion.tutrastero.com/form/contratacion-online"
         "?utm_campaign=Contrataci%C3%B3n+Online&utm_medium=bitly"
@@ -596,48 +489,19 @@ def reservar_trastero_email(nombre: str) -> str:
 
 
 def notificar_incidencia_email(nombre: str) -> str:
-    n = nombre or "cliente"
-    body = (
-        f'<p {_P}>Estimado/a {n}</p>'
-        f'<p {_P}><br></p>'
-        f'<p {_P}>En Tu Trastero&#174;, su tranquilidad es lo m&#225;s importante. Entendemos que a veces pueden surgir '
-        f'imprevistos y queremos que sepa que estamos aqu&#237; para ayudar a solucionarlos de la forma m&#225;s r&#225;pida '
-        f'y eficaz posible.</p>'
-        f'<p {_P}><br></p>'
-        f'<p {_P}>Para ello, hemos creado un portal de soporte directo. Si tiene cualquier incidencia, puede '
-        f'gestionarla f&#225;cilmente desde un &#250;nico lugar.</p>'
-        f'<p {_P}><br></p>'
-        f'<p {_P}>Haga clic en el siguiente bot&#243;n para abrir un caso y nuestro equipo se pondr&#225; en marcha:</p>'
-    )
+    body = _load_body("notificar_incidencia.html", nombre=nombre or "cliente")
     btn = dark_btn("https://tutrastero.com/es/servicios-online/gestion-incidencias/", "Reportar incidencia")
     return build("CGI Notificar Incidencia - tutrastero", BANNER_INCIDENCIA, body, btn)
 
 
 def autorizar_terceros_email(nombre: str) -> str:
-    n = nombre or "cliente"
-    body = (
-        f'<p {_P}>Estimado/a {n}</p>'
-        f'<p {_P}><br></p>'
-        f'<p {_PL}>En Tu Trastero&#174;, su seguridad y control son nuestra m&#225;xima prioridad. Por eso, le recordamos '
-        f'que tiene control total sobre qui&#233;n puede acceder a su trastero.</p>'
-        f'<p {_PL}><br></p>'
-        f'<p {_PL}>A trav&#233;s del siguiente bot&#243;n, puede <strong>autorizar a las personas </strong>para entrar a su '
-        f'm&#243;dulo de Tu Trastero&#174;, tal como lo har&#237;a usted mismo.</p>'
-    )
+    body = _load_body("autorizar_terceros.html", nombre=nombre or "cliente")
     btn = dark_btn("https://tutrastero.com/es/servicios-online/autorizacion-de-terceros/", "Gestionar mis accesos")
     return build("CGI Autorizar Terceros - tutrastero", BANNER_AUTORIZAR, body, btn)
 
 
 def actualizar_datos_email(nombre: str) -> str:
-    n = nombre or "cliente"
-    body = (
-        f'<p {_P}>Estimado/a {n}</p>'
-        f'<p {_P}><br></p>'
-        f'<p {_P}>Hemos recibido su solicitud para actualizar los datos de su contrato.</p>'
-        f'<p {_P}><br></p>'
-        f'<p {_P}>Para continuar, por favor, pulse el siguiente bot&#243;n. Le llevar&#225; directamente al formulario '
-        f'para que pueda realizar los cambios de forma segura.</p>'
-    )
+    body = _load_body("actualizar_datos.html", nombre=nombre or "cliente")
     btn = dark_btn("https://tutrastero.com/es/servicios-online/actualizar/", "Actualizar mis datos")
     after = (
         f'<p {_P}>Una vez dentro, podr&#225; modificar su tel&#233;fono, email, m&#233;todo de pago y m&#225;s.</p>'
@@ -648,51 +512,18 @@ def actualizar_datos_email(nombre: str) -> str:
 
 
 def hacer_inventario_email(nombre: str) -> str:
-    n = nombre or "cliente"
-    body = (
-        f'<p {_P}>Estimado/a {n}</p>'
-        f'<p {_P}><br></p>'
-        f'<p {_PL}>Gracias por contactar con el equipo de Tu Trastero&#174;.</p>'
-        f'<p {_PL}><br></p>'
-        f'<p {_P}>En respuesta a su consulta, la mejor manera de llevar un control detallado de tus pertenencias '
-        f'es utilizando nuestra herramienta de <strong>inventario digital</strong>.</p>'
-        f'<p {_P}><br></p>'
-        f'<p {_P}>Con ella, podr&#225;s <strong>crear un inventario de todas las pertenencias que guardar&#225;s en '
-        f'Tu Trastero&#174;</strong> y estar siempre organizado.</p>'
-    )
+    body = _load_body("hacer_inventario.html", nombre=nombre or "cliente")
     btn = dark_btn("https://tutrastero.com/es/servicios-online/inventario/", "Hacer inventario")
     return build("CGI Hacer Inventario - tutrastero", BANNER_INVENTARIO, body, btn)
 
 
 def hacer_valoracion_email(nombre: str) -> str:
-    n = nombre or "cliente"
-    body = (
-        f'<p {_P}>Estimado/a {n}</p>'
-        f'<p {_P}><br></p>'
-        f'<p {_P}>Gracias por contactarnos.</p>'
-        f'<p {_PL}><br></p>'
-        f'<p {_P}>En respuesta a su consulta, le confirmamos que la forma m&#225;s sencilla de registrar el valor '
-        f'de tus pertenencias es a trav&#233;s de nuestra herramienta de inventario online.</p>'
-        f'<p {_P}><br></p>'
-        f'<p {_P}>Dentro de ella, tiene la opci&#243;n de <strong>indicar el valor de cada una de las pertenencias '
-        f'que guarda en su m&#243;dulo.</strong> Esto es fundamental para tener un control total y asegurarte de '
-        f'que tu cobertura de seguro es la adecuada.</p>'
-        f'<p {_P}><br></p>'
-        f'<p {_P}>Puedes acceder directamente y empezar ahora mismo desde el siguiente bot&#243;n:</p>'
-    )
+    body = _load_body("hacer_valoracion.html", nombre=nombre or "cliente")
     btn = dark_btn("https://tutrastero.com/es/servicios-online/declaracion-de-valor/", "Indicar el valor de mis bienes")
     return build("CGI Hacer Valoraci&#243;n - tutrastero", BANNER_VALORACION, body, btn)
 
 
 def presupuesto_email(nombre: str) -> str:
-    n = nombre or "cliente"
-    body = (
-        f'<p {_P}>Estimado/a {n}</p>'
-        f'<p {_P}><br></p>'
-        f'<p {_P}>Gracias por su inter&#233;s en Tu Trastero&#174;.</p>'
-        f'<p {_P}><br></p>'
-        f'<p {_P}>Consiga su presupuesto a su medida y sin compromiso desde nuestra web, '
-        f'haciendo clic en el siguiente bot&#243;n.</p>'
-    )
+    body = _load_body("presupuesto.html", nombre=nombre or "cliente")
     btn = dark_btn("https://tutrastero.com/es/solicitud-de-presupuesto/", "Quiero mi presupuesto")
     return build("CGI Presupuesto - tutrastero", BANNER_PRESUPUESTO, body, btn)

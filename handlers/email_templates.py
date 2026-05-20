@@ -386,7 +386,7 @@ def _load_template(filename: str, **kwargs) -> tuple:
     """Load a template file and return (body, cta_html, after_html, is_full_html).
 
     Full HTML mode — paste a complete email HTML (starts with <!DOCTYPE or <html):
-      Python sends it as-is after substituting {nombre} / {lead_id}.
+      Python sends it as-is after substituting {nombre} / {ticket_id}.
 
     Fragment mode — HTML snippet with optional meta-comments:
       <!-- cta-dark: https://url/ | Button text -->
@@ -426,30 +426,30 @@ def _render(filename: str, title: str, banner: str, is_ticket: bool = False, **k
     return build(title, banner, body, cta, after, is_ticket=is_ticket)
 
 
-def ticket_email(nombre: str, lead_id: str) -> str:
+def ticket_email(nombre: str, ticket_id: str) -> str:
     """Generic humano/ticket — bot_humano.py and Otros."""
     return _render("ticket.html", "CGI OtrosGen&#233;rico - tutrastero", BANNER_TICKET,
-                   is_ticket=True, nombre=nombre or "cliente", lead_id=lead_id)
+                   is_ticket=True, nombre=nombre or "cliente", ticket_id=ticket_id)
 
 
-def cambio_trastero_email(nombre: str, lead_id: str) -> str:
+def cambio_trastero_email(nombre: str, ticket_id: str) -> str:
     return _render("cambio_trastero.html", "CGI OtrosGen&#233;rico - tutrastero", BANNER_TICKET,
-                   is_ticket=True, nombre=nombre or "cliente", lead_id=lead_id)
+                   is_ticket=True, nombre=nombre or "cliente", ticket_id=ticket_id)
 
 
-def resena_ticket_email(nombre: str, lead_id: str) -> str:
+def resena_ticket_email(nombre: str, ticket_id: str) -> str:
     return _render("resena_ticket.html", "CGI OtrosGen&#233;rico - tutrastero", BANNER_TICKET,
-                   is_ticket=True, nombre=nombre or "cliente", lead_id=lead_id)
+                   is_ticket=True, nombre=nombre or "cliente", ticket_id=ticket_id)
 
 
-def otros_ticket_email(nombre: str, lead_id: str) -> str:
+def otros_ticket_email(nombre: str, ticket_id: str) -> str:
     return _render("otros_ticket.html", "CGI OtrosGen&#233;rico - tutrastero", BANNER_TICKET,
-                   is_ticket=True, nombre=nombre or "cliente", lead_id=lead_id)
+                   is_ticket=True, nombre=nombre or "cliente", ticket_id=ticket_id)
 
 
-def foto_salida_ticket_email(nombre: str, lead_id: str) -> str:
+def foto_salida_ticket_email(nombre: str, ticket_id: str) -> str:
     return _render("foto_salida_ticket.html", "CGI OtrosGen&#233;rico - tutrastero", BANNER_TICKET,
-                   is_ticket=True, nombre=nombre or "cliente", lead_id=lead_id)
+                   is_ticket=True, nombre=nombre or "cliente", ticket_id=ticket_id)
 
 
 def area_cliente_email(nombre: str) -> str:

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -64,7 +64,7 @@ flowchart TD
       K -- SÍ --> L
       K -- NO → bot --> M
 
-      L["Buscar contacto Bitrix por from_email\nEnviar 📧 TICKET al cliente\n  Asunto: Número de Ticket #lead_id\nActualizar Lead:\n  STAGE_ID = UC_BZJ6XN\n  TITLE = CGI - Requiere HUMANO\nComentario en timeline Bitrix\nActualizar Clasificación:\n  acciones_1 = Se deriva con gestor\n  humano_bot = humano"]
+      L["Buscar contacto Bitrix por from_email\nEnviar 📧 TICKET al cliente\n  Asunto: Número de Ticket #ticket_id\nActualizar Item 1034:\n  stageId = DT1034_120:CLIENT\n  TITLE = CGI - Requiere HUMANO\nComentario en timeline Bitrix\nActualizar Clasificación:\n  acciones_1 = Se deriva con gestor\n  humano_bot = humano"]
       L --> LEND([🧑 HUMANO · FIN])
 
       M{"GATE router 25\nbot_humano == bot\nAND\ntipo == Requerimiento OR cliente == True"}
@@ -73,7 +73,7 @@ flowchart TD
       M -- SÍ --> N
 
       N{"categoria in\nÁREA GENERAL?"}
-      N -- SÍ --> O["[1.4] Respuestas Área General\n─────────────────────────\nActualizar Airtable Clasificación\nActualizar Lead Bitrix + timeline\nEnviar 📧 email CTA al cliente\n─────────────────────────\nAgendar Visita\nReservar Tu Trastero\nNotificar Incidencia\nHacer Valoración\nHacer Inventario\nAutorizar a Terceros\nActualizar Tus Datos\nPresupuesto\nCambio de trastero → ticket STAGE=UC_M25V3A"]
+      N -- SÍ --> O["[1.4] Respuestas Área General\n─────────────────────────\nActualizar Airtable Clasificación\nActualizar Lead Bitrix + timeline\nEnviar 📧 email CTA al cliente\n─────────────────────────\nAgendar Visita\nReservar Tu Trastero\nNotificar Incidencia\nHacer Valoración\nHacer Inventario\nAutorizar a Terceros\nActualizar Tus Datos\nPresupuesto\nCambio de trastero → ticket STAGE=DT1034_120:PREPARATION"]
       O --> OEND([✅ CTA área general · FIN])
 
       N -- NO --> P{"categoria in\nÁREA CLIENTE?"}
@@ -86,11 +86,11 @@ flowchart TD
 
       S -- Mudanza --> S1["📧 email Mudanza\nActualizar Lead EXITOSA\nClasif: Se deriva · humano"]
       S -- Materiales de embalaje --> S2["📧 email Materiales\nActualizar Lead\nClasif: Enlace a web · bot"]
-      S -- Otros --> S3["📧 email Ticket Otros #lead_id\nLead STAGE = UC_M25V3A\nClasif: Se deriva · humano"]
-      S -- Reseña google --> S4["📧 email Reseña Ticket #lead_id\nClasif: Se deriva · humano"]
+      S -- Otros --> S3["📧 email Ticket Otros #ticket_id\nLead STAGE = DT1034_120:PREPARATION\nClasif: Se deriva · humano"]
+      S -- Reseña google --> S4["📧 email Reseña Ticket #ticket_id\nClasif: Se deriva · humano"]
       S -- Moroso --> S5["📧 email Moroso\nClasif: Enlace a web · bot"]
       S -- Desestima Oferta --> S6["📧 email Desestima\nClasif: Enlace a web · bot"]
-      S -- Foto Salida --> S7["📧 email Foto Ticket #lead_id\nClasif: Se deriva · humano"]
+      S -- Foto Salida --> S7["📧 email Foto Ticket #ticket_id\nClasif: Se deriva · humano"]
       S1 & S2 & S3 & S4 & S5 & S6 & S7 --> SEND([✅ Otros servicios · FIN])
     end
 
@@ -98,7 +98,7 @@ flowchart TD
     subgraph CADENA ["🔄 HILO EXISTENTE (CADENA)"]
       direction TB
 
-      Z1["Recuperar de Airtable Datos extraídos:\nnombre · lead_id · categoria_api · tipo"]
+      Z1["Recuperar de Airtable Datos extraídos:\nnombre · ticket_id · categoria_api · tipo"]
 
       Z1 --> Z2["[1.5] SIEMPRE con datos existentes\n────────────────────────\nbot == humano → enviar ticket email\n  actualizar Lead + Airtable\nbot == bot → status ok"]
 

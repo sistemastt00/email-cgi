@@ -55,13 +55,18 @@ async def run(args: dict) -> dict:
 
         if ticket_id:
             item_fields = {
-                "stageId":      "DT1034_120:PREPARATION",
-                "assignedById": "6358",
-                "title":        "CGI - Cambio de titular/modulo",
+                "stageId": "DT1034_120:PREPARATION",
+                "title":   "CGI - Cambio de titular/modulo",
             }
             if contact_id:
                 item_fields["contactId"] = contact_id
+            else:
+                item_fields["assignedById"] = "22"
             await bitrix.update_crm_item(1034, ticket_id, item_fields)
+            await bitrix.add_timeline_comment(
+                "dynamic_1034", ticket_id,
+                "Comunicarse con cliente: Cambio de trastero.",
+            )
 
         if clasif_id:
             await airtable.update_record(config.AT_TBL_CLASIFICACION, clasif_id, {

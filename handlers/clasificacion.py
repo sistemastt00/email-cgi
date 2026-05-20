@@ -347,7 +347,7 @@ async def _send_area_cliente_email(
         await bitrix.update_crm_item(1034, ticket_id, {
             "assignedById": "6358",
             "title":        f"CGI - Respuesta EXITOSA: {categoria}",
-            "stageId":      "DT1034_120:CLIENT",
+            "stageId":      "DT1034_120:SUCCESS",
         })
         await bitrix.add_timeline_comment(
             "dynamic_1034", ticket_id,
@@ -384,7 +384,7 @@ async def _send_otros_servicios_email(
             await bitrix.update_crm_item(1034, ticket_id, {
                 "assignedById": "6358",
                 "title":        "CGI - Respuesta EXITOSA: Mudanza",
-                "stageId":      "DT1034_120:PREPARATION",
+                "stageId":      "DT1034_120:SUCCESS",
             })
         if clasif_id:
             await airtable.update_record(config.AT_TBL_CLASIFICACION, clasif_id, {
@@ -417,12 +417,6 @@ async def _send_otros_servicios_email(
             body=email_templates.otros_ticket_email(nombre, ticket_id),
             body_type="html", bcc=_BCC,
         )
-        if ticket_id:
-            await bitrix.update_crm_item(1034, ticket_id, {
-                "stageId":      "DT1034_120:PREPARATION",
-                "assignedById": "6358",
-                "title":        "CGI - Respuesta EXITOSA: (Sin clasificar)",
-            })
         if clasif_id:
             await airtable.update_record(config.AT_TBL_CLASIFICACION, clasif_id, {
                 "fldXQvHFuiY9ebvYa": "Se deriva con gestor",
@@ -456,6 +450,16 @@ async def _send_otros_servicios_email(
             body=email_templates.moroso_email(nombre),
             body_type="html", bcc=_BCC,
         )
+        if ticket_id:
+            await bitrix.update_crm_item(1034, ticket_id, {
+                "stageId":      "DT1034_120:CLIENT",
+                "assignedById": "43712",
+            })
+            await bitrix.add_timeline_comment(
+                "dynamic_1034", ticket_id,
+                f"Se indicó al CLIENTE que el acceso a su trastero será inhabilitado en caso de impago.\n"
+                f"NAME: {nombre}, EMAIL: {from_email}",
+            )
         if clasif_id:
             await airtable.update_record(config.AT_TBL_CLASIFICACION, clasif_id, {
                 "fldgj898WCeUM3QqV": "Enlace a web",
@@ -469,6 +473,15 @@ async def _send_otros_servicios_email(
             body=email_templates.desestima_email(nombre),
             body_type="html", bcc=_BCC,
         )
+        if ticket_id:
+            await bitrix.update_crm_item(1034, ticket_id, {
+                "stageId": "DT1034_120:PREPARATION",
+            })
+            await bitrix.add_timeline_comment(
+                "dynamic_1034", ticket_id,
+                f"El CLIENTE DESESTIMA la oferta por la contratación de su módulo.\n"
+                f"NAME: {nombre}, EMAIL: {from_email}",
+            )
         if clasif_id:
             await airtable.update_record(config.AT_TBL_CLASIFICACION, clasif_id, {
                 "fldgj898WCeUM3QqV": "Enlace a web",
@@ -476,12 +489,33 @@ async def _send_otros_servicios_email(
             })
 
     elif "foto" in cat or "foto" in capi:
+        foto_contacts = await bitrix.search_contacts_by_email(from_email)
+        foto_contact_found = len(foto_contacts) > 0
         await gmail.send_email(
             to=[from_email],
             subject=f"Número de Ticket #{ticket_id}",
             body=email_templates.foto_salida_ticket_email(nombre, ticket_id),
             body_type="html", bcc=_BCC,
         )
+        if ticket_id:
+            if foto_contact_found:
+                await bitrix.update_crm_item(1034, ticket_id, {
+                    "stageId": "DT1034_120:SUCCESS",
+                })
+                await bitrix.add_timeline_comment(
+                    "dynamic_1034", ticket_id,
+                    "Se reenvió al cliente URL para que suba las fotos de estado del trastero.",
+                )
+            else:
+                await bitrix.update_crm_item(1034, ticket_id, {
+                    "stageId":      "DT1034_120:CLIENT",
+                    "assignedById": "20",
+                })
+                await bitrix.add_timeline_comment(
+                    "dynamic_1034", ticket_id,
+                    f"Se reenvió al cliente URL para que suba las fotos de estado del trastero.\n"
+                    f"NAME: {nombre}, EMAIL: {from_email}",
+                )
         if clasif_id:
             await airtable.update_record(config.AT_TBL_CLASIFICACION, clasif_id, {
                 "fldXQvHFuiY9ebvYa": "Se deriva con gestor",

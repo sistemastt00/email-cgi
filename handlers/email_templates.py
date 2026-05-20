@@ -393,7 +393,7 @@ def _load_template(filename: str, **kwargs) -> tuple:
       <!-- cta-light: https://url/ | Button text -->
       <!-- after --> ... <!-- /after -->
     """
-    content = (_TEMPLATES_DIR / filename).read_text(encoding="utf-8")
+    content = (_TEMPLATES_DIR / filename).read_text(encoding="utf-8-sig")
     for key, val in kwargs.items():
         content = content.replace(f"{{{key}}}", str(val))
 

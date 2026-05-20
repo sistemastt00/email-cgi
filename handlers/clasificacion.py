@@ -436,6 +436,17 @@ async def _send_otros_servicios_email(
             body=email_templates.resena_ticket_email(nombre, ticket_id),
             body_type="html", bcc=_BCC,
         )
+        if ticket_id:
+            contacts = await bitrix.search_contacts_by_email(from_email)
+            if contacts:
+                await bitrix.update_crm_item(1034, ticket_id, {
+                    "stageId": "DT1034_120:SUCCESS",
+                })
+            else:
+                await bitrix.update_crm_item(1034, ticket_id, {
+                    "stageId":      "DT1034_120:SUCCESS",
+                    "assignedById": "22",
+                })
         if clasif_id:
             await airtable.update_record(config.AT_TBL_CLASIFICACION, clasif_id, {
                 "fldXQvHFuiY9ebvYa": "Se deriva con gestor",

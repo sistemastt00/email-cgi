@@ -203,7 +203,7 @@ async def _without_contact(args, gpt_data, from_email, email_to, subject, has_at
         "stageId":      "DT1034_120:NEW",
         "contactId":    contact_id,
         "sourceId":     "EMAIL",
-        "assignedById": _ASSIGNED_BY_ID,
+        "assignedById": "22",
     })
     ticket_id = str(item_resp.get("result", {}).get("item", {}).get("id", ""))
 

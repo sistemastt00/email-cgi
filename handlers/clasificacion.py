@@ -431,22 +431,18 @@ async def _send_otros_servicios_email(
 
     elif "reseña" in cat or "resena" in capi or "google" in cat:
         ticket_subj = f"Reseña recibida - Número de Ticket #{ticket_id}"
+        contacts = await bitrix.search_contacts_by_email(from_email)
+        contact_found = len(contacts) > 0
         await gmail.send_email(
             to=[from_email], subject=ticket_subj,
             body=email_templates.resena_ticket_email(nombre, ticket_id),
             body_type="html", bcc=_BCC,
         )
-        if ticket_id:
-            contacts = await bitrix.search_contacts_by_email(from_email)
-            if contacts:
-                await bitrix.update_crm_item(1034, ticket_id, {
-                    "stageId": "DT1034_120:SUCCESS",
-                })
-            else:
-                await bitrix.update_crm_item(1034, ticket_id, {
-                    "stageId":      "DT1034_120:SUCCESS",
-                    "assignedById": "22",
-                })
+        if ticket_id and contact_found:
+            await bitrix.add_timeline_comment(
+                "dynamic_1034", ticket_id,
+                "Comunicarse con cliente.\n\nNota: el correo del remitente fue encontrado en la base de datos de Bitrix.",
+            )
         if clasif_id:
             await airtable.update_record(config.AT_TBL_CLASIFICACION, clasif_id, {
                 "fldXQvHFuiY9ebvYa": "Se deriva con gestor",

@@ -16,9 +16,17 @@ git commit -m "$MSG" 2>/dev/null || echo "    (sin cambios nuevos que commitear)
 git push
 
 echo "==> git pull en el servidor..."
-sshpass -p 'TuRasero.com' ssh -o StrictHostKeyChecking=no \
-  "$REMOTE_USER@$REMOTE_HOST" \
-  "git -C $REMOTE_DIR pull origin master && sudo systemctl restart $SERVICE && echo 'Servicio reiniciado OK'"
+REMOTE_CMD="git -C $REMOTE_DIR pull origin master && echo 'TuRasero.com' | sudo -S systemctl restart $SERVICE && echo 'Servicio reiniciado OK'"
+
+# Intentar con sshpass (WSL/Linux) o plink (Windows)
+if command -v sshpass &>/dev/null; then
+  sshpass -p 'TuRasero.com' ssh -o StrictHostKeyChecking=no "$REMOTE_USER@$REMOTE_HOST" "$REMOTE_CMD"
+elif [ -f "/mnt/c/Program Files/PuTTY/plink.exe" ]; then
+  echo yes | "/mnt/c/Program Files/PuTTY/plink.exe" -pw 'TuRasero.com' "$REMOTE_USER@$REMOTE_HOST" "$REMOTE_CMD"
+else
+  echo "ERROR: Instala sshpass (sudo apt install sshpass) o PuTTY"
+  exit 1
+fi
 
 echo ""
 echo "Despliegue completado."

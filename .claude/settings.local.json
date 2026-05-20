@@ -31,7 +31,12 @@
       "Bash(Measure-Object -Line)",
       "Bash(Select-Object -ExpandProperty Lines)",
       "Bash(python -c \"from handlers import email_templates; print\\('OK — import sin errores'\\)\")",
-      "Bash(python -c ' *)"
+      "Bash(python -c ' *)",
+      "Bash(where plink *)",
+      "Bash(python3)",
+      "Bash(python)",
+      "Bash(powershell -Command \"\\(Get-Content '1. Clasificación de correos CGI.blueprint.json' | Measure-Object -Line\\).Lines\")",
+      "Bash(powershell -Command \"Select-String -Pattern '\\\\\"id\\\\\": \\(2[5-9]|[3-9][0-9]\\)' '1. Clasificación de correos CGI.blueprint.json' | Select-Object -First 20\")"
     ]
   }
 }

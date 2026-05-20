@@ -206,10 +206,10 @@ async def classify_tipo(
     model: str = None,
 ) -> str:
     """
-    Clasifica el tipo del correo: Requerimiento, Informativo, Interno o Malicioso.
+    Clasifica el tipo del correo: accion o informacion.
     examples_clasif: registros de BC_Ejemplos Clasificación
     examples_tipo:   registros de BC_Ejemplos Tipo (campos: Fragmento de Correo, Tipo de correo)
-    Devuelve: "Requerimiento" | "Informativo" | "Interno" | "Malicioso"
+    Devuelve: "accion" | "informacion"
     """
     examples_clasif_text = json.dumps(examples_clasif, ensure_ascii=False)
     examples_tipo_text   = json.dumps(examples_tipo,   ensure_ascii=False)
@@ -217,28 +217,24 @@ async def classify_tipo(
     prompt = (
         "Eres un asistente experto en la clasificación de correos para un negocio de self-storage. "
         "Tu principal tarea es analizar e identificar el \"tipo\" de correo electrónico. "
-        "Los tipos pueden ser \"Requerimiento\", \"Informativo\",  \"Interno\" o \"Malicioso\"\n\n"
-        f"- Requerimiento: en base, primero, al cuerpo y, luego, al asunto del correo electrónico "
+        "Los tipos pueden ser \"accion\" o \"informacion\"\n\n"
+        f"- accion: en base, primero, al cuerpo y, luego, al asunto del correo electrónico "
         f"de categoría {categoria}, analiza si el emisor solicita o requiere cierta información "
         f"relacionada a la categoría identificada. Además, en base a la categoría {categoria} y a "
         f"los ejemplos de la base de conocimiento {examples_clasif_text}, identifica si brinda "
         "información con el objetivo de solicitar algo referente a la categoría "
         f"{categoria}. Además, analiza si la intención del mensaje es para reclamar algo y espera "
         "una respuesta.  En caso la categoría "
-        f"{categoria} sea \"Mis Documentos\", \"Documentos Generales\", \"Claves de Acceso\", "
-        "\"Pagar Facturas\", \"Ver Facturas\", \"Renueve Promocion\", \"Cancelar Tu Trastero\",  "
-        "\"Notificar Incidencia\" has un análisis más profundo, y determina si el emisor hace una "
-        "solicitud, y clasificalo como \"Requerimiento\".\n\n"
-        "- Informativo: en base, primero, al cuerpo y, luego, al asunto del correo electrónico de "
+        f"{categoria} sea \"mis_documentos\", \"documentos_generales\", \"claves_acceso\", "
+        "\"pagar_facturas\", \"ver_facturas\", \"renueve_promocion\", \"aviso_salida\", "
+        "\"incidencia\" has un análisis más profundo, y determina si el emisor hace una "
+        "solicitud, y clasificalo como \"accion\".\n\n"
+        "- informacion: en base, primero, al cuerpo y, luego, al asunto del correo electrónico de "
         f"categoría {categoria}, analiza si el cuerpo del correo electrónico solo muestra información "
         "y no solicita nada respecto a la categoría. Además, esta categoría debe clasificar los correos "
         "que tengan intensión de vender, ofrecer o mostrar algún producto o servicio.\n\n"
-        f"- Interno:  si {from_email} contiene un dominio como @tutrastero.com, @mail-tutrastero.com, "
-        "soporte@trasterone.com o emails que incluyan \"tutrastero\" deben ser clasificados como "
-        "\"Interno\". Adicional a ello, en esta categoría entran emails de Jotform (por ejemplo, "
-        "encuestas de satisfacción), soporte@trasterone.com y similares. \n\n"
         f"--- EJEMPLOS DE TIPOS---\n{examples_tipo_text}\n\n"
-        "La salida debe ser una de las siguiente: \"Requerimiento\", \"Informativo\" o  \"Interno\""
+        "La salida debe ser una de las siguiente: \"accion\" o \"informacion\""
     )
 
     result = await extract_structured_data(
@@ -247,9 +243,9 @@ async def classify_tipo(
         parameters=[{
             "name": "tipo",
             "type": "string",
-            "description": "Requerimiento, Informativo o Interno",
+            "description": "accion o informacion",
             "isRequired": False,
         }],
         model=model,
     )
-    return result.get("tipo", "Informativo")
+    return result.get("tipo", "informacion")

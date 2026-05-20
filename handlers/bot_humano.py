@@ -39,6 +39,10 @@ async def run(args: dict) -> dict:
         logger.info(f"[1.5] bot_humano={bot_humano!r} — sin acción")
         return {"status": "ok", "bot_humano": bot_humano}
 
+    if categoria == "doble":
+        logger.info(f"[1.5] categoria=doble — gestionado por blueprint 1.5")
+        return {"status": "ok", "bot_humano": bot_humano, "categoria": "doble"}
+
     # 1. Email completo
     email      = await gmail.get_email(message_id)
     from_email = email.get("fromEmail", "")

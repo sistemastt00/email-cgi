@@ -40,30 +40,19 @@ _capture_handler.setFormatter(logging.Formatter("%(message)s"))
 _BCC = ["iacgi@tutrastero.com", "sistemas@tutrastero.com"]
 
 _AREA_GENERAL_CATS = {
-    "Agendar Visita", "Reservar Tu Trastero", "Notificar Incidencia",
-    "Hacer Valoración", "Hacer Inventario", "Autorizar a Terceros",
-    "Actualizar Tus Datos", "Cambio de Titular/Modulo", "Presupuesto",
-    "Cambio de trastero",
-    "agendar_visita", "reservar_trastero", "notificar_incidencia",
-    "hacer_valoracion", "hacer_inventario", "autorizar_terceros",
-    "actualizar_datos", "cambio_titular", "presupuesto", "cambio_trastero",
+    "agendar_visita", "reservar", "presupuesto", "autorizar_terceros",
+    "incidencia", "actualizar_datos", "inventario", "valoración",
+    "cambio_titular_modulo",
 }
 
 _AREA_CLIENTE_CATS = {
-    "Mis Documentos", "Documentos Generales", "Claves de Acceso",
-    "Pagar Facturas", "Ver Facturas", "Renueve Promocion", "Cancelar Tu Trastero",
     "mis_documentos", "documentos_generales", "claves_acceso",
-    "pagar_facturas", "ver_facturas", "renueve_promocion", "cancelar_trastero",
+    "pagar_facturas", "ver_facturas", "renueve_promocion", "aviso_salida",
 }
 
 _OTROS_SERVICIOS_CATS = {
-    "Mudanza", "mudanza",
-    "Materiales de embalaje", "tu_caja",
-    "Otros", "otros",
-    "Reseña google", "resena_google",
-    "Moroso", "moroso",
-    "Desestima Oferta", "desestima_oferta",
-    "Foto Salida", "foto_salida",
+    "mudanza", "materiales_embalaje", "otros", "resena_google",
+    "moroso", "desestima_oferta", "foto_salida",
 }
 
 
@@ -218,8 +207,8 @@ async def _process_email_inner(msg_stub: dict):
         except Exception as exc:
             logger.error(f"[1] Error en 1.0: {exc}", exc_info=True)
 
-        # 1.5 si (tipo==Requerimiento AND categoria!=Franquicia) OR cliente==True
-        is_req = tipo == "Requerimiento" and "franquicia" not in (categoria_api or categoria).lower()
+        # 1.5 si (tipo==accion AND categoria!=Franquicia) OR cliente==True
+        is_req = tipo == "accion" and "franquicia" not in (categoria_api or categoria).lower()
         if is_req or cliente:
             try:
                 r15 = await bot_humano.run({
@@ -293,8 +282,8 @@ async def _process_email_inner(msg_stub: dict):
         except Exception as exc:
             logger.error(f"[1] Error en 1.5 (cadena): {exc}", exc_info=True)
 
-        # 1.2 si bot_humano != "bot" AND tipo_existente == "Requerimiento" (módulo 90)
-        if bot_humano_result != "bot" and ex_tipo == "Requerimiento":
+        # 1.2 si bot_humano != "bot" AND tipo_existente == "accion" (módulo 90)
+        if bot_humano_result != "bot" and ex_tipo == "accion":
             try:
                 r90 = await extraccion_cadena.run({
                     "message_id":           message_id,

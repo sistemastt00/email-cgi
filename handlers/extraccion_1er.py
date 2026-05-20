@@ -5,9 +5,9 @@ Recibe (de clasificacion.py):
     message_id, thread_id, categoria_correo, tipo_correo, bot_humano, row, subject
 
 Lógica:
-  A) Si tipo != "Requerimiento"  → devuelve {"status": "ok"}
+  A) Si tipo != "accion"  → devuelve {"status": "ok"}
   B) Si categoria == "Franquicia" → GPT franquicia, crea Contact + item pipeline 169
-  C) Caso normal (Requerimiento, no Franquicia):
+  C) Caso normal (accion, no Franquicia):
      - GPT extrae: nombre, apellido, dni, telefono, n_contrato, n_modulo, centro
      - Si hay contacto en Bitrix → crea Lead con ese contacto
      - Si no hay contacto → crea Contact + Lead
@@ -101,9 +101,9 @@ async def run(args: dict) -> dict:
     categoria  = args.get("categoria_correo", "")
     tipo       = args.get("tipo_correo", "")
 
-    # A) No es Requerimiento
-    if tipo != "Requerimiento":
-        logger.info(f"[1.1] tipo={tipo!r} — no es Requerimiento, se omite extracción")
+    # A) No es accion
+    if tipo != "accion":
+        logger.info(f"[1.1] tipo={tipo!r} — no es accion, se omite extracción")
         return {"status": "ok"}
 
     email      = await gmail.get_email(message_id)
@@ -121,7 +121,7 @@ async def run(args: dict) -> dict:
     if categoria == "Franquicia":
         return await _handle_franquicia(args, from_email, email_to, subject, body)
 
-    # C) Requerimiento normal
+    # C) accion normal
     # Cargar centros para prompt
     centros_records = await airtable.search_records(config.AT_TBL_CENTROS, formula="", max_records=20)
     centros_list    = [r["fields"].get("Centro", "") for r in centros_records if r.get("fields")]

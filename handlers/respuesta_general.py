@@ -14,14 +14,14 @@ logger = logging.getLogger("email-cgi")
 _BCC = ["iacgi@tutrastero.com", "sistemas@tutrastero.com"]
 
 _EMAIL_BUILDERS = {
-    "Agendar Visita":       email_templates.agendar_visita_email,
-    "Reservar Tu Trastero": email_templates.reservar_trastero_email,
-    "Notificar Incidencia": email_templates.notificar_incidencia_email,
-    "Hacer Valoración":     email_templates.hacer_valoracion_email,
-    "Hacer Inventario":     email_templates.hacer_inventario_email,
-    "Autorizar a Terceros": email_templates.autorizar_terceros_email,
-    "Actualizar Tus Datos": email_templates.actualizar_datos_email,
-    "Presupuesto":          email_templates.presupuesto_email,
+    "agendar_visita":      email_templates.agendar_visita_email,
+    "reservar":            email_templates.reservar_trastero_email,
+    "incidencia":          email_templates.notificar_incidencia_email,
+    "valoración":          email_templates.hacer_valoracion_email,
+    "inventario":          email_templates.hacer_inventario_email,
+    "autorizar_terceros":  email_templates.autorizar_terceros_email,
+    "actualizar_datos":    email_templates.actualizar_datos_email,
+    "presupuesto":         email_templates.presupuesto_email,
 }
 
 
@@ -41,12 +41,12 @@ async def run(args: dict) -> dict:
 
     clasif_id = row or await _get_clasif_id(thread_id)
 
-    # ── Cambio de trastero ────────────────────────────────────────────────────
-    if categoria in {"Cambio de trastero", "cambio_trastero"}:
+    # ── Cambio de titular/modulo ──────────────────────────────────────────────
+    if categoria == "cambio_titular_modulo":
         contacts   = await bitrix.search_contacts_by_email(from_email)
         contact_id = contacts[0]["ID"] if contacts else None
 
-        ticket_subj = f"Solicitud Cambio de Trastero - Número de Ticket #{lead_id}"
+        ticket_subj = f"Solicitud Cambio de Titular/Modulo - Número de Ticket #{lead_id}"
         await gmail.send_email(
             to=[from_email], subject=ticket_subj,
             body=email_templates.cambio_trastero_email(nombre, lead_id),
@@ -57,7 +57,7 @@ async def run(args: dict) -> dict:
             lead_fields = {
                 "STAGE_ID":       "UC_M25V3A",
                 "ASSIGNED_BY_ID": "6358",
-                "TITLE":          "CGI - Cambio de trastero",
+                "TITLE":          "CGI - Cambio de titular/modulo",
             }
             if contact_id:
                 lead_fields["CONTACT_ID"] = contact_id
@@ -69,8 +69,8 @@ async def run(args: dict) -> dict:
                 "fldquQJeU5QJmNfBa": "humano",
             })
 
-        logger.info(f"[1.4] Cambio de trastero ticket enviado | lead_id={lead_id}")
-        return {"status": "ok", "categoria": categoria, "flujo": "cambio_trastero"}
+        logger.info(f"[1.4] Cambio de titular/modulo ticket enviado | lead_id={lead_id}")
+        return {"status": "ok", "categoria": categoria, "flujo": "cambio_titular_modulo"}
 
     # ── Flujo área general (CTA) ──────────────────────────────────────────────
 
@@ -94,7 +94,7 @@ async def run(args: dict) -> dict:
 
     # 3. Bitrix: TITLE y timeline (Presupuesto tiene texto propio)
     if lead_id:
-        if categoria == "Presupuesto":
+        if categoria == "presupuesto":
             bitrix_title = "CGI - Solicitud de Presupuesto"
             timeline_msg = "Se envió enlace a web al CLIENTE para que solicite presupuesto."
         else:

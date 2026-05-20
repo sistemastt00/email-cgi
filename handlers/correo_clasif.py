@@ -4,7 +4,7 @@ handlers/correo_clasif.py — Escenario 1.0: Correo de Clasificación
 Recibe:
     message_id       — ID del mensaje en Gmail
     row              — ID del registro en Airtable Clasificación (tblKSSUdMWhL1n2Sw)
-    lead_id          — ID del lead en Bitrix24 (de extraccion_1er)
+    ticket_id        — ID del item SPA 1034 en Bitrix24 (de extraccion_1er)
     categoria_correo — clasificación principal
     tipo_correo      — subtipo
     bot_humano       — "bot" | "humano"

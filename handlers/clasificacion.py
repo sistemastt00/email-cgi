@@ -92,7 +92,7 @@ async def _process_email_inner(msg_stub: dict):
             "categoria":  "—",
             "tipo":       "—",
             "bot_humano": "—",
-            "lead_id":    "—",
+            "ticket_id":  "—",
             "nombre":     "—",
             "resultado":  "Ignorado (blacklist)",
             "error":      False,
@@ -189,20 +189,20 @@ async def _process_email_inner(msg_stub: dict):
     # 7. Secuencia principal: solo si es hilo nuevo
     extrac_result = {}
     if is_new_thread:
-        # 1.1 primero (devuelve lead_id, nombre, Cliente)
+        # 1.1 primero (devuelve ticket_id, nombre, Cliente)
         try:
             extrac_result = await extraccion_1er.run(args_base)
             logger.info(f"[1] 1.1 ok | {extrac_result}")
         except Exception as exc:
             logger.error(f"[1] Error en 1.1: {exc}", exc_info=True)
 
-        lead_id = extrac_result.get("lead_id", "")
-        nombre  = extrac_result.get("nombre", "")
-        cliente = extrac_result.get("Cliente", False)
+        ticket_id = extrac_result.get("ticket_id", "")
+        nombre    = extrac_result.get("nombre", "")
+        cliente   = extrac_result.get("Cliente", False)
 
-        # 1.0 con lead_id de 1.1
+        # 1.0 con ticket_id de 1.1
         try:
-            r10 = await correo_clasif.run({**args_base, "lead_id": lead_id})
+            r10 = await correo_clasif.run({**args_base, "ticket_id": ticket_id})
             logger.info(f"[1] 1.0 ok | {r10}")
         except Exception as exc:
             logger.error(f"[1] Error en 1.0: {exc}", exc_info=True)
@@ -213,8 +213,8 @@ async def _process_email_inner(msg_stub: dict):
             try:
                 r15 = await bot_humano.run({
                     **args_base,
-                    "lead_id": lead_id,
-                    "nombre":  nombre,
+                    "ticket_id": ticket_id,
+                    "nombre":    nombre,
                 })
                 logger.info(f"[1] 1.5 ok | {r15}")
             except Exception as exc:
@@ -226,9 +226,9 @@ async def _process_email_inner(msg_stub: dict):
                 try:
                     r14 = await respuesta_general.run({
                         **args_base,
-                        "lead_id":  lead_id,
-                        "nombre":   nombre,
-                        "apellido": extrac_result.get("apellido", ""),
+                        "ticket_id": ticket_id,
+                        "nombre":    nombre,
+                        "apellido":  extrac_result.get("apellido", ""),
                     })
                     logger.info(f"[1] 1.4 ok | {r14}")
                 except Exception as exc:
@@ -237,7 +237,7 @@ async def _process_email_inner(msg_stub: dict):
             elif categoria in _AREA_CLIENTE_CATS or categoria_api in _AREA_CLIENTE_CATS:
                 try:
                     await _send_area_cliente_email(
-                        message_id=message_id, nombre=nombre, lead_id=lead_id,
+                        message_id=message_id, nombre=nombre, ticket_id=ticket_id,
                         clasif_id=clasif_record_id, categoria=categoria,
                     )
                     logger.info(f"[1] area_cliente email enviado | categoria={categoria}")
@@ -252,7 +252,7 @@ async def _process_email_inner(msg_stub: dict):
                 await _send_otros_servicios_email(
                     categoria=categoria, categoria_api=categoria_api,
                     from_email=from_email, subject=subject,
-                    nombre=nombre, lead_id=lead_id,
+                    nombre=nombre, ticket_id=ticket_id,
                     clasif_id=clasif_record_id, message_id=message_id,
                 )
                 logger.info(f"[1] otros_servicios ok | categoria={categoria}")
@@ -261,10 +261,10 @@ async def _process_email_inner(msg_stub: dict):
 
     # 8. Secuencia cadena: si hay registro existente en Datos extraídos
     if existing:
-        ex_nombre    = existing_fields.get("nombre", "")
-        ex_lead_id   = existing_fields.get("lead_id", "")
-        ex_categoria = existing_fields.get("categoria_api", "")
-        ex_tipo      = existing_fields.get("tipo", "")
+        ex_nombre     = existing_fields.get("nombre", "")
+        ex_ticket_id  = existing_fields.get("lead_id", "")  # Airtable field still named lead_id
+        ex_categoria  = existing_fields.get("categoria_api", "")
+        ex_tipo       = existing_fields.get("tipo", "")
 
         # 1.5 con datos del registro existente (módulo 89)
         try:
@@ -272,7 +272,7 @@ async def _process_email_inner(msg_stub: dict):
                 "message_id":       message_id,
                 "thread_id":        thread_id,
                 "nombre":           ex_nombre,
-                "lead_id":          ex_lead_id,
+                "ticket_id":        ex_ticket_id,
                 "categoria_correo": ex_categoria,
                 "bot_humano":       bot_humano_result,
                 "subject":          subject,
@@ -298,8 +298,8 @@ async def _process_email_inner(msg_stub: dict):
                 logger.error(f"[1] Error en 1.2: {exc}", exc_info=True)
 
     # ── Summary ──────────────────────────────────────────────────────────────
-    _nombre  = extrac_result.get("nombre", "") if is_new_thread else existing_fields.get("nombre", "")
-    _lead_id = extrac_result.get("lead_id", "") if is_new_thread else existing_fields.get("lead_id", "")
+    _nombre     = extrac_result.get("nombre", "") if is_new_thread else existing_fields.get("nombre", "")
+    _ticket_id  = extrac_result.get("ticket_id", "") if is_new_thread else existing_fields.get("lead_id", "")
 
     _sent_to_client = bot_humano_result == "bot" and (is_req or cliente)
     if bot_humano_result == "humano":
@@ -320,7 +320,7 @@ async def _process_email_inner(msg_stub: dict):
         "categoria":  categoria,
         "tipo":       tipo,
         "bot_humano": bot_humano_result,
-        "lead_id":    _lead_id,
+        "ticket_id":  _ticket_id,
         "nombre":     _nombre,
         "resultado":  resultado,
         "error":      False,
@@ -329,7 +329,7 @@ async def _process_email_inner(msg_stub: dict):
 
 
 async def _send_area_cliente_email(
-    message_id: str, nombre: str, lead_id: str, clasif_id: str, categoria: str,
+    message_id: str, nombre: str, ticket_id: str, clasif_id: str, categoria: str,
 ):
     email      = await gmail.get_email(message_id)
     from_email = email.get("fromEmail", "")
@@ -343,13 +343,14 @@ async def _send_area_cliente_email(
         bcc=_BCC,
     )
 
-    if lead_id:
-        await bitrix.update_lead(lead_id, {
-            "ASSIGNED_BY_ID": "6358",
-            "TITLE":          f"CGI - Respuesta EXITOSA: {categoria}",
+    if ticket_id:
+        await bitrix.update_crm_item(1034, ticket_id, {
+            "assignedById": "6358",
+            "title":        f"CGI - Respuesta EXITOSA: {categoria}",
+            "stageId":      "DT1034_120:CLIENT",
         })
         await bitrix.add_timeline_comment(
-            "lead", lead_id,
+            "dynamic_1034", ticket_id,
             f"Respuesta automática EXITOSA.\n"
             f"A la solicitud de {categoria} se generó la siguiente RESPUESTA AUTOMÁTICA: "
             f"Enlace a {categoria} de la web Tu Trastero.",
@@ -368,7 +369,7 @@ async def _send_area_cliente_email(
 
 async def _send_otros_servicios_email(
     categoria: str, categoria_api: str, from_email: str, subject: str,
-    nombre: str, lead_id: str, clasif_id: str, message_id: str,
+    nombre: str, ticket_id: str, clasif_id: str, message_id: str,
 ):
     cat  = categoria.lower()
     capi = categoria_api.lower()
@@ -379,10 +380,11 @@ async def _send_otros_servicios_email(
             body=email_templates.mudanza_email(nombre),
             body_type="html", bcc=_BCC,
         )
-        if lead_id:
-            await bitrix.update_lead(lead_id, {
-                "ASSIGNED_BY_ID": "6358",
-                "TITLE":          "CGI - Respuesta EXITOSA: Mudanza",
+        if ticket_id:
+            await bitrix.update_crm_item(1034, ticket_id, {
+                "assignedById": "6358",
+                "title":        "CGI - Respuesta EXITOSA: Mudanza",
+                "stageId":      "DT1034_120:PREPARATION",
             })
         if clasif_id:
             await airtable.update_record(config.AT_TBL_CLASIFICACION, clasif_id, {
@@ -396,10 +398,11 @@ async def _send_otros_servicios_email(
             body=email_templates.materiales_email(nombre),
             body_type="html", bcc=_BCC,
         )
-        if lead_id:
-            await bitrix.update_lead(lead_id, {
-                "ASSIGNED_BY_ID": "6358",
-                "TITLE":          "CGI - Respuesta EXITOSA: Tu Caja",
+        if ticket_id:
+            await bitrix.update_crm_item(1034, ticket_id, {
+                "assignedById": "6358",
+                "title":        "CGI - Respuesta EXITOSA: Tu Caja",
+                "stageId":      "DT1034_120:SUCCESS",
             })
         if clasif_id:
             await airtable.update_record(config.AT_TBL_CLASIFICACION, clasif_id, {
@@ -408,17 +411,17 @@ async def _send_otros_servicios_email(
             })
 
     elif cat == "otros" or capi == "otros":
-        ticket_subj = f"Número de Ticket # {lead_id} - {subject}"
+        ticket_subj = f"Número de Ticket # {ticket_id} - {subject}"
         await gmail.send_email(
             to=[from_email], subject=ticket_subj,
-            body=email_templates.otros_ticket_email(nombre, lead_id),
+            body=email_templates.otros_ticket_email(nombre, ticket_id),
             body_type="html", bcc=_BCC,
         )
-        if lead_id:
-            await bitrix.update_lead(lead_id, {
-                "STAGE_ID":       "UC_M25V3A",
-                "ASSIGNED_BY_ID": "6358",
-                "TITLE":          "CGI - Respuesta EXITOSA: (Sin clasificar)",
+        if ticket_id:
+            await bitrix.update_crm_item(1034, ticket_id, {
+                "stageId":      "DT1034_120:PREPARATION",
+                "assignedById": "6358",
+                "title":        "CGI - Respuesta EXITOSA: (Sin clasificar)",
             })
         if clasif_id:
             await airtable.update_record(config.AT_TBL_CLASIFICACION, clasif_id, {
@@ -427,10 +430,10 @@ async def _send_otros_servicios_email(
             })
 
     elif "reseña" in cat or "resena" in capi or "google" in cat:
-        ticket_subj = f"Reseña recibida - Número de Ticket #{lead_id}"
+        ticket_subj = f"Reseña recibida - Número de Ticket #{ticket_id}"
         await gmail.send_email(
             to=[from_email], subject=ticket_subj,
-            body=email_templates.resena_ticket_email(nombre, lead_id),
+            body=email_templates.resena_ticket_email(nombre, ticket_id),
             body_type="html", bcc=_BCC,
         )
         if clasif_id:
@@ -468,8 +471,8 @@ async def _send_otros_servicios_email(
     elif "foto" in cat or "foto" in capi:
         await gmail.send_email(
             to=[from_email],
-            subject=f"Número de Ticket #{lead_id}",
-            body=email_templates.foto_salida_ticket_email(nombre, lead_id),
+            subject=f"Número de Ticket #{ticket_id}",
+            body=email_templates.foto_salida_ticket_email(nombre, ticket_id),
             body_type="html", bcc=_BCC,
         )
         if clasif_id:

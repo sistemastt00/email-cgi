@@ -28,7 +28,7 @@ _EMAIL_BUILDERS = {
 async def run(args: dict) -> dict:
     thread_id  = args.get("thread_id", "")
     message_id = args.get("message_id", "")
-    lead_id    = args.get("lead_id", "")
+    ticket_id  = args.get("ticket_id", "")
     nombre     = args.get("nombre", "")
     categoria  = args.get("categoria_correo", "")
     row        = args.get("row", "")
@@ -37,7 +37,7 @@ async def run(args: dict) -> dict:
     from_email = email.get("fromEmail", "")
     subj       = email.get("subject", "")
 
-    logger.info(f"[1.4] from={from_email} | categoria={categoria!r} | lead_id={lead_id}")
+    logger.info(f"[1.4] from={from_email} | categoria={categoria!r} | ticket_id={ticket_id}")
 
     clasif_id = row or await _get_clasif_id(thread_id)
 
@@ -46,22 +46,22 @@ async def run(args: dict) -> dict:
         contacts   = await bitrix.search_contacts_by_email(from_email)
         contact_id = contacts[0]["ID"] if contacts else None
 
-        ticket_subj = f"Solicitud Cambio de Titular/Modulo - Número de Ticket #{lead_id}"
+        ticket_subj = f"Solicitud Cambio de Titular/Modulo - Número de Ticket #{ticket_id}"
         await gmail.send_email(
             to=[from_email], subject=ticket_subj,
-            body=email_templates.cambio_trastero_email(nombre, lead_id),
+            body=email_templates.cambio_trastero_email(nombre, ticket_id),
             body_type="html", bcc=_BCC,
         )
 
-        if lead_id:
-            lead_fields = {
-                "STAGE_ID":       "UC_M25V3A",
-                "ASSIGNED_BY_ID": "6358",
-                "TITLE":          "CGI - Cambio de titular/modulo",
+        if ticket_id:
+            item_fields = {
+                "stageId":      "DT1034_120:PREPARATION",
+                "assignedById": "6358",
+                "title":        "CGI - Cambio de titular/modulo",
             }
             if contact_id:
-                lead_fields["CONTACT_ID"] = contact_id
-            await bitrix.update_lead(lead_id, lead_fields)
+                item_fields["contactId"] = contact_id
+            await bitrix.update_crm_item(1034, ticket_id, item_fields)
 
         if clasif_id:
             await airtable.update_record(config.AT_TBL_CLASIFICACION, clasif_id, {
@@ -69,7 +69,7 @@ async def run(args: dict) -> dict:
                 "fldquQJeU5QJmNfBa": "humano",
             })
 
-        logger.info(f"[1.4] Cambio de titular/modulo ticket enviado | lead_id={lead_id}")
+        logger.info(f"[1.4] Cambio de titular/modulo ticket enviado | ticket_id={ticket_id}")
         return {"status": "ok", "categoria": categoria, "flujo": "cambio_titular_modulo"}
 
     # ── Flujo área general (CTA) ──────────────────────────────────────────────
@@ -92,8 +92,8 @@ async def run(args: dict) -> dict:
         logger.info(f"[1.4] Sin template definido para categoria={categoria!r}")
         return {"status": "ok", "categoria": categoria, "flujo": "sin_cta"}
 
-    # 3. Bitrix: TITLE y timeline (Presupuesto tiene texto propio)
-    if lead_id:
+    # 3. Bitrix: title y timeline (Presupuesto tiene texto propio)
+    if ticket_id:
         if categoria == "presupuesto":
             bitrix_title = "CGI - Solicitud de Presupuesto"
             timeline_msg = "Se envió enlace a web al CLIENTE para que solicite presupuesto."
@@ -103,12 +103,13 @@ async def run(args: dict) -> dict:
                 f"Respuesta automática EXITOSA. A la solicitud de {categoria} se generó "
                 f"la siguiente RESPUESTA AUTOMÁTICA: Enlace directo {categoria} de la web Tu Trastero."
             )
-        await bitrix.update_lead(lead_id, {
-            "ASSIGNED_BY_ID": "6358",
-            "TITLE":          bitrix_title,
+        await bitrix.update_crm_item(1034, ticket_id, {
+            "assignedById": "6358",
+            "title":        bitrix_title,
+            "stageId":      "DT1034_120:SUCCESS",
         })
-        await bitrix.add_timeline_comment("lead", lead_id, timeline_msg)
-        logger.info(f"[1.4] Bitrix actualizado | lead_id={lead_id}")
+        await bitrix.add_timeline_comment("dynamic_1034", ticket_id, timeline_msg)
+        logger.info(f"[1.4] Bitrix actualizado | ticket_id={ticket_id}")
 
     # 4. Email CTA al cliente
     await gmail.send_email(

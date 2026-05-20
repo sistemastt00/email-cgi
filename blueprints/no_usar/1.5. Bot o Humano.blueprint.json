@@ -2108,11 +2108,8 @@
                             },
                             "mapper": {
                                 "base": "appMNiPmgPOBdXZxt",
-                                "useColumnId": false,
-                                "table": "tblFsUGpeqIvAnEVh",
-                                "formula": "{thread_id}=\"{{1.thread_id}}\"",
-                                "maxRecords": "1",
                                 "view": "viwXuqiglkuOhwjw4",
+                                "table": "tblFsUGpeqIvAnEVh",
                                 "fields": [
                                     "thread_id",
                                     "fecha_creacion",
@@ -2131,9 +2128,11 @@
                                     "tipo",
                                     "codigo_generado",
                                     "lead_id",
-                                    "categoria_label",
-                                    "ticket_id"
-                                ]
+                                    "categoria_label"
+                                ],
+                                "formula": "{thread_id}=\"{{1.thread_id}}\"",
+                                "maxRecords": "1",
+                                "useColumnId": false
                             },
                             "metadata": {
                                 "designer": {
@@ -2142,26 +2141,10 @@
                                     "name": "Datos"
                                 },
                                 "restore": {
-                                    "parameters": {
-                                        "__IMTCONN__": {
-                                            "label": "My Airtable OAuth connection MasIP (User ID: usrhEfequCBBlG5d3)",
-                                            "data": {
-                                                "scoped": "true",
-                                                "connection": "airtable3"
-                                            }
-                                        }
-                                    },
                                     "expect": {
                                         "base": {
                                             "mode": "chose",
                                             "label": "Email CGI"
-                                        },
-                                        "useColumnId": {
-                                            "mode": "chose"
-                                        },
-                                        "table": {
-                                            "mode": "chose",
-                                            "label": "Datos extraídos"
                                         },
                                         "sort": {
                                             "mode": "chose"
@@ -2169,6 +2152,10 @@
                                         "view": {
                                             "mode": "chose",
                                             "label": "Grid view"
+                                        },
+                                        "table": {
+                                            "mode": "chose",
+                                            "label": "Datos extraídos"
                                         },
                                         "fields": {
                                             "mode": "chose",
@@ -2190,9 +2177,20 @@
                                                 "tipo",
                                                 "codigo_generado",
                                                 "lead_id",
-                                                "categoria_label",
-                                                "ticket_id"
+                                                "categoria_label"
                                             ]
+                                        },
+                                        "useColumnId": {
+                                            "mode": "chose"
+                                        }
+                                    },
+                                    "parameters": {
+                                        "__IMTCONN__": {
+                                            "data": {
+                                                "scoped": "true",
+                                                "connection": "airtable3"
+                                            },
+                                            "label": "My Airtable OAuth connection MasIP (User ID: usrhEfequCBBlG5d3)"
                                         }
                                     }
                                 },
@@ -2235,15 +2233,13 @@
                                     },
                                     {
                                         "name": "sort",
-                                        "type": "array",
-                                        "label": "Sort",
                                         "spec": [
                                             {
                                                 "name": "field",
                                                 "type": "select",
                                                 "label": "Field",
-                                                "options": [],
-                                                "dynamic": true
+                                                "dynamic": true,
+                                                "options": []
                                             },
                                             {
                                                 "name": "direction",
@@ -2260,7 +2256,9 @@
                                                     }
                                                 ]
                                             }
-                                        ]
+                                        ],
+                                        "type": "array",
+                                        "label": "Sort"
                                     },
                                     {
                                         "name": "view",
@@ -2277,13 +2275,13 @@
                                 "interface": [
                                     {
                                         "name": "__IMTLENGTH__",
-                                        "label": "Total number of bundles",
-                                        "type": "uinteger"
+                                        "type": "uinteger",
+                                        "label": "Total number of bundles"
                                     },
                                     {
                                         "name": "__IMTINDEX__",
-                                        "label": "Bundle order position",
-                                        "type": "uinteger"
+                                        "type": "uinteger",
+                                        "label": "Bundle order position"
                                     },
                                     {
                                         "name": "id",
@@ -2297,99 +2295,94 @@
                                     },
                                     {
                                         "name": "thread_id",
-                                        "label": "thread_id",
                                         "type": "text",
+                                        "label": "thread_id",
                                         "multiline": true
                                     },
                                     {
                                         "name": "fecha_creacion",
-                                        "label": "fecha_creacion",
-                                        "type": "date"
+                                        "type": "date",
+                                        "label": "fecha_creacion"
                                     },
                                     {
                                         "name": "asunto",
-                                        "label": "asunto",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "asunto"
                                     },
                                     {
                                         "name": "from_email",
-                                        "label": "from_email",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "from_email"
                                     },
                                     {
                                         "name": "to_email",
-                                        "label": "to_email",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "to_email"
                                     },
                                     {
                                         "name": "nombre",
-                                        "label": "nombre",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "nombre"
                                     },
                                     {
                                         "name": "apellido",
-                                        "label": "apellido",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "apellido"
                                     },
                                     {
                                         "name": "dni",
-                                        "label": "dni",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "dni"
                                     },
                                     {
                                         "name": "telefono",
-                                        "label": "telefono",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "telefono"
                                     },
                                     {
                                         "name": "email",
-                                        "label": "email",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "email"
                                     },
                                     {
                                         "name": "n_contrato",
-                                        "label": "n_contrato",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "n_contrato"
                                     },
                                     {
                                         "name": "n_modulo",
-                                        "label": "n_modulo",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "n_modulo"
                                     },
                                     {
                                         "name": "centro",
-                                        "label": "centro",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "centro"
                                     },
                                     {
                                         "name": "categoria_api",
-                                        "label": "categoria_api",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "categoria_api"
                                     },
                                     {
                                         "name": "tipo",
-                                        "label": "tipo",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "tipo"
                                     },
                                     {
                                         "name": "codigo_generado",
-                                        "label": "codigo_generado",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "codigo_generado"
                                     },
                                     {
                                         "name": "lead_id",
-                                        "label": "lead_id",
-                                        "type": "text"
-                                    },
-                                    {
-                                        "name": "ticket_id",
-                                        "label": "ticket_id",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "lead_id"
                                     },
                                     {
                                         "name": "categoria_label",
-                                        "label": "categoria_label",
-                                        "type": "text"
+                                        "type": "text",
+                                        "label": "categoria_label"
                                     }
                                 ]
                             }
@@ -2962,40 +2955,34 @@
                                                             }
                                                         },
                                                         {
-                                                            "id": 19,
+                                                            "id": 11,
                                                             "module": "bitrix24:makeApiCall",
                                                             "version": 1,
                                                             "parameters": {
                                                                 "__IMTCONN__": 12025279
                                                             },
                                                             "mapper": {
-                                                                "url": "crm.timeline.comment.add",
+                                                                "url": "crm.lead.update",
+                                                                "body": "{\r\n  \"id\": {{10.lead_id}},\r\n  \"fields\": {\r\n    \"STAGE_ID\": \"UC_BZJ6XN\",\n    \"ASSIGNED_BY_ID\": \"6358\",\n    \"TITLE\": \"CGI - Requiere HUMANO: {{10.categoria_label}}\",\n    \"CONTACT_ID\":\"{{3.ID}}\"\n  }\r\n}",
                                                                 "method": "POST",
                                                                 "headers": [
                                                                     {
                                                                         "key": "Content-Type",
                                                                         "value": "application/json"
                                                                     }
-                                                                ],
-                                                                "body": "{\r\n  \"fields\": {\r\n    \"ENTITY_ID\":{{10.ticket_id}},\r\n    \"ENTITY_TYPE\": \"dynamic_1034\",\r\n    \"COMMENT\": \"Comunicarse con el cliente. No se atendió al requerimiento. El emisor del correo solicita la comunicación con un HUMANO para {{10.categoria_label}}\"\r\n}\r\n}"
+                                                                ]
                                                             },
                                                             "metadata": {
                                                                 "designer": {
                                                                     "x": 2700,
                                                                     "y": 0,
-                                                                    "name": "Comentario en timeline"
+                                                                    "name": "actualiza_lead"
                                                                 },
                                                                 "restore": {
-                                                                    "parameters": {
-                                                                        "__IMTCONN__": {
-                                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)",
-                                                                            "data": {
-                                                                                "scoped": "true",
-                                                                                "connection": "bitrix24"
-                                                                            }
-                                                                        }
-                                                                    },
                                                                     "expect": {
+                                                                        "qs": {
+                                                                            "mode": "chose"
+                                                                        },
                                                                         "method": {
                                                                             "mode": "chose",
                                                                             "label": "POST"
@@ -3005,9 +2992,15 @@
                                                                             "items": [
                                                                                 null
                                                                             ]
-                                                                        },
-                                                                        "qs": {
-                                                                            "mode": "chose"
+                                                                        }
+                                                                    },
+                                                                    "parameters": {
+                                                                        "__IMTCONN__": {
+                                                                            "data": {
+                                                                                "scoped": "true",
+                                                                                "connection": "bitrix24"
+                                                                            },
+                                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)"
                                                                         }
                                                                     }
                                                                 },
@@ -3043,8 +3036,6 @@
                                                                     },
                                                                     {
                                                                         "name": "headers",
-                                                                        "type": "array",
-                                                                        "label": "Headers",
                                                                         "spec": [
                                                                             {
                                                                                 "name": "key",
@@ -3056,12 +3047,12 @@
                                                                                 "type": "text",
                                                                                 "label": "Value"
                                                                             }
-                                                                        ]
+                                                                        ],
+                                                                        "type": "array",
+                                                                        "label": "Headers"
                                                                     },
                                                                     {
                                                                         "name": "qs",
-                                                                        "type": "array",
-                                                                        "label": "Query String",
                                                                         "spec": [
                                                                             {
                                                                                 "name": "key",
@@ -3073,7 +3064,131 @@
                                                                                 "type": "text",
                                                                                 "label": "Value"
                                                                             }
-                                                                        ]
+                                                                        ],
+                                                                        "type": "array",
+                                                                        "label": "Query String"
+                                                                    },
+                                                                    {
+                                                                        "name": "body",
+                                                                        "type": "any",
+                                                                        "label": "Body"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        },
+                                                        {
+                                                            "id": 19,
+                                                            "module": "bitrix24:makeApiCall",
+                                                            "version": 1,
+                                                            "parameters": {
+                                                                "__IMTCONN__": 12025279
+                                                            },
+                                                            "mapper": {
+                                                                "url": "crm.timeline.comment.add",
+                                                                "body": "{\r\n  \"fields\": {\r\n    \"ENTITY_ID\":{{10.lead_id}},\r\n    \"ENTITY_TYPE\": \"lead\",\r\n    \"COMMENT\": \"Comunicarse con el cliente. No se atendió al requerimiento. El emisor del correo solicita la comunicación con un HUMANO para {{10.categoria_label}}\"\r\n}\r\n}",
+                                                                "method": "POST",
+                                                                "headers": [
+                                                                    {
+                                                                        "key": "Content-Type",
+                                                                        "value": "application/json"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            "metadata": {
+                                                                "designer": {
+                                                                    "x": 3000,
+                                                                    "y": 0,
+                                                                    "name": "Comentario en timeline"
+                                                                },
+                                                                "restore": {
+                                                                    "expect": {
+                                                                        "qs": {
+                                                                            "mode": "chose"
+                                                                        },
+                                                                        "method": {
+                                                                            "mode": "chose",
+                                                                            "label": "POST"
+                                                                        },
+                                                                        "headers": {
+                                                                            "mode": "chose",
+                                                                            "items": [
+                                                                                null
+                                                                            ]
+                                                                        }
+                                                                    },
+                                                                    "parameters": {
+                                                                        "__IMTCONN__": {
+                                                                            "data": {
+                                                                                "scoped": "true",
+                                                                                "connection": "bitrix24"
+                                                                            },
+                                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)"
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "parameters": [
+                                                                    {
+                                                                        "name": "__IMTCONN__",
+                                                                        "type": "account:bitrix24",
+                                                                        "label": "Connection",
+                                                                        "required": true
+                                                                    }
+                                                                ],
+                                                                "expect": [
+                                                                    {
+                                                                        "name": "url",
+                                                                        "type": "text",
+                                                                        "label": "URL",
+                                                                        "required": true
+                                                                    },
+                                                                    {
+                                                                        "name": "method",
+                                                                        "type": "select",
+                                                                        "label": "Method",
+                                                                        "required": true,
+                                                                        "validate": {
+                                                                            "enum": [
+                                                                                "GET",
+                                                                                "POST",
+                                                                                "PUT",
+                                                                                "PATCH",
+                                                                                "DELETE"
+                                                                            ]
+                                                                        }
+                                                                    },
+                                                                    {
+                                                                        "name": "headers",
+                                                                        "spec": [
+                                                                            {
+                                                                                "name": "key",
+                                                                                "type": "text",
+                                                                                "label": "Key"
+                                                                            },
+                                                                            {
+                                                                                "name": "value",
+                                                                                "type": "text",
+                                                                                "label": "Value"
+                                                                            }
+                                                                        ],
+                                                                        "type": "array",
+                                                                        "label": "Headers"
+                                                                    },
+                                                                    {
+                                                                        "name": "qs",
+                                                                        "spec": [
+                                                                            {
+                                                                                "name": "key",
+                                                                                "type": "text",
+                                                                                "label": "Key"
+                                                                            },
+                                                                            {
+                                                                                "name": "value",
+                                                                                "type": "text",
+                                                                                "label": "Value"
+                                                                            }
+                                                                        ],
+                                                                        "type": "array",
+                                                                        "label": "Query String"
                                                                     },
                                                                     {
                                                                         "name": "body",
@@ -3103,7 +3218,7 @@
                                                             },
                                                             "metadata": {
                                                                 "designer": {
-                                                                    "x": 3000,
+                                                                    "x": 3300,
                                                                     "y": 0,
                                                                     "name": "Clasificacion"
                                                                 },
@@ -3342,7 +3457,7 @@
                                                             },
                                                             "metadata": {
                                                                 "designer": {
-                                                                    "x": 3300,
+                                                                    "x": 3600,
                                                                     "y": 0
                                                                 },
                                                                 "restore": {
@@ -3607,40 +3722,34 @@
                                                             }
                                                         },
                                                         {
-                                                            "id": 20,
+                                                            "id": 16,
                                                             "module": "bitrix24:makeApiCall",
                                                             "version": 1,
                                                             "parameters": {
                                                                 "__IMTCONN__": 12025279
                                                             },
                                                             "mapper": {
-                                                                "url": "crm.timeline.comment.add",
+                                                                "url": "crm.lead.update",
+                                                                "body": "{\r\n  \"id\": {{10.lead_id}},\r\n  \"fields\": {\r\n    \"STAGE_ID\": \"UC_BZJ6XN\",\n    \"ASSIGNED_BY_ID\": \"6358\",\n    \"TITLE\": \"CGI - Requiere HUMANO: {{10.categoria_label}}\",\n  }\r\n}",
                                                                 "method": "POST",
                                                                 "headers": [
                                                                     {
                                                                         "key": "Content-Type",
                                                                         "value": "application/json"
                                                                     }
-                                                                ],
-                                                                "body": "{\r\n  \"fields\": {\r\n    \"ENTITY_ID\":{{10.ticket_id}},\r\n    \"ENTITY_TYPE\": \"dynamic_1034\",\r\n    \"COMMENT\": \"Comunicarse con el cliente. No se atendió al requerimiento. El emisor del correo solicita la comunicación con un HUMANO para {{10.categoria_label}}\"\r\n}\r\n}"
+                                                                ]
                                                             },
                                                             "metadata": {
                                                                 "designer": {
                                                                     "x": 2700,
                                                                     "y": 300,
-                                                                    "name": "Comentario en timeline"
+                                                                    "name": "actualiza_lead"
                                                                 },
                                                                 "restore": {
-                                                                    "parameters": {
-                                                                        "__IMTCONN__": {
-                                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)",
-                                                                            "data": {
-                                                                                "scoped": "true",
-                                                                                "connection": "bitrix24"
-                                                                            }
-                                                                        }
-                                                                    },
                                                                     "expect": {
+                                                                        "qs": {
+                                                                            "mode": "chose"
+                                                                        },
                                                                         "method": {
                                                                             "mode": "chose",
                                                                             "label": "POST"
@@ -3650,9 +3759,15 @@
                                                                             "items": [
                                                                                 null
                                                                             ]
-                                                                        },
-                                                                        "qs": {
-                                                                            "mode": "chose"
+                                                                        }
+                                                                    },
+                                                                    "parameters": {
+                                                                        "__IMTCONN__": {
+                                                                            "data": {
+                                                                                "scoped": "true",
+                                                                                "connection": "bitrix24"
+                                                                            },
+                                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)"
                                                                         }
                                                                     }
                                                                 },
@@ -3688,8 +3803,6 @@
                                                                     },
                                                                     {
                                                                         "name": "headers",
-                                                                        "type": "array",
-                                                                        "label": "Headers",
                                                                         "spec": [
                                                                             {
                                                                                 "name": "key",
@@ -3701,12 +3814,12 @@
                                                                                 "type": "text",
                                                                                 "label": "Value"
                                                                             }
-                                                                        ]
+                                                                        ],
+                                                                        "type": "array",
+                                                                        "label": "Headers"
                                                                     },
                                                                     {
                                                                         "name": "qs",
-                                                                        "type": "array",
-                                                                        "label": "Query String",
                                                                         "spec": [
                                                                             {
                                                                                 "name": "key",
@@ -3718,7 +3831,131 @@
                                                                                 "type": "text",
                                                                                 "label": "Value"
                                                                             }
-                                                                        ]
+                                                                        ],
+                                                                        "type": "array",
+                                                                        "label": "Query String"
+                                                                    },
+                                                                    {
+                                                                        "name": "body",
+                                                                        "type": "any",
+                                                                        "label": "Body"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        },
+                                                        {
+                                                            "id": 20,
+                                                            "module": "bitrix24:makeApiCall",
+                                                            "version": 1,
+                                                            "parameters": {
+                                                                "__IMTCONN__": 12025279
+                                                            },
+                                                            "mapper": {
+                                                                "url": "crm.timeline.comment.add",
+                                                                "body": "{\r\n  \"fields\": {\r\n    \"ENTITY_ID\":{{10.lead_id}},\r\n    \"ENTITY_TYPE\": \"lead\",\r\n    \"COMMENT\": \"Comunicarse con el cliente. No se atendió al requerimiento. El emisor del correo solicita la comunicación con un HUMANO para {{10.categoria_label}}\"\r\n}\r\n}",
+                                                                "method": "POST",
+                                                                "headers": [
+                                                                    {
+                                                                        "key": "Content-Type",
+                                                                        "value": "application/json"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            "metadata": {
+                                                                "designer": {
+                                                                    "x": 3000,
+                                                                    "y": 300,
+                                                                    "name": "Comentario en timeline"
+                                                                },
+                                                                "restore": {
+                                                                    "expect": {
+                                                                        "qs": {
+                                                                            "mode": "chose"
+                                                                        },
+                                                                        "method": {
+                                                                            "mode": "chose",
+                                                                            "label": "POST"
+                                                                        },
+                                                                        "headers": {
+                                                                            "mode": "chose",
+                                                                            "items": [
+                                                                                null
+                                                                            ]
+                                                                        }
+                                                                    },
+                                                                    "parameters": {
+                                                                        "__IMTCONN__": {
+                                                                            "data": {
+                                                                                "scoped": "true",
+                                                                                "connection": "bitrix24"
+                                                                            },
+                                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)"
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "parameters": [
+                                                                    {
+                                                                        "name": "__IMTCONN__",
+                                                                        "type": "account:bitrix24",
+                                                                        "label": "Connection",
+                                                                        "required": true
+                                                                    }
+                                                                ],
+                                                                "expect": [
+                                                                    {
+                                                                        "name": "url",
+                                                                        "type": "text",
+                                                                        "label": "URL",
+                                                                        "required": true
+                                                                    },
+                                                                    {
+                                                                        "name": "method",
+                                                                        "type": "select",
+                                                                        "label": "Method",
+                                                                        "required": true,
+                                                                        "validate": {
+                                                                            "enum": [
+                                                                                "GET",
+                                                                                "POST",
+                                                                                "PUT",
+                                                                                "PATCH",
+                                                                                "DELETE"
+                                                                            ]
+                                                                        }
+                                                                    },
+                                                                    {
+                                                                        "name": "headers",
+                                                                        "spec": [
+                                                                            {
+                                                                                "name": "key",
+                                                                                "type": "text",
+                                                                                "label": "Key"
+                                                                            },
+                                                                            {
+                                                                                "name": "value",
+                                                                                "type": "text",
+                                                                                "label": "Value"
+                                                                            }
+                                                                        ],
+                                                                        "type": "array",
+                                                                        "label": "Headers"
+                                                                    },
+                                                                    {
+                                                                        "name": "qs",
+                                                                        "spec": [
+                                                                            {
+                                                                                "name": "key",
+                                                                                "type": "text",
+                                                                                "label": "Key"
+                                                                            },
+                                                                            {
+                                                                                "name": "value",
+                                                                                "type": "text",
+                                                                                "label": "Value"
+                                                                            }
+                                                                        ],
+                                                                        "type": "array",
+                                                                        "label": "Query String"
                                                                     },
                                                                     {
                                                                         "name": "body",
@@ -3748,7 +3985,7 @@
                                                             },
                                                             "metadata": {
                                                                 "designer": {
-                                                                    "x": 3000,
+                                                                    "x": 3300,
                                                                     "y": 300,
                                                                     "name": "Clasificacion"
                                                                 },
@@ -3987,7 +4224,7 @@
                                                             },
                                                             "metadata": {
                                                                 "designer": {
-                                                                    "x": 3300,
+                                                                    "x": 3600,
                                                                     "y": 300
                                                                 },
                                                                 "restore": {
@@ -4282,40 +4519,34 @@
                                                             }
                                                         },
                                                         {
-                                                            "id": 26,
+                                                            "id": 25,
                                                             "module": "bitrix24:makeApiCall",
                                                             "version": 1,
                                                             "parameters": {
                                                                 "__IMTCONN__": 12025279
                                                             },
                                                             "mapper": {
-                                                                "url": "crm.timeline.comment.add",
+                                                                "url": "crm.lead.update",
+                                                                "body": "{\r\n  \"id\": {{10.lead_id}},\r\n  \"fields\": {\r\n    \"STAGE_ID\": \"UC_BZJ6XN\",\n    \"ASSIGNED_BY_ID\": \"6358\",\n    \"TITLE\": \"CGI - Requiere HUMANO: Doble Solicitud\",\n    \"CONTACT_ID\":\"{{3.ID}}\"\n  }\r\n}",
                                                                 "method": "POST",
                                                                 "headers": [
                                                                     {
                                                                         "key": "Content-Type",
                                                                         "value": "application/json"
                                                                     }
-                                                                ],
-                                                                "body": "{\r\n  \"fields\": {\r\n    \"ENTITY_ID\":{{10.ticket_id}},\r\n    \"ENTITY_TYPE\": \"dynamic_1034\",\r\n    \"COMMENT\": \"Comunicarse con el cliente. No se atendió al requerimiento. El emisor del correo ha hecho más de una solicitud en el correo y no pudo ser atendida por el bot.\"\r\n}\r\n}"
+                                                                ]
                                                             },
                                                             "metadata": {
                                                                 "designer": {
                                                                     "x": 2700,
                                                                     "y": 600,
-                                                                    "name": "Comentario en timeline"
+                                                                    "name": "actualiza_lead"
                                                                 },
                                                                 "restore": {
-                                                                    "parameters": {
-                                                                        "__IMTCONN__": {
-                                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)",
-                                                                            "data": {
-                                                                                "scoped": "true",
-                                                                                "connection": "bitrix24"
-                                                                            }
-                                                                        }
-                                                                    },
                                                                     "expect": {
+                                                                        "qs": {
+                                                                            "mode": "chose"
+                                                                        },
                                                                         "method": {
                                                                             "mode": "chose",
                                                                             "label": "POST"
@@ -4325,9 +4556,15 @@
                                                                             "items": [
                                                                                 null
                                                                             ]
-                                                                        },
-                                                                        "qs": {
-                                                                            "mode": "chose"
+                                                                        }
+                                                                    },
+                                                                    "parameters": {
+                                                                        "__IMTCONN__": {
+                                                                            "data": {
+                                                                                "scoped": "true",
+                                                                                "connection": "bitrix24"
+                                                                            },
+                                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)"
                                                                         }
                                                                     }
                                                                 },
@@ -4363,8 +4600,6 @@
                                                                     },
                                                                     {
                                                                         "name": "headers",
-                                                                        "type": "array",
-                                                                        "label": "Headers",
                                                                         "spec": [
                                                                             {
                                                                                 "name": "key",
@@ -4376,12 +4611,12 @@
                                                                                 "type": "text",
                                                                                 "label": "Value"
                                                                             }
-                                                                        ]
+                                                                        ],
+                                                                        "type": "array",
+                                                                        "label": "Headers"
                                                                     },
                                                                     {
                                                                         "name": "qs",
-                                                                        "type": "array",
-                                                                        "label": "Query String",
                                                                         "spec": [
                                                                             {
                                                                                 "name": "key",
@@ -4393,7 +4628,131 @@
                                                                                 "type": "text",
                                                                                 "label": "Value"
                                                                             }
-                                                                        ]
+                                                                        ],
+                                                                        "type": "array",
+                                                                        "label": "Query String"
+                                                                    },
+                                                                    {
+                                                                        "name": "body",
+                                                                        "type": "any",
+                                                                        "label": "Body"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        },
+                                                        {
+                                                            "id": 26,
+                                                            "module": "bitrix24:makeApiCall",
+                                                            "version": 1,
+                                                            "parameters": {
+                                                                "__IMTCONN__": 12025279
+                                                            },
+                                                            "mapper": {
+                                                                "url": "crm.timeline.comment.add",
+                                                                "body": "{\r\n  \"fields\": {\r\n    \"ENTITY_ID\":{{10.lead_id}},\r\n    \"ENTITY_TYPE\": \"lead\",\r\n    \"COMMENT\": \"Comunicarse con el cliente. No se atendió al requerimiento. El emisor del correo ha hecho más de una solicitud en el correo y no pudo ser atendida por el bot.\"\r\n}\r\n}",
+                                                                "method": "POST",
+                                                                "headers": [
+                                                                    {
+                                                                        "key": "Content-Type",
+                                                                        "value": "application/json"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            "metadata": {
+                                                                "designer": {
+                                                                    "x": 3000,
+                                                                    "y": 600,
+                                                                    "name": "Comentario en timeline"
+                                                                },
+                                                                "restore": {
+                                                                    "expect": {
+                                                                        "qs": {
+                                                                            "mode": "chose"
+                                                                        },
+                                                                        "method": {
+                                                                            "mode": "chose",
+                                                                            "label": "POST"
+                                                                        },
+                                                                        "headers": {
+                                                                            "mode": "chose",
+                                                                            "items": [
+                                                                                null
+                                                                            ]
+                                                                        }
+                                                                    },
+                                                                    "parameters": {
+                                                                        "__IMTCONN__": {
+                                                                            "data": {
+                                                                                "scoped": "true",
+                                                                                "connection": "bitrix24"
+                                                                            },
+                                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)"
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "parameters": [
+                                                                    {
+                                                                        "name": "__IMTCONN__",
+                                                                        "type": "account:bitrix24",
+                                                                        "label": "Connection",
+                                                                        "required": true
+                                                                    }
+                                                                ],
+                                                                "expect": [
+                                                                    {
+                                                                        "name": "url",
+                                                                        "type": "text",
+                                                                        "label": "URL",
+                                                                        "required": true
+                                                                    },
+                                                                    {
+                                                                        "name": "method",
+                                                                        "type": "select",
+                                                                        "label": "Method",
+                                                                        "required": true,
+                                                                        "validate": {
+                                                                            "enum": [
+                                                                                "GET",
+                                                                                "POST",
+                                                                                "PUT",
+                                                                                "PATCH",
+                                                                                "DELETE"
+                                                                            ]
+                                                                        }
+                                                                    },
+                                                                    {
+                                                                        "name": "headers",
+                                                                        "spec": [
+                                                                            {
+                                                                                "name": "key",
+                                                                                "type": "text",
+                                                                                "label": "Key"
+                                                                            },
+                                                                            {
+                                                                                "name": "value",
+                                                                                "type": "text",
+                                                                                "label": "Value"
+                                                                            }
+                                                                        ],
+                                                                        "type": "array",
+                                                                        "label": "Headers"
+                                                                    },
+                                                                    {
+                                                                        "name": "qs",
+                                                                        "spec": [
+                                                                            {
+                                                                                "name": "key",
+                                                                                "type": "text",
+                                                                                "label": "Key"
+                                                                            },
+                                                                            {
+                                                                                "name": "value",
+                                                                                "type": "text",
+                                                                                "label": "Value"
+                                                                            }
+                                                                        ],
+                                                                        "type": "array",
+                                                                        "label": "Query String"
                                                                     },
                                                                     {
                                                                         "name": "body",
@@ -4423,7 +4782,7 @@
                                                             },
                                                             "metadata": {
                                                                 "designer": {
-                                                                    "x": 3000,
+                                                                    "x": 3300,
                                                                     "y": 600,
                                                                     "name": "Clasificacion"
                                                                 },
@@ -4662,7 +5021,7 @@
                                                             },
                                                             "metadata": {
                                                                 "designer": {
-                                                                    "x": 3300,
+                                                                    "x": 3600,
                                                                     "y": 600
                                                                 },
                                                                 "restore": {
@@ -4927,40 +5286,34 @@
                                                             }
                                                         },
                                                         {
-                                                            "id": 31,
+                                                            "id": 30,
                                                             "module": "bitrix24:makeApiCall",
                                                             "version": 1,
                                                             "parameters": {
                                                                 "__IMTCONN__": 12025279
                                                             },
                                                             "mapper": {
-                                                                "url": "crm.timeline.comment.add",
+                                                                "url": "crm.lead.update",
+                                                                "body": "{\r\n  \"id\": {{10.lead_id}},\r\n  \"fields\": {\r\n    \"STAGE_ID\": \"UC_BZJ6XN\",\n    \"ASSIGNED_BY_ID\": \"6358\",\n    \"TITLE\": \"CGI - Requiere HUMANO: Doble Solicitud\",\n  }\r\n}",
                                                                 "method": "POST",
                                                                 "headers": [
                                                                     {
                                                                         "key": "Content-Type",
                                                                         "value": "application/json"
                                                                     }
-                                                                ],
-                                                                "body": "{\r\n  \"fields\": {\r\n    \"ENTITY_ID\":{{10.ticket_id}},\r\n    \"ENTITY_TYPE\": \"dynamic_1034\",\r\n    \"COMMENT\": \"Comunicarse con el cliente. No se atendió al requerimiento. El emisor del correo ha hecho más de una solicitud en el correo y no pudo ser atendida por el bot.\"\r\n}\r\n}"
+                                                                ]
                                                             },
                                                             "metadata": {
                                                                 "designer": {
                                                                     "x": 2700,
                                                                     "y": 900,
-                                                                    "name": "Comentario en timeline"
+                                                                    "name": "actualiza_lead"
                                                                 },
                                                                 "restore": {
-                                                                    "parameters": {
-                                                                        "__IMTCONN__": {
-                                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)",
-                                                                            "data": {
-                                                                                "scoped": "true",
-                                                                                "connection": "bitrix24"
-                                                                            }
-                                                                        }
-                                                                    },
                                                                     "expect": {
+                                                                        "qs": {
+                                                                            "mode": "chose"
+                                                                        },
                                                                         "method": {
                                                                             "mode": "chose",
                                                                             "label": "POST"
@@ -4970,9 +5323,15 @@
                                                                             "items": [
                                                                                 null
                                                                             ]
-                                                                        },
-                                                                        "qs": {
-                                                                            "mode": "chose"
+                                                                        }
+                                                                    },
+                                                                    "parameters": {
+                                                                        "__IMTCONN__": {
+                                                                            "data": {
+                                                                                "scoped": "true",
+                                                                                "connection": "bitrix24"
+                                                                            },
+                                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)"
                                                                         }
                                                                     }
                                                                 },
@@ -5008,8 +5367,6 @@
                                                                     },
                                                                     {
                                                                         "name": "headers",
-                                                                        "type": "array",
-                                                                        "label": "Headers",
                                                                         "spec": [
                                                                             {
                                                                                 "name": "key",
@@ -5021,12 +5378,12 @@
                                                                                 "type": "text",
                                                                                 "label": "Value"
                                                                             }
-                                                                        ]
+                                                                        ],
+                                                                        "type": "array",
+                                                                        "label": "Headers"
                                                                     },
                                                                     {
                                                                         "name": "qs",
-                                                                        "type": "array",
-                                                                        "label": "Query String",
                                                                         "spec": [
                                                                             {
                                                                                 "name": "key",
@@ -5038,7 +5395,131 @@
                                                                                 "type": "text",
                                                                                 "label": "Value"
                                                                             }
-                                                                        ]
+                                                                        ],
+                                                                        "type": "array",
+                                                                        "label": "Query String"
+                                                                    },
+                                                                    {
+                                                                        "name": "body",
+                                                                        "type": "any",
+                                                                        "label": "Body"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        },
+                                                        {
+                                                            "id": 31,
+                                                            "module": "bitrix24:makeApiCall",
+                                                            "version": 1,
+                                                            "parameters": {
+                                                                "__IMTCONN__": 12025279
+                                                            },
+                                                            "mapper": {
+                                                                "url": "crm.timeline.comment.add",
+                                                                "body": "{\r\n  \"fields\": {\r\n    \"ENTITY_ID\":{{10.lead_id}},\r\n    \"ENTITY_TYPE\": \"lead\",\r\n    \"COMMENT\": \"Comunicarse con el cliente. No se atendió al requerimiento. El emisor del correo ha hecho más de una solicitud en el correo y no pudo ser atendida por el bot.\"\r\n}\r\n}",
+                                                                "method": "POST",
+                                                                "headers": [
+                                                                    {
+                                                                        "key": "Content-Type",
+                                                                        "value": "application/json"
+                                                                    }
+                                                                ]
+                                                            },
+                                                            "metadata": {
+                                                                "designer": {
+                                                                    "x": 3000,
+                                                                    "y": 900,
+                                                                    "name": "Comentario en timeline"
+                                                                },
+                                                                "restore": {
+                                                                    "expect": {
+                                                                        "qs": {
+                                                                            "mode": "chose"
+                                                                        },
+                                                                        "method": {
+                                                                            "mode": "chose",
+                                                                            "label": "POST"
+                                                                        },
+                                                                        "headers": {
+                                                                            "mode": "chose",
+                                                                            "items": [
+                                                                                null
+                                                                            ]
+                                                                        }
+                                                                    },
+                                                                    "parameters": {
+                                                                        "__IMTCONN__": {
+                                                                            "data": {
+                                                                                "scoped": "true",
+                                                                                "connection": "bitrix24"
+                                                                            },
+                                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)"
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "parameters": [
+                                                                    {
+                                                                        "name": "__IMTCONN__",
+                                                                        "type": "account:bitrix24",
+                                                                        "label": "Connection",
+                                                                        "required": true
+                                                                    }
+                                                                ],
+                                                                "expect": [
+                                                                    {
+                                                                        "name": "url",
+                                                                        "type": "text",
+                                                                        "label": "URL",
+                                                                        "required": true
+                                                                    },
+                                                                    {
+                                                                        "name": "method",
+                                                                        "type": "select",
+                                                                        "label": "Method",
+                                                                        "required": true,
+                                                                        "validate": {
+                                                                            "enum": [
+                                                                                "GET",
+                                                                                "POST",
+                                                                                "PUT",
+                                                                                "PATCH",
+                                                                                "DELETE"
+                                                                            ]
+                                                                        }
+                                                                    },
+                                                                    {
+                                                                        "name": "headers",
+                                                                        "spec": [
+                                                                            {
+                                                                                "name": "key",
+                                                                                "type": "text",
+                                                                                "label": "Key"
+                                                                            },
+                                                                            {
+                                                                                "name": "value",
+                                                                                "type": "text",
+                                                                                "label": "Value"
+                                                                            }
+                                                                        ],
+                                                                        "type": "array",
+                                                                        "label": "Headers"
+                                                                    },
+                                                                    {
+                                                                        "name": "qs",
+                                                                        "spec": [
+                                                                            {
+                                                                                "name": "key",
+                                                                                "type": "text",
+                                                                                "label": "Key"
+                                                                            },
+                                                                            {
+                                                                                "name": "value",
+                                                                                "type": "text",
+                                                                                "label": "Value"
+                                                                            }
+                                                                        ],
+                                                                        "type": "array",
+                                                                        "label": "Query String"
                                                                     },
                                                                     {
                                                                         "name": "body",
@@ -5068,7 +5549,7 @@
                                                             },
                                                             "metadata": {
                                                                 "designer": {
-                                                                    "x": 3000,
+                                                                    "x": 3300,
                                                                     "y": 900,
                                                                     "name": "Clasificacion"
                                                                 },
@@ -5307,7 +5788,7 @@
                                                             },
                                                             "metadata": {
                                                                 "designer": {
-                                                                    "x": 3300,
+                                                                    "x": 3600,
                                                                     "y": 900
                                                                 },
                                                                 "restore": {
@@ -5408,8 +5889,8 @@
                             },
                             "metadata": {
                                 "designer": {
-                                    "x": 1200,
-                                    "y": 1200
+                                    "x": 1175,
+                                    "y": 866
                                 },
                                 "restore": {
                                     "expect": {

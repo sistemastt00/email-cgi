@@ -2,7 +2,7 @@
 handlers/bot_humano.py — Escenario 1.5: Bot o Humano
 
 Recibe (de clasificacion.py):
-    message_id, thread_id, lead_id, nombre, bot_humano,
+    message_id, thread_id, ticket_id, nombre, bot_humano,
     categoria_correo, tipo_correo, subject, row
 
 Lógica:
@@ -29,7 +29,7 @@ async def run(args: dict) -> dict:
     bot_humano = args.get("bot_humano", "")
     thread_id  = args.get("thread_id", "")
     message_id = args.get("message_id", "")
-    lead_id    = args.get("lead_id", "")
+    ticket_id  = args.get("ticket_id", "")
     nombre     = args.get("nombre", "")
     categoria  = args.get("categoria_correo", "")
     subject    = args.get("subject", "")
@@ -48,39 +48,39 @@ async def run(args: dict) -> dict:
     from_email = email.get("fromEmail", "")
     email_subj = email.get("subject", "") or subject
 
-    logger.info(f"[1.5] humano | from={from_email} | lead_id={lead_id}")
+    logger.info(f"[1.5] humano | from={from_email} | ticket_id={ticket_id}")
 
     # 2. Buscar contacto Bitrix
     contacts   = await bitrix.search_contacts_by_email(from_email)
     contact_id = contacts[0]["ID"] if contacts else None
 
     # 3. Enviar correo de ticket al cliente
-    ticket_subject = f"Número de Ticket #{lead_id} - {email_subj}"
+    ticket_subject = f"Número de Ticket #{ticket_id} - {email_subj}"
     await gmail.send_email(
         to        = [from_email],
         subject   = ticket_subject,
-        body      = email_templates.ticket_email(nombre, lead_id),
+        body      = email_templates.ticket_email(nombre, ticket_id),
         body_type = "html",
         bcc       = _TICKET_BCC,
     )
     logger.info(f"[1.5] Ticket enviado | subject={ticket_subject!r}")
 
-    # 4. Actualizar Lead en Bitrix
-    lead_fields = {
-        "STAGE_ID":       "UC_BZJ6XN",
-        "ASSIGNED_BY_ID": "6358",
-        "TITLE":          f"CGI - Requiere HUMANO: {categoria}",
+    # 4. Actualizar item SPA 1034
+    item_fields = {
+        "stageId":      "DT1034_120:CLIENT",
+        "assignedById": "6358",
+        "title":        f"CGI - Requiere HUMANO: {categoria}",
     }
     if contact_id:
-        lead_fields["CONTACT_ID"] = contact_id
+        item_fields["contactId"] = contact_id
 
-    if lead_id:
-        await bitrix.update_lead(lead_id, lead_fields)
-        logger.info(f"[1.5] Lead actualizado | lead_id={lead_id} | contact_id={contact_id}")
+    if ticket_id:
+        await bitrix.update_crm_item(1034, ticket_id, item_fields)
+        logger.info(f"[1.5] Item 1034 actualizado | ticket_id={ticket_id} | contact_id={contact_id}")
 
         # 5. Comentario en timeline
         await bitrix.add_timeline_comment(
-            "lead", lead_id,
+            "dynamic_1034", ticket_id,
             f"Comunicarse con el cliente. No se atendió al requerimiento. "
             f"El emisor del correo solicita la comunicación con un HUMANO para {categoria}",
         )
@@ -106,4 +106,4 @@ async def run(args: dict) -> dict:
         )
         logger.info(f"[1.5] Clasificación actualizada | clasif_id={clasif_id}")
 
-    return {"status": "ok", "bot_humano": "humano", "ticket_subject": ticket_subject}
+    return {"status": "ok", "bot_humano": "humano", "ticket_subject": ticket_subject, "ticket_id": ticket_id}

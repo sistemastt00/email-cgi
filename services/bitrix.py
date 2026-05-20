@@ -39,12 +39,7 @@ async def create_contact(fields: dict) -> dict:
     return await api_call("crm.contact.add", {"fields": fields})
 
 
-# ─── Leads ────────────────────────────────────────────────────────────────────
-
-async def create_lead(fields: dict) -> dict:
-    """Crea un lead CRM. Devuelve {result: id}."""
-    return await api_call("crm.lead.add", {"fields": fields})
-
+# ─── SPA Items ────────────────────────────────────────────────────────────────
 
 async def create_crm_item(entity_type_id: int, fields: dict) -> dict:
     """Crea un elemento en un pipeline SPA (crm.item.add). Devuelve el item."""
@@ -54,11 +49,12 @@ async def create_crm_item(entity_type_id: int, fields: dict) -> dict:
     })
 
 
-async def update_lead(lead_id: str | int, fields: dict) -> dict:
-    """Actualiza campos de un lead."""
-    return await api_call("crm.lead.update", {
-        "id":     lead_id,
-        "fields": fields,
+async def update_crm_item(entity_type_id: int, item_id: str | int, fields: dict) -> dict:
+    """Actualiza un elemento SPA (crm.item.update)."""
+    return await api_call("crm.item.update", {
+        "entityTypeId": entity_type_id,
+        "id":           item_id,
+        "fields":       fields,
     })
 
 
@@ -71,7 +67,7 @@ async def add_timeline_comment(
 ) -> dict:
     """
     Añade un comentario al timeline de una entidad CRM.
-    entity_type: "lead" | "contact" | "deal"
+    entity_type: "dynamic_1034" | "contact" | "deal"
     """
     return await api_call("crm.timeline.comment.add", {
         "fields": {

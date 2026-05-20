@@ -255,7 +255,7 @@ def _render_monitor():
         from_display = s["from_name"] or s["from_email"]
         subj = s["subject"].replace("<", "&lt;")[:60]
         nombre_val = s["nombre"] if s["nombre"] and s["nombre"] != "—" else "—"
-        lead_val   = f"#{s['lead_id']}" if s["lead_id"] and s["lead_id"] != "—" else "—"
+        lead_val   = f"#{s['ticket_id']}" if s["ticket_id"] and s["ticket_id"] != "—" else "—"
         log_rows = ""
         for entry in s.get("logs", []):
             lc = {"ERROR": "#e74c3c", "WARNING": "#f39c12", "INFO": "#3498db"}.get(entry["level"], "#aaa")

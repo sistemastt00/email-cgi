@@ -73,15 +73,15 @@ async def run(args: dict) -> dict:
     )
     logger.info(f"[1.2] Airtable upsert | record_id={record_id or 'nuevo'}")
 
-    # 5. Comentario en Bitrix24 si existe lead_id
-    lead_id = existing.get("lead_id")
-    if lead_id and dni and dni != "null":
+    # 5. Comentario en Bitrix24 si existe ticket_id
+    ticket_id = existing.get("lead_id")  # Airtable field still named lead_id
+    if ticket_id and dni and dni != "null":
         await bitrix.add_timeline_comment(
-            entity_type="lead",
-            entity_id=lead_id,
+            entity_type="dynamic_1034",
+            entity_id=ticket_id,
             comment=f"DNI CORREGIDO {dni}",
         )
-        logger.info(f"[1.2] Timeline comment añadido | lead_id={lead_id}")
+        logger.info(f"[1.2] Timeline comment añadido | ticket_id={ticket_id}")
 
     fields = updated.get("fields", {})
     return {

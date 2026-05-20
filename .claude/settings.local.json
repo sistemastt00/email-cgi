@@ -36,7 +36,9 @@
       "Bash(python3)",
       "Bash(python)",
       "Bash(powershell -Command \"\\(Get-Content '1. Clasificación de correos CGI.blueprint.json' | Measure-Object -Line\\).Lines\")",
-      "Bash(powershell -Command \"Select-String -Pattern '\\\\\"id\\\\\": \\(2[5-9]|[3-9][0-9]\\)' '1. Clasificación de correos CGI.blueprint.json' | Select-Object -First 20\")"
+      "Bash(powershell -Command \"Select-String -Pattern '\\\\\"id\\\\\": \\(2[5-9]|[3-9][0-9]\\)' '1. Clasificación de correos CGI.blueprint.json' | Select-Object -First 20\")",
+      "Bash(findstr /C:\"crm.item\" \"1.1. Extracción Datos - 1er correo.blueprint.json\")",
+      "Bash(findstr /C:\"crm.lead\" \"1.5. Bot o Humano.blueprint.json\")"
     ]
   }
 }

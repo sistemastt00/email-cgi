@@ -15,7 +15,7 @@ Lógica:
      - Si hay adjuntos → comenta en timeline Bitrix
 
 Devuelve:
-    {lead_id, nombre, apellido, Cliente (bool), datos_extraidos_id}
+    {ticket_id, nombre, apellido, Cliente (bool), datos_extraidos_id}
 """
 import logging
 import config
@@ -74,7 +74,7 @@ _PARAMS_FRANQUICIA = [
 ]
 
 
-def _datos_extraidos_fields(args: dict, gpt: dict, lead_id: str,
+def _datos_extraidos_fields(args: dict, gpt: dict, ticket_id: str,
                              from_email: str, email_to: str, subject: str) -> dict:
     return {
         "fldD5UfZHBGw8VnB9": args.get("categoria_correo", ""),
@@ -88,7 +88,7 @@ def _datos_extraidos_fields(args: dict, gpt: dict, lead_id: str,
         "flddKn7zZbx4JxG2C": from_email,
         "fldkbeuamIponQYBs": from_email,
         "fldhg38Me05r19rBb": gpt.get("n_contrato", ""),
-        "fldiGEfwffi6SSteD": lead_id,
+        "fldiGEfwffi6SSteD": ticket_id,
         "fldkENBRVsvYqJX10": gpt.get("telefono", ""),
         "fldkQKHpXP7eQuD3E": gpt.get("centro", ""),
         "fldrIiOucUDZMiUXW": gpt.get("dni", ""),
@@ -152,33 +152,33 @@ async def _with_contact(args, gpt_data, from_email, email_to, subject, has_attac
     nombre_bx   = contact.get("NAME", gpt_data.get("nombre", ""))
     apellido_bx = contact.get("LAST_NAME", gpt_data.get("apellido", ""))
 
-    lead_resp = await bitrix.create_lead({
-        "TITLE":          f"CGI - Respuesta automática: {args.get('categoria_correo', '')}",
-        "STATUS_ID":      "NEW",
-        "CONTACT_IDS":    [contact_id],
-        "SOURCE_ID": "EMAIL",
-        "ASSIGNED_BY_ID": _ASSIGNED_BY_ID,
+    item_resp = await bitrix.create_crm_item(1034, {
+        "title":        f"CGI - Respuesta automática: {args.get('categoria_correo', '')}",
+        "stageId":      "DT1034_120:NEW",
+        "contactId":    contact_id,
+        "sourceId":     "EMAIL",
+        "assignedById": _ASSIGNED_BY_ID,
     })
-    lead_id = str(lead_resp.get("result", ""))
+    ticket_id = str(item_resp.get("result", {}).get("item", {}).get("id", ""))
 
     at_record = await airtable.create_record(
         config.AT_TBL_DATOS_EXTRAIDOS,
-        _datos_extraidos_fields(args, gpt_data, lead_id, from_email, email_to, subject),
+        _datos_extraidos_fields(args, gpt_data, ticket_id, from_email, email_to, subject),
     )
     at_id = at_record.get("id", "")
 
     if has_attach:
         await bitrix.add_timeline_comment(
-            "LEAD", lead_id,
+            "dynamic_1034", ticket_id,
             f"📧 CORREO RECIBIDO de {from_email}:\nAsunto: {subject}"
         )
 
-    logger.info(f"[1.1] Lead (contacto existente) | lead_id={lead_id} | at={at_id}")
+    logger.info(f"[1.1] Item 1034 (contacto existente) | ticket_id={ticket_id} | at={at_id}")
     return {
         "nombre": nombre_bx, "apellido": apellido_bx, "email": from_email,
         "dni": gpt_data.get("dni", ""), "n_modulo": gpt_data.get("n_modulo", ""),
         "n_contrato": gpt_data.get("n_contrato", ""), "telefono": gpt_data.get("telefono", ""),
-        "lead_id": lead_id, "centro": gpt_data.get("centro", ""),
+        "ticket_id": ticket_id, "centro": gpt_data.get("centro", ""),
         "datos_extraidos_id": at_id, "Cliente": True,
     }
 
@@ -197,30 +197,30 @@ async def _without_contact(args, gpt_data, from_email, email_to, subject, has_at
     })
     contact_id = str(contact_resp.get("result", ""))
 
-    lead_resp = await bitrix.create_lead({
-        "TITLE":          f"CGI - Respuesta automática: {args.get('categoria_correo', '')}",
-        "STATUS_ID":      "NEW",
-        "CONTACT_IDS":    [contact_id],
-        "SOURCE_ID": "EMAIL",
-        "ASSIGNED_BY_ID": _ASSIGNED_BY_ID,
+    item_resp = await bitrix.create_crm_item(1034, {
+        "title":        f"CGI - Respuesta automática: {args.get('categoria_correo', '')}",
+        "stageId":      "DT1034_120:NEW",
+        "contactId":    contact_id,
+        "sourceId":     "EMAIL",
+        "assignedById": _ASSIGNED_BY_ID,
     })
-    lead_id = str(lead_resp.get("result", ""))
+    ticket_id = str(item_resp.get("result", {}).get("item", {}).get("id", ""))
 
     at_record = await airtable.create_record(
         config.AT_TBL_DATOS_EXTRAIDOS,
-        _datos_extraidos_fields(args, gpt_data, lead_id, from_email, email_to, subject),
+        _datos_extraidos_fields(args, gpt_data, ticket_id, from_email, email_to, subject),
     )
     at_id = at_record.get("id", "")
 
     if has_attach:
-        await bitrix.add_timeline_comment("lead", lead_id, "Archivos adjuntos: ")
+        await bitrix.add_timeline_comment("dynamic_1034", ticket_id, "Archivos adjuntos: ")
 
-    logger.info(f"[1.1] Lead (contacto nuevo) | lead_id={lead_id} | at={at_id}")
+    logger.info(f"[1.1] Item 1034 (contacto nuevo) | ticket_id={ticket_id} | at={at_id}")
     return {
         "nombre": gpt_data.get("nombre", ""), "apellido": gpt_data.get("apellido", ""),
         "email": from_email, "dni": gpt_data.get("dni", ""),
         "n_modulo": gpt_data.get("n_modulo", ""), "n_contrato": gpt_data.get("n_contrato", ""),
-        "telefono": gpt_data.get("telefono", ""), "lead_id": lead_id,
+        "telefono": gpt_data.get("telefono", ""), "ticket_id": ticket_id,
         "centro": gpt_data.get("centro", ""), "datos_extraidos_id": at_id, "Cliente": False,
     }
 
@@ -254,19 +254,19 @@ async def _handle_franquicia(args, from_email, email_to, subject, body):
         "ufCrm48_1705404240183": gpt_data.get("localidad", ""),
         "ufCrm48_1705404499208": gpt_data.get("numero_plantas", ""),
     })
-    item_id = item_resp.get("result", {}).get("item", {}).get("id", "")
-    lead_id = f"169_{item_id}"
+    item_id   = item_resp.get("result", {}).get("item", {}).get("id", "")
+    ticket_id = f"169_{item_id}"
 
     at_record = await airtable.create_record(
         config.AT_TBL_DATOS_EXTRAIDOS,
-        _datos_extraidos_fields(args, gpt_data, lead_id, from_email, email_to, subject),
+        _datos_extraidos_fields(args, gpt_data, ticket_id, from_email, email_to, subject),
     )
     at_id = at_record.get("id", "")
 
     logger.info(f"[1.1] Franquicia creada | item={item_id} | at={at_id}")
     return {
         "nombre": gpt_data.get("nombre", ""), "apellido": "",
-        "email": from_email, "lead_id": lead_id,
+        "email": from_email, "ticket_id": ticket_id,
         "centro": gpt_data.get("centro_operativo", ""),
         "datos_extraidos_id": at_id, "Cliente": True,
     }

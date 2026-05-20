@@ -525,15 +525,12 @@
             },
             "mapper": {
                 "base": "appMNiPmgPOBdXZxt",
-                "useColumnId": false,
-                "table": "tblFsUGpeqIvAnEVh",
-                "formula": "{thread_id}=\"{{1.thread_id}}\"",
-                "maxRecords": "1",
                 "view": "viwXuqiglkuOhwjw4",
+                "table": "tblFsUGpeqIvAnEVh",
                 "fields": [
                     "thread_id",
                     "fecha_creacion",
-                    "asunto",
+                    "Asunto",
                     "from_email",
                     "to_email",
                     "nombre",
@@ -547,10 +544,12 @@
                     "categoria_api",
                     "tipo",
                     "codigo_generado",
-                    "ticket_id",
-                    "categoria_label",
-                    "lead_id"
-                ]
+                    "lead_id",
+                    "categoria_label"
+                ],
+                "formula": "{thread_id}=\"{{1.thread_id}}\"",
+                "maxRecords": "1",
+                "useColumnId": false
             },
             "metadata": {
                 "designer": {
@@ -559,26 +558,10 @@
                     "name": "Datos"
                 },
                 "restore": {
-                    "parameters": {
-                        "__IMTCONN__": {
-                            "label": "My Airtable OAuth connection MasIP (User ID: usrhEfequCBBlG5d3)",
-                            "data": {
-                                "scoped": "true",
-                                "connection": "airtable3"
-                            }
-                        }
-                    },
                     "expect": {
                         "base": {
                             "mode": "chose",
                             "label": "Email CGI"
-                        },
-                        "useColumnId": {
-                            "mode": "chose"
-                        },
-                        "table": {
-                            "mode": "chose",
-                            "label": "Datos extraídos"
                         },
                         "sort": {
                             "mode": "chose"
@@ -587,12 +570,16 @@
                             "mode": "chose",
                             "label": "Grid view"
                         },
+                        "table": {
+                            "mode": "chose",
+                            "label": "Datos extraídos"
+                        },
                         "fields": {
                             "mode": "chose",
                             "label": [
                                 "thread_id",
                                 "fecha_creacion",
-                                "asunto",
+                                "Asunto",
                                 "from_email",
                                 "to_email",
                                 "nombre",
@@ -606,10 +593,21 @@
                                 "categoria_api",
                                 "tipo",
                                 "codigo_generado",
-                                "ticket_id",
-                                "categoria_label",
-                                "lead_id"
+                                "lead_id",
+                                "categoria_label"
                             ]
+                        },
+                        "useColumnId": {
+                            "mode": "chose"
+                        }
+                    },
+                    "parameters": {
+                        "__IMTCONN__": {
+                            "data": {
+                                "scoped": "true",
+                                "connection": "airtable3"
+                            },
+                            "label": "My Airtable OAuth connection MasIP (User ID: usrhEfequCBBlG5d3)"
                         }
                     }
                 },
@@ -652,15 +650,13 @@
                     },
                     {
                         "name": "sort",
-                        "type": "array",
-                        "label": "Sort",
                         "spec": [
                             {
                                 "name": "field",
                                 "type": "select",
                                 "label": "Field",
-                                "options": [],
-                                "dynamic": true
+                                "dynamic": true,
+                                "options": []
                             },
                             {
                                 "name": "direction",
@@ -677,7 +673,9 @@
                                     }
                                 ]
                             }
-                        ]
+                        ],
+                        "type": "array",
+                        "label": "Sort"
                     },
                     {
                         "name": "view",
@@ -694,13 +692,13 @@
                 "interface": [
                     {
                         "name": "__IMTLENGTH__",
-                        "label": "Total number of bundles",
-                        "type": "uinteger"
+                        "type": "uinteger",
+                        "label": "Total number of bundles"
                     },
                     {
                         "name": "__IMTINDEX__",
-                        "label": "Bundle order position",
-                        "type": "uinteger"
+                        "type": "uinteger",
+                        "label": "Bundle order position"
                     },
                     {
                         "name": "id",
@@ -714,99 +712,89 @@
                     },
                     {
                         "name": "thread_id",
-                        "label": "thread_id",
                         "type": "text",
+                        "label": "thread_id",
                         "multiline": true
                     },
                     {
                         "name": "fecha_creacion",
-                        "label": "fecha_creacion",
-                        "type": "date"
-                    },
-                    {
-                        "name": "asunto",
-                        "label": "asunto",
-                        "type": "text"
+                        "type": "date",
+                        "label": "fecha_creacion"
                     },
                     {
                         "name": "from_email",
-                        "label": "from_email",
-                        "type": "text"
+                        "type": "text",
+                        "label": "from_email"
                     },
                     {
                         "name": "to_email",
-                        "label": "to_email",
-                        "type": "text"
+                        "type": "text",
+                        "label": "to_email"
                     },
                     {
                         "name": "nombre",
-                        "label": "nombre",
-                        "type": "text"
+                        "type": "text",
+                        "label": "nombre"
                     },
                     {
                         "name": "apellido",
-                        "label": "apellido",
-                        "type": "text"
+                        "type": "text",
+                        "label": "apellido"
                     },
                     {
                         "name": "dni",
-                        "label": "dni",
-                        "type": "text"
+                        "type": "text",
+                        "label": "dni"
                     },
                     {
                         "name": "telefono",
-                        "label": "telefono",
-                        "type": "text"
+                        "type": "text",
+                        "label": "telefono"
                     },
                     {
                         "name": "email",
-                        "label": "email",
-                        "type": "text"
+                        "type": "text",
+                        "label": "email"
                     },
                     {
                         "name": "n_contrato",
-                        "label": "n_contrato",
-                        "type": "text"
+                        "type": "text",
+                        "label": "n_contrato"
                     },
                     {
                         "name": "n_modulo",
-                        "label": "n_modulo",
-                        "type": "text"
+                        "type": "text",
+                        "label": "n_modulo"
                     },
                     {
                         "name": "centro",
-                        "label": "centro",
-                        "type": "text"
+                        "type": "text",
+                        "label": "centro"
                     },
                     {
                         "name": "categoria_api",
-                        "label": "categoria_api",
-                        "type": "text"
+                        "type": "text",
+                        "label": "categoria_api"
                     },
                     {
                         "name": "tipo",
-                        "label": "tipo",
-                        "type": "text"
+                        "type": "text",
+                        "label": "tipo"
                     },
                     {
                         "name": "codigo_generado",
-                        "label": "codigo_generado",
-                        "type": "text"
+                        "type": "text",
+                        "label": "codigo_generado"
                     },
                     {
                         "name": "lead_id",
-                        "label": "lead_id",
-                        "type": "text"
-                    },
-                    {
-                        "name": "ticket_id",
-                        "label": "ticket_id",
-                        "type": "text"
+                        "type": "text",
+                        "label": "lead_id"
                     },
                     {
                         "name": "categoria_label",
-                        "label": "categoria_label",
-                        "type": "text"
+                        "type": "text",
+                        "label": "categoria_label"
                     }
                 ]
             }
@@ -821,13 +809,13 @@
             "filter": null,
             "mapper": {
                 "base": "appMNiPmgPOBdXZxt",
-                "typecast": false,
-                "useColumnId": false,
                 "table": "tblFsUGpeqIvAnEVh",
-                "recordId": "{{3.id}}",
                 "record": {
                     "fldrIiOucUDZMiUXW": "{{2.dni}}"
-                }
+                },
+                "recordId": "{{3.id}}",
+                "typecast": false,
+                "useColumnId": false
             },
             "metadata": {
                 "designer": {
@@ -836,27 +824,27 @@
                     "name": "Datos"
                 },
                 "restore": {
-                    "parameters": {
-                        "__IMTCONN__": {
-                            "label": "My Airtable OAuth connection MasIP (User ID: usrhEfequCBBlG5d3)",
-                            "data": {
-                                "scoped": "true",
-                                "connection": "airtable3"
-                            }
-                        }
-                    },
                     "expect": {
                         "base": {
                             "label": "Email CGI"
+                        },
+                        "table": {
+                            "label": "Datos extraídos"
                         },
                         "typecast": {
                             "mode": "chose"
                         },
                         "useColumnId": {
                             "mode": "chose"
-                        },
-                        "table": {
-                            "label": "Datos extraídos"
+                        }
+                    },
+                    "parameters": {
+                        "__IMTCONN__": {
+                            "data": {
+                                "scoped": "true",
+                                "connection": "airtable3"
+                            },
+                            "label": "My Airtable OAuth connection MasIP (User ID: usrhEfequCBBlG5d3)"
                         }
                     }
                 },
@@ -900,8 +888,6 @@
                     },
                     {
                         "name": "record",
-                        "type": "collection",
-                        "label": "Record",
                         "spec": [
                             {
                                 "name": "fldI9gglSHnvp0ptM",
@@ -911,7 +897,7 @@
                             {
                                 "name": "fldGQIcSIN49d4OzB",
                                 "type": "text",
-                                "label": "asunto"
+                                "label": "Asunto"
                             },
                             {
                                 "name": "fldkbeuamIponQYBs",
@@ -984,16 +970,13 @@
                                 "label": "lead_id"
                             },
                             {
-                                "name": "fld5mQVmKfGTbTI6j",
-                                "type": "text",
-                                "label": "ticket_id"
-                            },
-                            {
                                 "name": "fldD5UfZHBGw8VnB9",
                                 "type": "text",
                                 "label": "categoria_label"
                             }
-                        ]
+                        ],
+                        "type": "collection",
+                        "label": "Record"
                     }
                 ],
                 "interface": [
@@ -1009,99 +992,93 @@
                     },
                     {
                         "name": "thread_id",
-                        "label": "thread_id",
                         "type": "text",
-                        "multiline": true
+                        "label": "thread_id"
                     },
                     {
                         "name": "fecha_creacion",
-                        "label": "fecha_creacion",
-                        "type": "date"
+                        "type": "date",
+                        "label": "fecha_creacion"
                     },
                     {
-                        "name": "asunto",
-                        "label": "asunto",
-                        "type": "text"
+                        "name": "Asunto",
+                        "type": "text",
+                        "label": "Asunto"
                     },
                     {
                         "name": "from_email",
-                        "label": "from_email",
-                        "type": "text"
+                        "type": "text",
+                        "label": "from_email"
                     },
                     {
                         "name": "to_email",
-                        "label": "to_email",
-                        "type": "text"
+                        "type": "text",
+                        "label": "to_email"
                     },
                     {
                         "name": "nombre",
-                        "label": "nombre",
-                        "type": "text"
+                        "type": "text",
+                        "label": "nombre"
                     },
                     {
                         "name": "apellido",
-                        "label": "apellido",
-                        "type": "text"
+                        "type": "text",
+                        "label": "apellido"
                     },
                     {
                         "name": "dni",
-                        "label": "dni",
-                        "type": "text"
+                        "type": "text",
+                        "label": "dni"
                     },
                     {
                         "name": "telefono",
-                        "label": "telefono",
-                        "type": "text"
+                        "type": "text",
+                        "label": "telefono"
                     },
                     {
                         "name": "email",
-                        "label": "email",
-                        "type": "text"
+                        "type": "text",
+                        "label": "email"
                     },
                     {
                         "name": "n_contrato",
-                        "label": "n_contrato",
-                        "type": "text"
+                        "type": "text",
+                        "label": "n_contrato"
                     },
                     {
                         "name": "n_modulo",
-                        "label": "n_modulo",
-                        "type": "text"
+                        "type": "text",
+                        "label": "n_modulo"
                     },
                     {
                         "name": "centro",
-                        "label": "centro",
-                        "type": "text"
+                        "type": "text",
+                        "label": "centro"
                     },
                     {
                         "name": "categoria_api",
-                        "label": "categoria_api",
-                        "type": "text"
+                        "type": "text",
+                        "label": "categoria_api"
                     },
                     {
                         "name": "tipo",
-                        "label": "tipo",
-                        "type": "text"
+                        "type": "text",
+                        "label": "tipo"
                     },
                     {
                         "name": "codigo_generado",
-                        "label": "codigo_generado",
-                        "type": "text"
+                        "type": "text",
+                        "label": "codigo_generado"
                     },
                     {
                         "name": "lead_id",
-                        "label": "lead_id",
-                        "type": "text"
-                    },
-                    {
-                        "name": "ticket_id",
-                        "label": "ticket_id",
-                        "type": "text"
+                        "type": "text",
+                        "label": "lead_id"
                     },
                     {
                         "name": "categoria_label",
-                        "label": "categoria_label",
-                        "type": "text"
+                        "type": "text",
+                        "label": "categoria_label"
                     }
                 ]
             }
@@ -1115,14 +1092,14 @@
             },
             "mapper": {
                 "url": "crm.timeline.comment.add",
+                "body": "{\r\n  \"fields\": {\r\n    \"ENTITY_ID\":{{7.lead_id}},\r\n    \"ENTITY_TYPE\": \"lead\",\r\n    \"COMMENT\": \"DNI CORREGIDO {{2.dni}}\"\r\n}\r\n}",
                 "method": "POST",
                 "headers": [
                     {
                         "key": "Content-Type",
                         "value": "application/json"
                     }
-                ],
-                "body": "{\r\n  \"fields\": {\r\n    \"ENTITY_ID\":{{7.ticket_id}},\r\n    \"ENTITY_TYPE\": \"dynamic_1034\",\r\n    \"COMMENT\": \"DNI CORREGIDO {{2.dni}}\"\r\n}\r\n}"
+                ]
             },
             "metadata": {
                 "designer": {
@@ -1131,16 +1108,10 @@
                     "name": "Comentario en timeline"
                 },
                 "restore": {
-                    "parameters": {
-                        "__IMTCONN__": {
-                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)",
-                            "data": {
-                                "scoped": "true",
-                                "connection": "bitrix24"
-                            }
-                        }
-                    },
                     "expect": {
+                        "qs": {
+                            "mode": "chose"
+                        },
                         "method": {
                             "mode": "chose",
                             "label": "POST"
@@ -1150,9 +1121,15 @@
                             "items": [
                                 null
                             ]
-                        },
-                        "qs": {
-                            "mode": "chose"
+                        }
+                    },
+                    "parameters": {
+                        "__IMTCONN__": {
+                            "data": {
+                                "scoped": "true",
+                                "connection": "bitrix24"
+                            },
+                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)"
                         }
                     }
                 },
@@ -1188,8 +1165,6 @@
                     },
                     {
                         "name": "headers",
-                        "type": "array",
-                        "label": "Headers",
                         "spec": [
                             {
                                 "name": "key",
@@ -1201,12 +1176,12 @@
                                 "type": "text",
                                 "label": "Value"
                             }
-                        ]
+                        ],
+                        "type": "array",
+                        "label": "Headers"
                     },
                     {
                         "name": "qs",
-                        "type": "array",
-                        "label": "Query String",
                         "spec": [
                             {
                                 "name": "key",
@@ -1218,7 +1193,9 @@
                                 "type": "text",
                                 "label": "Value"
                             }
-                        ]
+                        ],
+                        "type": "array",
+                        "label": "Query String"
                     },
                     {
                         "name": "body",
@@ -1234,8 +1211,8 @@
             "version": 1,
             "parameters": {},
             "mapper": {
-                "status": "200",
                 "body": "{\n  \"nombre\":\"{{7.nombre}}\",\n   \"apellido\":\"{{7.apellido}}\",\n   \"dni\":\"{{7.dni}}\",\n   \"n_modulo\":\"{{7.n_contrato}}\",  \n   \"n_contrato\":\"{{7.n_contrato}}\",\n   \"tipo_contacto\":\"{{7.tipo}}\",  \n   \"telefono\":\"{{7.telefono}}\",  \n   \"datos_extraidos_id\":\"{{7.id}}\",\n   \"centro\":\"{{7.centro}}\"\n  }",
+                "status": "200",
                 "headers": [
                     {
                         "key": "Content-Type",
@@ -1263,10 +1240,10 @@
                         "name": "status",
                         "type": "uinteger",
                         "label": "Status",
+                        "required": true,
                         "validate": {
                             "min": 100
-                        },
-                        "required": true
+                        }
                     },
                     {
                         "name": "body",
@@ -1275,16 +1252,11 @@
                     },
                     {
                         "name": "headers",
-                        "type": "array",
-                        "label": "Custom headers",
-                        "validate": {
-                            "maxItems": 16
-                        },
                         "spec": [
                             {
                                 "name": "key",
-                                "label": "Key",
                                 "type": "text",
+                                "label": "Key",
                                 "required": true,
                                 "validate": {
                                     "max": 256
@@ -1292,14 +1264,19 @@
                             },
                             {
                                 "name": "value",
-                                "label": "Value",
                                 "type": "text",
+                                "label": "Value",
                                 "required": true,
                                 "validate": {
                                     "max": 4096
                                 }
                             }
-                        ]
+                        ],
+                        "type": "array",
+                        "label": "Custom headers",
+                        "validate": {
+                            "maxItems": 16
+                        }
                     }
                 ],
                 "advanced": true

@@ -156,6 +156,7 @@ async def _with_contact(args, gpt_data, from_email, email_to, subject, has_attac
         "TITLE":          f"CGI - Respuesta automática: {args.get('categoria_correo', '')}",
         "STATUS_ID":      "NEW",
         "CONTACT_IDS":    [contact_id],
+        "SOURCE_ID": "EMAIL",
         "ASSIGNED_BY_ID": _ASSIGNED_BY_ID,
     })
     lead_id = str(lead_resp.get("result", ""))
@@ -189,7 +190,6 @@ async def _without_contact(args, gpt_data, from_email, email_to, subject, has_at
         "EMAIL":       [{"VALUE": from_email, "TYPE_ID": "EMAIL", "VALUE_TYPE": "WORK"}],
         "PHONE":       [{"VALUE": gpt_data.get("telefono", ""), "TYPE_ID": "PHONE", "VALUE_TYPE": "WORK"}],
         "TYPE_ID":     "CLIENT",
-        "SOURCE_ID":   "EMAIL",
         "SECOND_NAME": " ",
         "UF_CRM_6FB0A682":   "122",
         "UF_CRM_FD1274F7":   "168",
@@ -201,6 +201,7 @@ async def _without_contact(args, gpt_data, from_email, email_to, subject, has_at
         "TITLE":          f"CGI - Respuesta automática: {args.get('categoria_correo', '')}",
         "STATUS_ID":      "NEW",
         "CONTACT_IDS":    [contact_id],
+        "SOURCE_ID": "EMAIL",
         "ASSIGNED_BY_ID": _ASSIGNED_BY_ID,
     })
     lead_id = str(lead_resp.get("result", ""))
@@ -236,7 +237,6 @@ async def _handle_franquicia(args, from_email, email_to, subject, body):
         "NAME":       gpt_data.get("nombre", ""),
         "EMAIL":      [{"VALUE": from_email, "TYPE_ID": "EMAIL", "VALUE_TYPE": "WORK"}],
         "TYPE_ID":    "OTHER",
-        "SOURCE_ID":  "EMAIL",
         "SECOND_NAME": " ",
         "UF_CRM_6FB0A682":   "122",
         "UF_CRM_FD1274F7":   "168",

@@ -38,7 +38,18 @@
       "Bash(powershell -Command \"\\(Get-Content '1. Clasificación de correos CGI.blueprint.json' | Measure-Object -Line\\).Lines\")",
       "Bash(powershell -Command \"Select-String -Pattern '\\\\\"id\\\\\": \\(2[5-9]|[3-9][0-9]\\)' '1. Clasificación de correos CGI.blueprint.json' | Select-Object -First 20\")",
       "Bash(findstr /C:\"crm.item\" \"1.1. Extracción Datos - 1er correo.blueprint.json\")",
-      "Bash(findstr /C:\"crm.lead\" \"1.5. Bot o Humano.blueprint.json\")"
+      "Bash(findstr /C:\"crm.lead\" \"1.5. Bot o Humano.blueprint.json\")",
+      "Bash(scp handlers/clasificacion.py sistemas@192.168.2.197:/home/sistemas/fastapi-email-cgi/handlers/clasificacion.py)",
+      "Bash(findstr /C:\"102\" \"1. Clasificación de correos CGI.blueprint.json\")",
+      "Bash(dir blueprints *)",
+      "Bash(powershell -Command \"Get-ChildItem -Filter '*Clasificación*' | Select-Object FullName\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File /tmp/find_nodes.ps1)",
+      "Bash(awk '/^[[:space:]]*\"id\": 82,/{flag=1; start=NR} flag && /^[[:space:]]*\"routes\"/{print NR\": routes found for node 82\"; found=1} flag && found && /^[[:space:]]*\\\\]/{if\\(++count==1\\) exit} flag{print NR\": \"$0}' \"1. Clasificación de correos CGI.blueprint.json\")",
+      "Bash(sed -n '5108,6891p' \"1. Clasificación de correos CGI.blueprint.json\")",
+      "Read(//tmp/**)",
+      "Bash(grep -n '^\\\\s*},\\\\s*$')",
+      "Bash(awk ' *)",
+      "Bash(ssh sistemas@192.168.2.197 \"cd /home/sistemas/fastapi-email-cgi && git pull && sudo systemctl restart fastapi-email-cgi && sudo systemctl status fastapi-email-cgi --no-pager -l\")"
     ]
   }
 }

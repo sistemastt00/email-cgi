@@ -383,16 +383,25 @@ _TEMPLATES_DIR = Path(__file__).parent.parent / "templates" / "emails"
 
 
 def _load_template(filename: str, **kwargs) -> tuple:
-    """Load body, cta_html, after_html from a template file.
+    """Load a template file and return (body, cta_html, after_html, is_full_html).
 
-    CTA format:   <!-- cta-dark: https://url/ | Button text -->
-                  <!-- cta-light: https://url/ | Button text -->
-    After format: <!-- after --> ... <!-- /after -->
+    Full HTML mode — paste a complete email HTML (starts with <!DOCTYPE or <html):
+      Python sends it as-is after substituting {nombre} / {lead_id}.
+
+    Fragment mode — HTML snippet with optional meta-comments:
+      <!-- cta-dark: https://url/ | Button text -->
+      <!-- cta-light: https://url/ | Button text -->
+      <!-- after --> ... <!-- /after -->
     """
     content = (_TEMPLATES_DIR / filename).read_text(encoding="utf-8")
     for key, val in kwargs.items():
         content = content.replace(f"{{{key}}}", str(val))
 
+    # Full HTML: skip build(), send as-is
+    if content.lstrip().startswith(("<!DOCTYPE", "<html", "<!doctype")):
+        return content, "", "", True
+
+    # Fragment mode
     after_m = re.search(r'<!--\s*after\s*-->(.*?)<!--\s*/after\s*-->', content, re.DOTALL)
     after = after_m.group(1).strip() if after_m else ""
 
@@ -406,97 +415,105 @@ def _load_template(filename: str, **kwargs) -> tuple:
     body = re.sub(r'<!--\s*cta-(?:dark|light):.*?-->\n?', '', content)
     body = re.sub(r'<!--\s*after\s*-->.*?<!--\s*/after\s*-->\n?', '', body, flags=re.DOTALL)
     body = re.sub(r'<!--.*?-->\n?', '', body)
-    return body.strip(), cta, after
+    return body.strip(), cta, after, False
+
+
+def _render(filename: str, title: str, banner: str, is_ticket: bool = False, **kwargs) -> str:
+    """Load template and build email — works for both full HTML files and fragments."""
+    body, cta, after, full = _load_template(filename, **kwargs)
+    if full:
+        return body
+    return build(title, banner, body, cta, after, is_ticket=is_ticket)
 
 
 def ticket_email(nombre: str, lead_id: str) -> str:
     """Generic humano/ticket — bot_humano.py and Otros."""
-    body, cta, after = _load_template("ticket.html", nombre=nombre or "cliente", lead_id=lead_id)
-    return build("CGI OtrosGen&#233;rico - tutrastero", BANNER_TICKET, body, cta, after, is_ticket=True)
+    return _render("ticket.html", "CGI OtrosGen&#233;rico - tutrastero", BANNER_TICKET,
+                   is_ticket=True, nombre=nombre or "cliente", lead_id=lead_id)
 
 
 def cambio_trastero_email(nombre: str, lead_id: str) -> str:
-    body, cta, after = _load_template("cambio_trastero.html", nombre=nombre or "cliente", lead_id=lead_id)
-    return build("CGI OtrosGen&#233;rico - tutrastero", BANNER_TICKET, body, cta, after, is_ticket=True)
+    return _render("cambio_trastero.html", "CGI OtrosGen&#233;rico - tutrastero", BANNER_TICKET,
+                   is_ticket=True, nombre=nombre or "cliente", lead_id=lead_id)
 
 
 def resena_ticket_email(nombre: str, lead_id: str) -> str:
-    body, cta, after = _load_template("resena_ticket.html", nombre=nombre or "cliente", lead_id=lead_id)
-    return build("CGI OtrosGen&#233;rico - tutrastero", BANNER_TICKET, body, cta, after, is_ticket=True)
+    return _render("resena_ticket.html", "CGI OtrosGen&#233;rico - tutrastero", BANNER_TICKET,
+                   is_ticket=True, nombre=nombre or "cliente", lead_id=lead_id)
 
 
 def otros_ticket_email(nombre: str, lead_id: str) -> str:
-    body, cta, after = _load_template("otros_ticket.html", nombre=nombre or "cliente", lead_id=lead_id)
-    return build("CGI OtrosGen&#233;rico - tutrastero", BANNER_TICKET, body, cta, after, is_ticket=True)
+    return _render("otros_ticket.html", "CGI OtrosGen&#233;rico - tutrastero", BANNER_TICKET,
+                   is_ticket=True, nombre=nombre or "cliente", lead_id=lead_id)
 
 
 def foto_salida_ticket_email(nombre: str, lead_id: str) -> str:
-    body, cta, after = _load_template("foto_salida_ticket.html", nombre=nombre or "cliente", lead_id=lead_id)
-    return build("CGI OtrosGen&#233;rico - tutrastero", BANNER_TICKET, body, cta, after, is_ticket=True)
+    return _render("foto_salida_ticket.html", "CGI OtrosGen&#233;rico - tutrastero", BANNER_TICKET,
+                   is_ticket=True, nombre=nombre or "cliente", lead_id=lead_id)
 
 
 def area_cliente_email(nombre: str) -> str:
-    body, cta, after = _load_template("area_cliente.html", nombre=nombre or "cliente")
-    return build("CGI &#193;rea Cliente - tutrastero", BANNER_AREA_CLI, body, cta, after)
+    return _render("area_cliente.html", "CGI &#193;rea Cliente - tutrastero", BANNER_AREA_CLI,
+                   nombre=nombre or "cliente")
 
 
 def mudanza_email(nombre: str) -> str:
-    body, cta, after = _load_template("mudanza.html", nombre=nombre or "cliente")
-    return build("CGI Mudanza - tutrastero", BANNER_MUDANZA_IMG, body, cta, after)
+    return _render("mudanza.html", "CGI Mudanza - tutrastero", BANNER_MUDANZA_IMG,
+                   nombre=nombre or "cliente")
 
 
 def materiales_email(nombre: str) -> str:
-    body, cta, after = _load_template("materiales.html", nombre=nombre or "cliente")
-    return build("CGI Materiales Embalaje - tutrastero", BANNER_MUDANZA_IMG, body, cta, after)
+    return _render("materiales.html", "CGI Materiales Embalaje - tutrastero", BANNER_MUDANZA_IMG,
+                   nombre=nombre or "cliente")
 
 
 def moroso_email(nombre: str) -> str:
-    body, cta, after = _load_template("moroso.html", nombre=nombre or "cliente")
-    return build("CGI Moroso - tutrastero", BANNER_MOROSO, body, cta, after)
+    return _render("moroso.html", "CGI Moroso - tutrastero", BANNER_MOROSO,
+                   nombre=nombre or "cliente")
 
 
 def desestima_email(nombre: str) -> str:
-    body, cta, after = _load_template("desestima.html", nombre=nombre or "cliente")
-    return build("CGI Desestima Oferta - tutrastero", BANNER_DESESTIMA, body, cta, after)
+    return _render("desestima.html", "CGI Desestima Oferta - tutrastero", BANNER_DESESTIMA,
+                   nombre=nombre or "cliente")
 
 
 # ── Área General CTA emails ───────────────────────────────────────────────────
 
 def agendar_visita_email(nombre: str) -> str:
-    body, cta, after = _load_template("agendar_visita.html", nombre=nombre or "cliente")
-    return build("CGI Agendar Visita - tutrastero", BANNER_AGENDAR, body, cta, after)
+    return _render("agendar_visita.html", "CGI Agendar Visita - tutrastero", BANNER_AGENDAR,
+                   nombre=nombre or "cliente")
 
 
 def reservar_trastero_email(nombre: str) -> str:
-    body, cta, after = _load_template("reservar_trastero.html", nombre=nombre or "cliente")
-    return build("CGI Reservar Tu Trastero - tutrastero", BANNER_RESERVAR, body, cta, after)
+    return _render("reservar_trastero.html", "CGI Reservar Tu Trastero - tutrastero", BANNER_RESERVAR,
+                   nombre=nombre or "cliente")
 
 
 def notificar_incidencia_email(nombre: str) -> str:
-    body, cta, after = _load_template("notificar_incidencia.html", nombre=nombre or "cliente")
-    return build("CGI Notificar Incidencia - tutrastero", BANNER_INCIDENCIA, body, cta, after)
+    return _render("notificar_incidencia.html", "CGI Notificar Incidencia - tutrastero", BANNER_INCIDENCIA,
+                   nombre=nombre or "cliente")
 
 
 def autorizar_terceros_email(nombre: str) -> str:
-    body, cta, after = _load_template("autorizar_terceros.html", nombre=nombre or "cliente")
-    return build("CGI Autorizar Terceros - tutrastero", BANNER_AUTORIZAR, body, cta, after)
+    return _render("autorizar_terceros.html", "CGI Autorizar Terceros - tutrastero", BANNER_AUTORIZAR,
+                   nombre=nombre or "cliente")
 
 
 def actualizar_datos_email(nombre: str) -> str:
-    body, cta, after = _load_template("actualizar_datos.html", nombre=nombre or "cliente")
-    return build("CGI Actualizar Datos - tutrastero", BANNER_ACTUALIZAR, body, cta, after)
+    return _render("actualizar_datos.html", "CGI Actualizar Datos - tutrastero", BANNER_ACTUALIZAR,
+                   nombre=nombre or "cliente")
 
 
 def hacer_inventario_email(nombre: str) -> str:
-    body, cta, after = _load_template("hacer_inventario.html", nombre=nombre or "cliente")
-    return build("CGI Hacer Inventario - tutrastero", BANNER_INVENTARIO, body, cta, after)
+    return _render("hacer_inventario.html", "CGI Hacer Inventario - tutrastero", BANNER_INVENTARIO,
+                   nombre=nombre or "cliente")
 
 
 def hacer_valoracion_email(nombre: str) -> str:
-    body, cta, after = _load_template("hacer_valoracion.html", nombre=nombre or "cliente")
-    return build("CGI Hacer Valoraci&#243;n - tutrastero", BANNER_VALORACION, body, cta, after)
+    return _render("hacer_valoracion.html", "CGI Hacer Valoraci&#243;n - tutrastero", BANNER_VALORACION,
+                   nombre=nombre or "cliente")
 
 
 def presupuesto_email(nombre: str) -> str:
-    body, cta, after = _load_template("presupuesto.html", nombre=nombre or "cliente")
-    return build("CGI Presupuesto - tutrastero", BANNER_PRESUPUESTO, body, cta, after)
+    return _render("presupuesto.html", "CGI Presupuesto - tutrastero", BANNER_PRESUPUESTO,
+                   nombre=nombre or "cliente")

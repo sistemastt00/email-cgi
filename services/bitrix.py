@@ -29,7 +29,7 @@ async def search_contacts_by_email(email: str) -> list[dict]:
         "limit":  1,
         "order":  {"DATE_CREATE": "DESC"},
         "filter": {"EMAIL": email},
-        "select": ["ID", "NAME", "LAST_NAME", "PHONE", "EMAIL"],
+        "select": ["ID", "NAME", "LAST_NAME", "PHONE", "EMAIL", "ASSIGNED_BY_ID"],
     })
     return data.get("result", [])
 

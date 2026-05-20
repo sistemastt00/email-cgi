@@ -151,13 +151,14 @@ async def _with_contact(args, gpt_data, from_email, email_to, subject, has_attac
     contact_id  = contact["ID"]
     nombre_bx   = contact.get("NAME", gpt_data.get("nombre", ""))
     apellido_bx = contact.get("LAST_NAME", gpt_data.get("apellido", ""))
+    assigned_by = contact.get("ASSIGNED_BY_ID") or _ASSIGNED_BY_ID
 
     item_resp = await bitrix.create_crm_item(1034, {
         "title":        f"CGI - Respuesta automática: {args.get('categoria_correo', '')}",
         "stageId":      "DT1034_120:NEW",
         "contactId":    contact_id,
         "sourceId":     "EMAIL",
-        "assignedById": _ASSIGNED_BY_ID,
+        "assignedById": assigned_by,
     })
     ticket_id = str(item_resp.get("result", {}).get("item", {}).get("id", ""))
 

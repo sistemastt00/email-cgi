@@ -227,7 +227,7 @@ em{color:#FBBF24;font-style:normal;font-weight:600}
     <div class="arr"><div class="arr-line"></div><div class="arr-tip">▼</div></div>
 
     <div class="center"><div class="gate" style="min-width:220px">
-      <div class="gate-icon">🏭</div>categoria == <em>"Franquicia"</em>?
+      <div class="gate-icon">🏭</div>categoria == <em>"franquicia"</em>?
     </div></div>
     <div class="arr-h" style="margin:5px 0">
       <span class="br br-y">SÍ — Franquicia</span>
@@ -262,7 +262,7 @@ em{color:#FBBF24;font-style:normal;font-weight:600}
       <div class="stack">
         <div class="node n-gpt">
           <div class="node-head"><span class="badge">GPT</span> Extracción datos cliente</div>
-          <div class="node-body">nombre · apellido · dni · teléfono<br>n_contrato · n_módulo · centro</div>
+          <div class="node-body">nombre · apellido · dni · teléfono<br>n_contrato · n_módulo · centro<br><em>prioridad</em>: baja / media / alta</div>
         </div>
         <div class="arr"><div class="arr-line"></div><div class="arr-tip">▼</div></div>
         <div class="center"><div class="gate" style="min-width:180px;font-size:10.5px">
@@ -273,7 +273,13 @@ em{color:#FBBF24;font-style:normal;font-weight:600}
             <span class="br br-y" style="text-align:center;font-size:9px">SÍ · Cliente=True</span>
             <div class="node n-bitrix">
               <div class="node-head" style="font-size:10px"><span class="badge" style="font-size:8px">Bitrix</span> SPA item <em>1034</em></div>
-              <div class="node-body"><span class="stage-pill s-new">NEW</span><br>assignedById = contacto.ASSIGNED_BY_ID || <em>"6358"</em></div>
+              <div class="node-body">
+                stageId = prioridad:<br>
+                <span class="stage-pill s-new">baja→NEW</span>
+                <span class="stage-pill s-prep">media→PREP</span>
+                <span class="stage-pill s-client">alta→CLIENT</span><br>
+                assignedById = contacto.ASSIGNED_BY_ID || <em>"6358"</em>
+              </div>
             </div>
           </div>
           <div class="stack">
@@ -285,7 +291,13 @@ em{color:#FBBF24;font-style:normal;font-weight:600}
             <div class="arr"><div class="arr-line" style="height:10px"></div><div class="arr-tip">▼</div></div>
             <div class="node n-bitrix">
               <div class="node-head" style="font-size:10px"><span class="badge" style="font-size:8px">Bitrix</span> SPA item <em>1034</em></div>
-              <div class="node-body"><span class="stage-pill s-new">NEW</span><br>assignedById = <em>"22"</em></div>
+              <div class="node-body">
+                stageId = prioridad:<br>
+                <span class="stage-pill s-new">baja→NEW</span>
+                <span class="stage-pill s-prep">media→PREP</span>
+                <span class="stage-pill s-client">alta→CLIENT</span><br>
+                assignedById = <em>"6358"</em>
+              </div>
             </div>
           </div>
         </div>
@@ -684,15 +696,15 @@ em{color:#FBBF24;font-style:normal;font-weight:600}
 <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
   <div class="node" style="min-width:200px;text-align:center">
     <span class="stage-pill s-new" style="font-size:11px">DT1034_120:NEW</span>
-    <div class="node-body" style="margin-top:5px">Creación inicial del ticket<br>al llegar el 1er email</div>
+    <div class="node-body" style="margin-top:5px">Creación inicial del ticket<br>prioridad <em>baja</em></div>
   </div>
   <div class="node" style="min-width:200px;text-align:center">
     <span class="stage-pill s-prep" style="font-size:11px">DT1034_120:PREPARATION</span>
-    <div class="node-body" style="margin-top:5px">cambio_titular · desestima_oferta</div>
+    <div class="node-body" style="margin-top:5px">prioridad <em>media</em><br>cambio_titular · desestima_oferta</div>
   </div>
   <div class="node" style="min-width:200px;text-align:center">
     <span class="stage-pill s-client" style="font-size:11px">DT1034_120:CLIENT</span>
-    <div class="node-body" style="margin-top:5px">Requiere humano · moroso<br>foto_salida sin contacto</div>
+    <div class="node-body" style="margin-top:5px">prioridad <em>alta</em><br>Requiere humano · moroso<br>foto_salida sin contacto</div>
   </div>
   <div class="node" style="min-width:220px;text-align:center">
     <span class="stage-pill s-success" style="font-size:11px">DT1034_120:SUCCESS</span>

@@ -59,7 +59,14 @@ _PARAMS_EXTRACCION = [
     {"name": "n_contrato", "type": "string", "description": "número de contrato del cliente",                "isRequired": False},
     {"name": "n_modulo",   "type": "string", "description": "número de módulo de trastero del cliente",      "isRequired": False},
     {"name": "centro",     "type": "string", "description": "Centro donde el cliente tiene su módulo",       "isRequired": False},
+    {"name": "prioridad",  "type": "string", "description": "baja, media o alta",                            "isRequired": False},
 ]
+
+_PRIORIDAD_STAGE = {
+    "baja":  "DT1034_120:NEW",
+    "media": "DT1034_120:PREPARATION",
+    "alta":  "DT1034_120:CLIENT",
+}
 
 _PARAMS_FRANQUICIA = [
     {"name": "nombre",             "type": "string", "description": "nombre del usuario",                            "isRequired": False},
@@ -118,7 +125,7 @@ async def run(args: dict) -> dict:
     logger.info(f"[1.1] from={from_email} | categoria={categoria} | adjuntos={has_attach}")
 
     # B) Franquicia
-    if categoria == "Franquicia":
+    if categoria.lower() == "franquicia":
         return await _handle_franquicia(args, from_email, email_to, subject, body)
 
     # C) accion normal
@@ -135,19 +142,21 @@ async def run(args: dict) -> dict:
         prompt=_PROMPT_EXTRACCION + f"\nCentros disponibles: {centros_desc}",
         parameters=params,
     )
-    logger.info(f"[1.1] GPT: nombre={gpt_data.get('nombre')} | centro={gpt_data.get('centro')}")
+    logger.info(f"[1.1] GPT: nombre={gpt_data.get('nombre')} | centro={gpt_data.get('centro')} | prioridad={gpt_data.get('prioridad')}")
+
+    stage_id = _PRIORIDAD_STAGE.get((gpt_data.get("prioridad") or "").lower(), "DT1034_120:NEW")
 
     # Buscar contacto Bitrix
     bitrix_contacts = await bitrix.search_contacts_by_email(from_email)
     contact_found   = len(bitrix_contacts) > 0
 
     if contact_found:
-        return await _with_contact(args, gpt_data, from_email, email_to, subject, has_attach, bitrix_contacts[0])
+        return await _with_contact(args, gpt_data, from_email, email_to, subject, has_attach, bitrix_contacts[0], stage_id)
     else:
-        return await _without_contact(args, gpt_data, from_email, email_to, subject, has_attach)
+        return await _without_contact(args, gpt_data, from_email, email_to, subject, has_attach, stage_id)
 
 
-async def _with_contact(args, gpt_data, from_email, email_to, subject, has_attach, contact):
+async def _with_contact(args, gpt_data, from_email, email_to, subject, has_attach, contact, stage_id="DT1034_120:NEW"):
     contact_id  = contact["ID"]
     nombre_bx   = contact.get("NAME", gpt_data.get("nombre", ""))
     apellido_bx = contact.get("LAST_NAME", gpt_data.get("apellido", ""))
@@ -155,7 +164,7 @@ async def _with_contact(args, gpt_data, from_email, email_to, subject, has_attac
 
     item_resp = await bitrix.create_crm_item(1034, {
         "title":        f"CGI - Respuesta automática: {args.get('categoria_correo', '')}",
-        "stageId":      "DT1034_120:NEW",
+        "stageId":      stage_id,
         "contactId":    contact_id,
         "sourceId":     "EMAIL",
         "assignedById": assigned_by,
@@ -184,7 +193,7 @@ async def _with_contact(args, gpt_data, from_email, email_to, subject, has_attac
     }
 
 
-async def _without_contact(args, gpt_data, from_email, email_to, subject, has_attach):
+async def _without_contact(args, gpt_data, from_email, email_to, subject, has_attach, stage_id="DT1034_120:NEW"):
     contact_resp = await bitrix.create_contact({
         "NAME":        gpt_data.get("nombre", ""),
         "LAST_NAME":   gpt_data.get("apellido", ""),
@@ -200,10 +209,10 @@ async def _without_contact(args, gpt_data, from_email, email_to, subject, has_at
 
     item_resp = await bitrix.create_crm_item(1034, {
         "title":        f"CGI - Respuesta automática: {args.get('categoria_correo', '')}",
-        "stageId":      "DT1034_120:NEW",
+        "stageId":      stage_id,
         "contactId":    contact_id,
         "sourceId":     "EMAIL",
-        "assignedById": "22",
+        "assignedById": _ASSIGNED_BY_ID,
     })
     ticket_id = str(item_resp.get("result", {}).get("item", {}).get("id", ""))
 

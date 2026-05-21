@@ -306,6 +306,16 @@ em{color:#FBBF24;font-style:normal;font-weight:600}
           <div class="node-head"><span class="badge">Airtable</span> Datos extraídos</div>
           <div class="node-body">todos los datos extraídos por GPT</div>
         </div>
+        <div class="arr"><div class="arr-line"></div><div class="arr-tip">▼</div></div>
+        <div class="node n-bitrix">
+          <div class="node-head"><span class="badge">Bitrix</span> Timeline comment</div>
+          <div class="node-body">📧 De · Asunto · Adjuntos<br>Nombre · Teléfono · Centro · Prioridad<br>Cuerpo del correo (max 3000 chars)</div>
+        </div>
+        <div class="arr"><div class="arr-line"></div><div class="arr-tip">▼</div></div>
+        <div class="node n-bitrix">
+          <div class="node-head"><span class="badge">Bitrix</span> Vincular email al ticket</div>
+          <div class="node-body">crm.activity.binding.add<br>activityId = email en Bitrix<br>entityTypeId = <em>1034</em> · entityId = ticket_id</div>
+        </div>
       </div>
     </div>
   </div>
@@ -357,7 +367,7 @@ em{color:#FBBF24;font-style:normal;font-weight:600}
         <div class="arr"><div class="arr-line"></div><div class="arr-tip">▼</div></div>
         <div class="node n-bitrix">
           <div class="node-head"><span class="badge">Bitrix</span> update item 1034</div>
-          <div class="node-body"><span class="stage-pill s-client">CLIENT</span> · assignedById=<em>"6358"</em><br>title="CGI - Requiere HUMANO: {cat}"<br>+ contactId si existe<br>Timeline: "...solicita HUMANO para {cat}"</div>
+          <div class="node-body"><span class="stage-pill s-client">CLIENT</span> · assignedById = contacto.ASSIGNED_BY_ID || <em>"6358"</em><br>title="CGI - Requiere HUMANO: {cat}"<br>+ contactId si existe<br>Timeline: "...solicita HUMANO para {cat}"</div>
         </div>
         <div class="arr"><div class="arr-line"></div><div class="arr-tip">▼</div></div>
         <div class="node n-airtable">

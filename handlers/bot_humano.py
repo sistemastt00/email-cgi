@@ -51,8 +51,9 @@ async def run(args: dict) -> dict:
     logger.info(f"[1.5] humano | from={from_email} | ticket_id={ticket_id}")
 
     # 2. Buscar contacto Bitrix
-    contacts   = await bitrix.search_contacts_by_email(from_email)
-    contact_id = contacts[0]["ID"] if contacts else None
+    contacts    = await bitrix.search_contacts_by_email(from_email)
+    contact_id  = contacts[0]["ID"] if contacts else None
+    assigned_by = (contacts[0].get("ASSIGNED_BY_ID") or "6358") if contacts else "6358"
 
     # 3. Enviar correo de ticket al cliente
     ticket_subject = f"Número de Ticket #{ticket_id} - {email_subj}"
@@ -68,7 +69,7 @@ async def run(args: dict) -> dict:
     # 4. Actualizar item SPA 1034
     item_fields = {
         "stageId":      "DT1034_120:CLIENT",
-        "assignedById": "6358",
+        "assignedById": assigned_by,
         "title":        f"CGI - Requiere HUMANO: {categoria}",
     }
     if contact_id:

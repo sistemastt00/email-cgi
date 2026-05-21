@@ -1,131 +1,705 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Flujo Email CGI — Filtros y decisiones</title>
-<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Flujo Email CGI — Tu Trastero</title>
 <style>
-  body { background: #0f0f1a; color: #eee; font-family: monospace; padding: 20px; }
-  h1   { color: #e94560; margin-bottom: 4px; }
-  p    { color: #888; font-size: .85em; margin-bottom: 20px; }
-  .meta { color: #555; font-size:.75em; margin-bottom:16px; }
-  .mermaid { background: #fff; border-radius: 10px; padding: 20px; }
+:root{
+  --bg:#080C14;--surface:#0F172A;--card:#162032;--border:#1E3048;
+  --text:#E2E8F0;--muted:#64748B;--dim:#94A3B8;
+  --gmail:#EA4335;--gpt:#10A37F;--bitrix:#FF6B35;--airtable:#18BFFF;
+  --email:#F59E0B;--gate:#8B5CF6;--cond:#1E3A5F;
+  --new:#3B82F6;--prep:#D97706;--client:#EF4444;--success:#22C55E;
+  --arrow:#334155;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;
+     font-size:12px;line-height:1.5;min-width:1200px}
+
+/* ─── TOPBAR ─────────────────────────────────── */
+.topbar{background:rgba(8,12,20,.95);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);padding:10px 24px;
+  position:sticky;top:0;z-index:100;display:flex;align-items:center;
+  justify-content:space-between;gap:16px;flex-wrap:wrap}
+.topbar-title{font-size:15px;font-weight:800;color:#fff;letter-spacing:.3px}
+.legend{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.leg{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)}
+.leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.stage-pill{font-size:9px;font-weight:700;border-radius:3px;padding:1px 5px}
+
+/* ─── MAIN WRAP ──────────────────────────────── */
+.wrap{padding:24px 20px 80px;max-width:1600px;margin:0 auto}
+
+/* ─── NODES ──────────────────────────────────── */
+.node{border-radius:8px;padding:9px 12px;border:1.5px solid var(--border);
+  background:var(--card);position:relative}
+.node-head{display:flex;align-items:center;gap:6px;margin-bottom:2px;font-weight:700;font-size:11px}
+.badge{font-size:9px;font-weight:700;border-radius:4px;padding:1px 6px;
+  color:#fff;white-space:nowrap;letter-spacing:.3px}
+.node-body{color:var(--dim);font-size:10.5px}
+.node-body ul{margin-left:14px}
+.node-body li{margin-bottom:1px}
+
+.n-gmail   {border-color:var(--gmail) }  .n-gmail   .badge{background:var(--gmail)}
+.n-gpt     {border-color:var(--gpt)   }  .n-gpt     .badge{background:var(--gpt)}
+.n-bitrix  {border-color:var(--bitrix)}  .n-bitrix  .badge{background:var(--bitrix)}
+.n-airtable{border-color:var(--airtable)} .n-airtable .badge{background:var(--airtable);color:#0F172A}
+.n-email   {border-color:var(--email) }  .n-email   .badge{background:var(--email);color:#0F172A}
+.n-info    {border-color:var(--border)}  .n-info    .badge{background:var(--border);color:var(--text)}
+
+/* ─── GATE (rhombus-ish) ─────────────────────── */
+.gate{background:#160D2E;border:2px solid var(--gate);border-radius:8px;
+  padding:8px 14px;text-align:center;font-weight:700;font-size:11px;color:#C4B5FD}
+.gate small{display:block;font-weight:400;font-size:9.5px;color:#A78BFA;margin-top:2px}
+.gate-icon{font-size:14px;margin-bottom:2px}
+
+/* ─── BRANCH LABELS ──────────────────────────── */
+.br{display:inline-block;border-radius:4px;padding:2px 7px;font-size:9.5px;font-weight:700;white-space:nowrap}
+.br-y{background:#052e16;color:#4ade80;border:1px solid #16a34a}
+.br-n{background:#2d0a00;color:#f87171;border:1px solid #dc2626}
+.br-bot{background:#172554;color:#93c5fd;border:1px solid #2563eb}
+.br-hum{background:#2d0a00;color:#fca5a5;border:1px solid #dc2626}
+
+/* ─── STAGE TAGS ─────────────────────────────── */
+.s-new    {background:#1E3A5F;color:#60A5FA;border:1px solid #3B82F6}
+.s-prep   {background:#3D2800;color:#FCD34D;border:1px solid #D97706}
+.s-client {background:#3D0000;color:#FCA5A5;border:1px solid #EF4444}
+.s-success{background:#002D1A;color:#86EFAC;border:1px solid #22C55E}
+
+/* ─── SECTIONS ───────────────────────────────── */
+.section{border:1.5px solid var(--border);border-radius:10px;padding:12px;
+  background:rgba(22,32,50,.6)}
+.sec-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;
+  color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.sec-title::before,.sec-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ─── ARROWS ─────────────────────────────────── */
+.arr{display:flex;flex-direction:column;align-items:center;margin:2px 0;gap:0}
+.arr-line{width:2px;height:16px;background:var(--arrow)}
+.arr-tip{color:var(--arrow);font-size:12px;line-height:1;margin-top:-2px}
+.arr-h{display:flex;align-items:center;gap:6px;justify-content:center;color:var(--arrow);
+  font-size:11px;margin:4px 0}
+.arr-h::before,.arr-h::after{content:'';flex:1;max-width:40px;height:1px;background:var(--arrow)}
+
+/* ─── LAYOUT HELPERS ─────────────────────────── */
+.stack{display:flex;flex-direction:column;gap:5px}
+.row{display:flex;gap:10px;align-items:start}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:start}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;align-items:start}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;align-items:start}
+.g7{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;align-items:start}
+.center{display:flex;justify-content:center}
+.sep{border:none;border-top:1px dashed var(--border);margin:14px 0}
+em{color:#FBBF24;font-style:normal;font-weight:600}
+
+/* ─── PHASE HEADER ───────────────────────────── */
+.phase{text-align:center;margin-bottom:8px}
+.phase-badge{display:inline-block;border-radius:20px;padding:4px 18px;
+  font-size:11px;font-weight:700;letter-spacing:.5px}
+
+/* ─── CATEGORY CARD ──────────────────────────── */
+.cat-card{background:var(--surface);border:1.5px solid var(--border);
+  border-radius:8px;padding:10px;display:flex;flex-direction:column;gap:5px}
+.cat-name{font-weight:700;font-size:11px;color:#FBBF24;margin-bottom:2px}
 </style>
 </head>
 <body>
-<h1>📧 Flujo Email CGI — árbol de decisiones completo</h1>
-<p>Todos los filtros activos en el código Python. Para comparar con blueprints de Make.com.</p>
-<div class="meta">Última actualización: 19/05/2026 · commit 796c3f2 · 15 entradas en blacklist</div>
 
-<div class="mermaid">
-flowchart TD
-    A([📨 Email recibido\nPoller Gmail / PubSub]) --> B
-
-    B{"🔴 BLACKLIST\nfrom_email.lower() contiene alguno de:\n─────────────────────────────\n@telefacil.com · noreply@ · no-reply@\n@e.fundacionmapfre.org · @alcobendas.org\n@hyperionup.com · newsletter · noreply.\n@norauto.es · info@necesitasrespirar.com\ndimitri@lcd-phone.com\nmailer-daemon@googlemail.com\nraquel.diaz-malaguilla.gonzalez@showheroes.com\nmarketing@navarroynavarro.es\ninfo@infofranquicias.com\n─────────────────────────────\n15 patrones activos"}
-    B -- SÍ --> BLOC([🚫 Marcar leído\nIgnorado blacklist · FIN])
-    B -- NO --> C
-
-    C[🤖 GPT: bot_humano\nbot · humano] --> D
-    D[🤖 GPT: categoria + categoria_api + tipo] --> E
-    E[📋 Airtable: crear registro Clasificación] --> F
-    F[✅ Gmail: marcar email como leído] --> G
-
-    G{"¿Hilo NUEVO?\n¿No existe thread_id\nen Datos extraídos?"}
-    G -- SÍ --> H
-    G -- NO → cadena --> Z1
-
-    %% ── RAMA NUEVO ──────────────────────────────────────────
-    subgraph NUEVO ["🆕 HILO NUEVO"]
-      direction TB
-
-      H{"[1.1] GATE\ntipo == Requerimiento?"}
-      H -- NO\nInformativo / etc --> H0([⏭ skip → status ok])
-      H -- SÍ --> H1
-
-      H1{"categoria == Franquicia?"}
-      H1 -- SÍ --> HF["🤖 GPT Franquicia\n→ crear Contact Bitrix\n→ crear CRM item pipeline 169\n→ crear Datos extraídos Airtable\ncliente = True"]
-      H1 -- NO --> H2
-
-      H2["🤖 GPT extrae:\nnombre · apellido · dni · telefono\nn_contrato · n_modulo · centro"] --> H3
-
-      H3{"¿Existe contacto en Bitrix\npor from_email?"}
-      H3 -- SÍ\ncliente = True --> H4["Crear Lead vinculado al contacto\ncrear Datos extraídos Airtable"]
-      H3 -- NO\ncliente = False --> H5["Crear Contact + Lead en Bitrix\ncrear Datos extraídos Airtable"]
-
-      H4 & H5 & HF --> I
-
-      I["[1.0] SIEMPRE — sin filtro\n─────────────────────────\nCalcula asunto-clasif\nActualiza Airtable Clasificación\nEnvía correo interno al equipo\n→ iacgi@tutrastero.com\n→ sistemas@tutrastero.com\n─────────────────────────\nContenido: email original\nAsunto: Clasificación CGI-(cat-tipo-bot)"] --> J
-
-      J{"GATE nodo 24\ntipo == Requerimiento\nAND categoria != Franquicia\n──── OR ────\ncliente == True"}
-      J -- NO\nInformativo / Franquicia sin cliente --> JEND(["📋 Clasificado\nSolo correo interno enviado · FIN"])
-      J -- SÍ --> K
-
-      K{"[1.5] bot_humano == humano?"}
-      K -- SÍ --> L
-      K -- NO → bot --> M
-
-      L["Buscar contacto Bitrix por from_email\nEnviar 📧 TICKET al cliente\n  Asunto: Número de Ticket #ticket_id\nActualizar Item 1034:\n  stageId = DT1034_120:CLIENT\n  TITLE = CGI - Requiere HUMANO\nComentario en timeline Bitrix\nActualizar Clasificación:\n  acciones_1 = Se deriva con gestor\n  humano_bot = humano"]
-      L --> LEND([🧑 HUMANO · FIN])
-
-      M{"GATE router 25\nbot_humano == bot\nAND\ntipo == Requerimiento OR cliente == True"}
-      M -- NO --> MEND([⏭ FIN sin email al cliente])
-
-      M -- SÍ --> N
-
-      N{"categoria in\nÁREA GENERAL?"}
-      N -- SÍ --> O["[1.4] Respuestas Área General\n─────────────────────────\nActualizar Airtable Clasificación\nActualizar Lead Bitrix + timeline\nEnviar 📧 email CTA al cliente\n─────────────────────────\nAgendar Visita\nReservar Tu Trastero\nNotificar Incidencia\nHacer Valoración\nHacer Inventario\nAutorizar a Terceros\nActualizar Tus Datos\nPresupuesto\nCambio de trastero → ticket STAGE=DT1034_120:PREPARATION"]
-      O --> OEND([✅ CTA área general · FIN])
-
-      N -- NO --> P{"categoria in\nÁREA CLIENTE?"}
-      P -- SÍ --> Q["Enviar 📧 email área cliente\nActualizar Lead Bitrix + timeline\nActualizar Clasificación\n─────────────────────────\nMis Documentos\nDocumentos Generales\nClaves de Acceso\nPagar Facturas · Ver Facturas\nRenueve Promocion\nCancelar Tu Trastero"]
-      Q --> QEND([✅ CTA área cliente · FIN])
-
-      P -- NO --> R{"categoria in\nOTROS SERVICIOS?"}
-      R -- NO --> REND([⏭ FIN sin email al cliente])
-      R -- SÍ --> S{"¿Qué categoría?"}
-
-      S -- Mudanza --> S1["📧 email Mudanza\nActualizar Lead EXITOSA\nClasif: Se deriva · humano"]
-      S -- Materiales de embalaje --> S2["📧 email Materiales\nActualizar Lead\nClasif: Enlace a web · bot"]
-      S -- Otros --> S3["📧 email Ticket Otros #ticket_id\nLead STAGE = DT1034_120:PREPARATION\nClasif: Se deriva · humano"]
-      S -- Reseña google --> S4["📧 email Reseña Ticket #ticket_id\nClasif: Se deriva · humano"]
-      S -- Moroso --> S5["📧 email Moroso\nClasif: Enlace a web · bot"]
-      S -- Desestima Oferta --> S6["📧 email Desestima\nClasif: Enlace a web · bot"]
-      S -- Foto Salida --> S7["📧 email Foto Ticket #ticket_id\nClasif: Se deriva · humano"]
-      S1 & S2 & S3 & S4 & S5 & S6 & S7 --> SEND([✅ Otros servicios · FIN])
-    end
-
-    %% ── RAMA CADENA ──────────────────────────────────────────
-    subgraph CADENA ["🔄 HILO EXISTENTE (CADENA)"]
-      direction TB
-
-      Z1["Recuperar de Airtable Datos extraídos:\nnombre · ticket_id · categoria_api · tipo"]
-
-      Z1 --> Z2["[1.5] SIEMPRE con datos existentes\n────────────────────────\nbot == humano → enviar ticket email\n  actualizar Lead + Airtable\nbot == bot → status ok"]
-
-      Z2 --> Z3{"GATE [1.2]\nbot_humano != bot\nAND ex_tipo == Requerimiento"}
-      Z3 -- NO --> Z3END([⏭ FIN])
-      Z3 -- SÍ --> Z4["[1.2] GPT extrae DNI del cuerpo\nUpsert campo dni en Airtable\nComentario Bitrix: DNI CORREGIDO"]
-      Z4 --> Z4END([🔄 Cadena completada · FIN])
-    end
-
-    %% ── ESTILOS ──────────────────────────────────────────────
-    classDef gate    fill:#2d1f00,stroke:#f39c12,color:#f39c12
-    classDef action  fill:#16213e,stroke:#3498db,color:#ccc
-    classDef end_ok  fill:#0d2b1a,stroke:#2ecc71,color:#2ecc71
-    classDef end_hum fill:#2d0a0a,stroke:#e74c3c,color:#e74c3c
-    classDef end_bl  fill:#1a1a1a,stroke:#555,color:#666
-    classDef start   fill:#1a0a2e,stroke:#9b59b6,color:#eee
-
-    class B,G,H,H1,H3,J,K,M,N,P,R,S,Z3 gate
-    class C,D,E,F,H2,HF,H4,H5,I,L,O,Q,S1,S2,S3,S4,S5,S6,S7,Z1,Z2,Z4 action
-    class OEND,QEND,SEND,Z4END end_ok
-    class LEND end_hum
-    class BLOC,H0,JEND,MEND,REND,Z3END end_bl
-    class A start
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-title">⚡ Flujo Email CGI · Tu Trastero</div>
+  <div class="legend">
+    <div class="leg"><div class="leg-dot" style="background:var(--gmail)"></div>Gmail</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--gpt)"></div>GPT / IA</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--bitrix)"></div>Bitrix24</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--airtable)"></div>Airtable</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--email)"></div>Email cliente</div>
+    <div class="leg"><div class="leg-dot" style="background:var(--gate)"></div>Condición</div>
+    <div class="leg"><span class="stage-pill s-new">NEW</span></div>
+    <div class="leg"><span class="stage-pill s-prep">PREP</span></div>
+    <div class="leg"><span class="stage-pill s-client">CLIENT</span></div>
+    <div class="leg"><span class="stage-pill s-success">SUCCESS</span></div>
+  </div>
 </div>
 
-<script>
-  mermaid.initialize({ startOnLoad: true, theme: 'default', flowchart: { curve: 'basis', useMaxWidth: false } });
-</script>
+<div class="wrap">
+
+<!-- ══ TRIGGER ══════════════════════════════════════════════════════════ -->
+<div class="center" style="margin-bottom:6px">
+  <div class="node n-gmail" style="min-width:340px;text-align:center">
+    <div class="node-head" style="justify-content:center">
+      <span class="badge">📨 Gmail Trigger</span>
+      Email nuevo no leído — cgi@tutrastero.com
+    </div>
+    <div class="node-body">Inbox · is:unread · hasta 10 emails por ciclo</div>
+  </div>
+</div>
+
+<div class="arr"><div class="arr-line"></div><div class="arr-tip">▼</div></div>
+
+<!-- ══ BLACKLIST ═════════════════════════════════════════════════════════ -->
+<div class="center">
+  <div class="gate" style="min-width:420px">
+    <div class="gate-icon">🚫</div>
+    ¿fromEmail en BLACKLIST?
+    <small>@telefacil.com · noreply@ · no-reply@ · mailer-daemon · newsletter<br>
+    @alcobendas.org · @hyperionup.com · @norauto.es · info@necesitasrespirar.com<br>
+    dimitri@lcd-phone.com · marketing@navarroynavarro.es · info@infofranquicias.com · +otros</small>
+  </div>
+</div>
+
+<div class="g2" style="max-width:500px;margin:6px auto 12px">
+  <div style="text-align:center" class="stack">
+    <span class="br br-y" style="text-align:center">SÍ</span>
+    <div class="node" style="text-align:center;border-color:#374151">
+      <div class="node-body">Gmail: marcar leído<br>Registra en summaries → <em>FIN</em></div>
+    </div>
+  </div>
+  <div style="text-align:center"><span class="br br-n">NO → continúa ↓</span></div>
+</div>
+
+<!-- ══ CLASIFICACIÓN IA ══════════════════════════════════════════════════ -->
+<div class="section" style="margin-bottom:6px">
+  <div class="sec-title">Clasificación IA + Registro</div>
+  <div class="g3" style="margin-bottom:8px">
+    <div class="node n-gpt">
+      <div class="node-head"><span class="badge">GPT-1</span> Bot o Humano</div>
+      <div class="node-body">Analiza cuerpo del email con ejemplos<br>→ <em>"bot"</em> | <em>"humano"</em></div>
+    </div>
+    <div class="node n-gpt">
+      <div class="node-head"><span class="badge">GPT-2</span> Categoría + Tipo</div>
+      <div class="node-body">
+        Con definiciones + ejemplos de Airtable<br>
+        → <em>categoria</em> (label) · <em>categoria_api</em><br>
+        → <em>tipo</em>: accion | informativo | otro
+      </div>
+    </div>
+    <div class="node n-airtable">
+      <div class="node-head"><span class="badge">Airtable</span> Crear Clasificación</div>
+      <div class="node-body">categoria · tipo · thread_id<br>bot_humano · subject</div>
+    </div>
+  </div>
+  <div class="center">
+    <div class="node n-gmail" style="min-width:260px;text-align:center">
+      <div class="node-head" style="justify-content:center"><span class="badge">Gmail</span> Marcar email como leído</div>
+    </div>
+  </div>
+</div>
+
+<div class="arr"><div class="arr-line"></div><div class="arr-tip">▼</div></div>
+
+<!-- ══ GATE HILO ═════════════════════════════════════════════════════════ -->
+<div class="center">
+  <div class="gate" style="min-width:380px">
+    <div class="gate-icon">🔀</div>
+    ¿thread_id ya existe en Airtable "Datos extraídos"?
+    <small>Determina si es el primer email del hilo o una respuesta</small>
+  </div>
+</div>
+
+<div class="arr-h" style="margin:8px 0">
+  <span class="br br-n">NO → Hilo Nuevo</span>
+  <span class="br br-y" style="background:#1c1917;color:#d6d3d1;border-color:#78716c">SÍ → Hilo Cadena</span>
+</div>
+
+<!-- ══ DOS COLUMNAS: NUEVO vs CADENA ════════════════════════════════════ -->
+<div class="g2" style="gap:20px;align-items:start">
+
+<!-- ────────────────────────────────────────────────
+     COLUMNA IZQUIERDA: HILO NUEVO
+──────────────────────────────────────────────────── -->
+<div class="stack" style="gap:6px">
+  <div class="phase">
+    <span class="phase-badge" style="background:#1E1B4B;color:#A5B4FC;border:1.5px solid #6366F1">
+      🆕 HILO NUEVO
+    </span>
+  </div>
+
+  <!-- [1.1] -->
+  <div class="section">
+    <div class="sec-title">[1.1] Extracción — 1er correo</div>
+
+    <div class="center"><div class="gate" style="min-width:240px">
+      <div class="gate-icon">❓</div>tipo == <em>"accion"</em>?
+      <small>si informativo/otro → devuelve ok sin crear ticket</small>
+    </div></div>
+    <div class="arr"><div class="arr-line"></div><div class="arr-tip">▼</div></div>
+
+    <div class="center"><div class="gate" style="min-width:220px">
+      <div class="gate-icon">🏭</div>categoria == <em>"Franquicia"</em>?
+    </div></div>
+    <div class="arr-h" style="margin:5px 0">
+      <span class="br br-y">SÍ — Franquicia</span>
+      <span class="br br-n">NO — Acción normal</span>
+    </div>
+
+    <div class="g2" style="gap:8px">
+      <!-- Franquicia -->
+      <div class="stack">
+        <div class="node n-gpt">
+          <div class="node-head"><span class="badge">GPT</span> Datos franquicia</div>
+          <div class="node-body">nombre · interés · localidad<br>CP · dirección · tamaño · plantas</div>
+        </div>
+        <div class="arr"><div class="arr-line"></div><div class="arr-tip">▼</div></div>
+        <div class="node n-bitrix">
+          <div class="node-head"><span class="badge">Bitrix</span> Crear Contacto</div>
+          <div class="node-body">TYPE: OTHER</div>
+        </div>
+        <div class="arr"><div class="arr-line"></div><div class="arr-tip">▼</div></div>
+        <div class="node n-bitrix">
+          <div class="node-head"><span class="badge">Bitrix</span> SPA item pipeline <em>169</em></div>
+          <div class="node-body"><span class="stage-pill s-new">DT169_102:NEW</span></div>
+        </div>
+        <div class="arr"><div class="arr-line"></div><div class="arr-tip">▼</div></div>
+        <div class="node n-airtable">
+          <div class="node-head"><span class="badge">Airtable</span> Datos extraídos</div>
+          <div class="node-body">ticket_id = "169_{item_id}"<br>Cliente = True</div>
+        </div>
+      </div>
+
+      <!-- Normal -->
+      <div class="stack">
+        <div class="node n-gpt">
+          <div class="node-head"><span class="badge">GPT</span> Extracción datos cliente</div>
+          <div class="node-body">nombre · apellido · dni · teléfono<br>n_contrato · n_módulo · centro</div>
+        </div>
+        <div class="arr"><div class="arr-line"></div><div class="arr-tip">▼</div></div>
+        <div class="center"><div class="gate" style="min-width:180px;font-size:10.5px">
+          ¿Contacto en Bitrix<br>por fromEmail?
+        </div></div>
+        <div class="g2" style="gap:6px">
+          <div class="stack">
+            <span class="br br-y" style="text-align:center;font-size:9px">SÍ · Cliente=True</span>
+            <div class="node n-bitrix">
+              <div class="node-head" style="font-size:10px"><span class="badge" style="font-size:8px">Bitrix</span> SPA item <em>1034</em></div>
+              <div class="node-body"><span class="stage-pill s-new">NEW</span><br>assignedById = contacto.ASSIGNED_BY_ID || <em>"6358"</em></div>
+            </div>
+          </div>
+          <div class="stack">
+            <span class="br br-n" style="text-align:center;font-size:9px">NO · Cliente=False</span>
+            <div class="node n-bitrix">
+              <div class="node-head" style="font-size:10px"><span class="badge" style="font-size:8px">Bitrix</span> Crear Contacto</div>
+              <div class="node-body">TYPE: CLIENT</div>
+            </div>
+            <div class="arr"><div class="arr-line" style="height:10px"></div><div class="arr-tip">▼</div></div>
+            <div class="node n-bitrix">
+              <div class="node-head" style="font-size:10px"><span class="badge" style="font-size:8px">Bitrix</span> SPA item <em>1034</em></div>
+              <div class="node-body"><span class="stage-pill s-new">NEW</span><br>assignedById = <em>"22"</em></div>
+            </div>
+          </div>
+        </div>
+        <div class="arr"><div class="arr-line"></div><div class="arr-tip">▼</div></div>
+        <div class="node n-airtable">
+          <div class="node-head"><span class="badge">Airtable</span> Datos extraídos</div>
+          <div class="node-body">todos los datos extraídos por GPT</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- [1.0] -->
+  <div class="section">
+    <div class="sec-title">[1.0] Correo Clasificación</div>
+    <div class="node n-email">
+      <div class="node-head"><span class="badge">Email interno</span> Notificación al equipo</div>
+      <div class="node-body">Envía resumen a iacgi@ y sistemas@<br>Con clasificación + datos extraídos del email</div>
+    </div>
+  </div>
+
+  <!-- GATE 1.5 -->
+  <div class="center"><div class="gate" style="min-width:320px">
+    <div class="gate-icon">🔒</div>
+    GATE [1.5]
+    <small>(tipo == "accion" AND NOT Franquicia) &nbsp;OR&nbsp; Cliente == True</small>
+  </div></div>
+  <div class="g2" style="max-width:320px;margin:5px auto 5px">
+    <div class="stack" style="align-items:center">
+      <span class="br br-n">NO</span>
+      <div class="node-body" style="font-size:10px;color:var(--muted);text-align:center">FIN hilo nuevo</div>
+    </div>
+    <div style="text-align:center"><span class="br br-y">SÍ → continúa</span></div>
+  </div>
+
+  <!-- [1.5] -->
+  <div class="section">
+    <div class="sec-title">[1.5] Bot o Humano</div>
+    <div class="g2" style="gap:8px">
+      <div class="stack">
+        <span class="br br-bot" style="text-align:center">bot_humano = "bot"</span>
+        <div class="node n-info">
+          <div class="node-body" style="text-align:center;padding:6px 0">Sin acción<br><span style="color:var(--muted)">pasa al routing ↓</span></div>
+        </div>
+      </div>
+      <div class="stack">
+        <span class="br br-hum" style="text-align:center">bot_humano = "humano"</span>
+        <div class="node n-bitrix">
+          <div class="node-head"><span class="badge">Bitrix</span> Busca contacto</div>
+          <div class="node-body">por fromEmail</div>
+        </div>
+        <div class="arr"><div class="arr-line"></div><div class="arr-tip">▼</div></div>
+        <div class="node n-email">
+          <div class="node-head"><span class="badge">Email ticket</span> Al cliente</div>
+          <div class="node-body">Asunto: "Nº Ticket #{id} – {subject}"<br>Template: <em>ticket.html</em></div>
+        </div>
+        <div class="arr"><div class="arr-line"></div><div class="arr-tip">▼</div></div>
+        <div class="node n-bitrix">
+          <div class="node-head"><span class="badge">Bitrix</span> update item 1034</div>
+          <div class="node-body"><span class="stage-pill s-client">CLIENT</span> · assignedById=<em>"6358"</em><br>title="CGI - Requiere HUMANO: {cat}"<br>+ contactId si existe<br>Timeline: "...solicita HUMANO para {cat}"</div>
+        </div>
+        <div class="arr"><div class="arr-line"></div><div class="arr-tip">▼</div></div>
+        <div class="node n-airtable">
+          <div class="node-head"><span class="badge">Airtable</span> Clasificación</div>
+          <div class="node-body">"Se deriva con gestor" · humano</div>
+        </div>
+        <div style="text-align:center;margin-top:2px">
+          <span style="background:#2D0A0A;color:#FCA5A5;border:1px solid #DC2626;
+            border-radius:4px;padding:2px 8px;font-size:9.5px;font-weight:700">🛑 FIN — HUMANO</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GATE ROUTING -->
+  <div class="center"><div class="gate" style="min-width:300px">
+    <div class="gate-icon">🤖</div>
+    GATE Routing
+    <small>bot_humano == "bot" &nbsp;AND&nbsp; Gate 1.5</small>
+  </div></div>
+  <div class="g2" style="max-width:300px;margin:5px auto 5px">
+    <div class="stack" style="align-items:center">
+      <span class="br br-n">NO</span>
+      <div class="node-body" style="font-size:10px;text-align:center;color:var(--muted)">FIN hilo nuevo</div>
+    </div>
+    <div style="text-align:center"><span class="br br-y">SÍ → routing ↓</span></div>
+  </div>
+
+</div><!-- fin col izquierda -->
+
+<!-- ────────────────────────────────────────────────
+     COLUMNA DERECHA: HILO CADENA
+──────────────────────────────────────────────────── -->
+<div class="stack" style="gap:6px">
+  <div class="phase">
+    <span class="phase-badge" style="background:#1C1917;color:#D6D3D1;border:1.5px solid #78716C">
+      🔗 HILO CADENA
+    </span>
+  </div>
+
+  <div class="section">
+    <div class="sec-title">[1.5] Bot o Humano — datos del hilo original</div>
+    <div class="node n-info" style="margin-bottom:8px">
+      <div class="node-head"><span class="badge">Recuperado</span> de Airtable Datos extraídos</div>
+      <div class="node-body">nombre · ticket_id · categoria_api · tipo</div>
+    </div>
+    <div class="g2" style="gap:8px">
+      <div class="stack">
+        <span class="br br-bot" style="text-align:center">= "bot"</span>
+        <div class="node n-info" style="text-align:center">
+          <div class="node-body">Sin acción</div>
+        </div>
+      </div>
+      <div class="stack">
+        <span class="br br-hum" style="text-align:center">= "humano"</span>
+        <div class="node n-email">
+          <div class="node-head"><span class="badge">Email ticket</span></div>
+          <div class="node-body">ticket.html<br>ticket_id del hilo original</div>
+        </div>
+        <div class="arr"><div class="arr-line"></div><div class="arr-tip">▼</div></div>
+        <div class="node n-bitrix">
+          <div class="node-head"><span class="badge">Bitrix</span> update 1034</div>
+          <div class="node-body"><span class="stage-pill s-client">CLIENT</span> · "6358"<br>Timeline: "...solicita HUMANO"</div>
+        </div>
+        <div class="arr"><div class="arr-line"></div><div class="arr-tip">▼</div></div>
+        <div class="node n-airtable">
+          <div class="node-head"><span class="badge">Airtable</span> Clasificación</div>
+          <div class="node-body">"Se deriva con gestor" · humano</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="center"><div class="gate" style="min-width:280px">
+    <div class="gate-icon">❓</div>
+    GATE [1.2]
+    <small>bot_humano != "bot" AND tipo_original == "accion"</small>
+  </div></div>
+  <div class="g2" style="max-width:280px;margin:5px auto 8px">
+    <div class="stack" style="align-items:center">
+      <span class="br br-n">NO</span>
+      <div class="node-body" style="font-size:10px;text-align:center;color:var(--muted)">FIN cadena</div>
+    </div>
+    <div style="text-align:center"><span class="br br-y">SÍ</span></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title">[1.2] Extracción cadena</div>
+    <div class="stack">
+      <div class="node n-gpt">
+        <div class="node-head"><span class="badge">GPT</span> Extrae DNI del correo de respuesta</div>
+        <div class="node-body">DNI / NIF / CIF / NIE / Pasaporte<br>Si no hay → "null"</div>
+      </div>
+      <div class="arr"><div class="arr-line"></div><div class="arr-tip">▼</div></div>
+      <div class="node n-airtable">
+        <div class="node-head"><span class="badge">Airtable</span> Upsert campo dni</div>
+        <div class="node-body">Actualiza Datos extraídos del hilo</div>
+      </div>
+      <div class="arr"><div class="arr-line"></div><div class="arr-tip">▼</div></div>
+      <div class="node n-bitrix">
+        <div class="node-head"><span class="badge">Bitrix</span> Timeline comment</div>
+        <div class="node-body">Si dni válido → <em>"DNI CORREGIDO {dni}"</em></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- fin col derecha -->
+</div><!-- fin g2 -->
+
+<!-- ══ ROUTING CATEGORÍAS ════════════════════════════════════════════════ -->
+<hr class="sep" style="margin:20px 0">
+<div style="text-align:center;margin-bottom:14px">
+  <span style="background:#1E293B;color:#94A3B8;border:1.5px solid #334155;
+    border-radius:20px;padding:5px 20px;font-size:10px;font-weight:700;
+    text-transform:uppercase;letter-spacing:1px">
+    Routing por Categoría &nbsp;·&nbsp; solo hilo nuevo &nbsp;·&nbsp; bot &nbsp;·&nbsp; gate ok
+  </span>
+</div>
+
+<div class="g3" style="gap:16px;align-items:start">
+
+  <!-- ── ÁREA GENERAL ─────────────────────────── -->
+  <div class="section" style="border-color:#6366F1">
+    <div class="sec-title" style="color:#A5B4FC">Área General [1.4]</div>
+    <div style="text-align:center;font-size:9.5px;color:#818CF8;margin-bottom:10px;line-height:1.8">
+      agendar_visita · reservar · presupuesto<br>
+      autorizar_terceros · incidencia<br>
+      actualizar_datos · inventario · valoración
+    </div>
+    <div class="stack">
+      <div class="node n-airtable">
+        <div class="node-head"><span class="badge">Airtable</span> Clasificación</div>
+        <div class="node-body">"Enlace a web" · bot</div>
+      </div>
+      <div class="arr"><div class="arr-line"></div><div class="arr-tip">▼</div></div>
+      <div class="node n-bitrix">
+        <div class="node-head"><span class="badge">Bitrix</span> update item 1034</div>
+        <div class="node-body">
+          <span class="stage-pill s-success">SUCCESS</span> · assignedById=<em>"6358"</em><br>
+          title = "CGI - Respuesta EXITOSA: {cat}"<br>
+          <span style="color:#818CF8">presupuesto →</span> "CGI - Solicitud de Presupuesto"<br>
+          Timeline: "Respuesta automática EXITOSA..."<br>
+          <span style="color:#818CF8">presupuesto →</span> "Se envió enlace a web..."
+        </div>
+      </div>
+      <div class="arr"><div class="arr-line"></div><div class="arr-tip">▼</div></div>
+      <div class="node n-email">
+        <div class="node-head"><span class="badge">Email CTA</span> Al cliente</div>
+        <div class="node-body">Template según categoria<br>Link a web tutrastero.com</div>
+      </div>
+    </div>
+
+    <hr class="sep" style="margin:10px 0">
+    <div style="text-align:center;font-size:10px;color:#818CF8;font-weight:700;margin-bottom:8px">cambio_titular_modulo</div>
+    <div class="center" style="margin-bottom:6px"><div class="gate" style="font-size:10px;min-width:160px">
+      ¿Contacto en Bitrix?
+    </div></div>
+    <div class="g2" style="gap:6px">
+      <div class="stack">
+        <span class="br br-y" style="font-size:9px;text-align:center">SÍ</span>
+        <div class="node n-email"><div class="node-head" style="font-size:10px"><span class="badge" style="font-size:8px">Email</span> cambio_trastero.html</div></div>
+        <div class="arr"><div class="arr-line" style="height:10px"></div><div class="arr-tip">▼</div></div>
+        <div class="node n-bitrix">
+          <div class="node-head" style="font-size:10px"><span class="badge" style="font-size:8px">Bitrix</span> update 1034</div>
+          <div class="node-body"><span class="stage-pill s-prep">PREP</span> + contactId<br>Timeline: "Comunicarse con cliente: Cambio de trastero."</div>
+        </div>
+      </div>
+      <div class="stack">
+        <span class="br br-n" style="font-size:9px;text-align:center">NO</span>
+        <div class="node n-email"><div class="node-head" style="font-size:10px"><span class="badge" style="font-size:8px">Email</span> cambio_trastero.html</div></div>
+        <div class="arr"><div class="arr-line" style="height:10px"></div><div class="arr-tip">▼</div></div>
+        <div class="node n-bitrix">
+          <div class="node-head" style="font-size:10px"><span class="badge" style="font-size:8px">Bitrix</span> update 1034</div>
+          <div class="node-body"><span class="stage-pill s-prep">PREP</span><br>Timeline: "Comunicarse con usuario...<br>Nombre/Apellido/Tel/Email"</div>
+        </div>
+      </div>
+    </div>
+    <div class="arr"><div class="arr-line"></div><div class="arr-tip">▼</div></div>
+    <div class="node n-airtable">
+      <div class="node-head"><span class="badge">Airtable</span> Clasificación</div>
+      <div class="node-body">"Se deriva con gestor" · humano</div>
+    </div>
+  </div>
+
+  <!-- ── ÁREA CLIENTE ─────────────────────────── -->
+  <div class="section" style="border-color:#0EA5E9">
+    <div class="sec-title" style="color:#7DD3FC">Área Cliente</div>
+    <div style="text-align:center;font-size:9.5px;color:#38BDF8;margin-bottom:10px;line-height:1.8">
+      mis_documentos · documentos_generales<br>
+      claves_acceso · pagar_facturas<br>
+      ver_facturas · renueve_promocion · aviso_salida
+    </div>
+    <div class="stack">
+      <div class="node n-email">
+        <div class="node-head"><span class="badge">Email área cliente</span></div>
+        <div class="node-body">Template: area_cliente.html<br>Link → administracion.tutrastero.com</div>
+      </div>
+      <div class="arr"><div class="arr-line"></div><div class="arr-tip">▼</div></div>
+      <div class="node n-bitrix">
+        <div class="node-head"><span class="badge">Bitrix</span> update item 1034</div>
+        <div class="node-body">
+          <span class="stage-pill s-success">SUCCESS</span> · assignedById=<em>"6358"</em><br>
+          title = "CGI - Respuesta EXITOSA: {cat}"<br>
+          Timeline: "Respuesta automática EXITOSA..."
+        </div>
+      </div>
+      <div class="arr"><div class="arr-line"></div><div class="arr-tip">▼</div></div>
+      <div class="node n-airtable">
+        <div class="node-head"><span class="badge">Airtable</span> Clasificación</div>
+        <div class="node-body">"Enlace a web" · bot</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── OTROS SERVICIOS ──────────────────────── -->
+  <div class="section" style="border-color:#D97706">
+    <div class="sec-title" style="color:#FCD34D">Otros Servicios</div>
+
+    <!-- mudanza + materiales -->
+    <div class="g2" style="gap:7px;margin-bottom:7px">
+      <div class="cat-card">
+        <div class="cat-name">mudanza</div>
+        <div class="node n-email" style="padding:6px 8px"><div class="node-head" style="font-size:10px"><span class="badge" style="font-size:8px">Email</span> mudanza.html</div></div>
+        <div class="node n-bitrix" style="padding:6px 8px">
+          <div class="node-head" style="font-size:10px"><span class="badge" style="font-size:8px">Bitrix</span> update 1034</div>
+          <div class="node-body"><span class="stage-pill s-success">SUCCESS</span> + <em>"6358"</em><br>Timeline: "Resp. EXITOSA..."</div>
+        </div>
+        <div class="node n-airtable" style="padding:6px 8px"><div class="node-head" style="font-size:9px"><span class="badge" style="font-size:7px">AT</span> "Se deriva gestor" / humano</div></div>
+      </div>
+      <div class="cat-card">
+        <div class="cat-name">materiales_embalaje</div>
+        <div class="node n-email" style="padding:6px 8px"><div class="node-head" style="font-size:10px"><span class="badge" style="font-size:8px">Email</span> Tu Caja</div></div>
+        <div class="node n-bitrix" style="padding:6px 8px">
+          <div class="node-head" style="font-size:10px"><span class="badge" style="font-size:8px">Bitrix</span> update 1034</div>
+          <div class="node-body"><span class="stage-pill s-success">SUCCESS</span> + <em>"6358"</em><br>Timeline: "CGI - EXITOSA Tu Caja..."</div>
+        </div>
+        <div class="node n-airtable" style="padding:6px 8px"><div class="node-head" style="font-size:9px"><span class="badge" style="font-size:7px">AT</span> "Enlace a web" / bot</div></div>
+      </div>
+    </div>
+
+    <!-- otros + resena -->
+    <div class="g2" style="gap:7px;margin-bottom:7px">
+      <div class="cat-card">
+        <div class="cat-name">otros</div>
+        <div class="node n-email" style="padding:6px 8px">
+          <div class="node-head" style="font-size:10px"><span class="badge" style="font-size:8px">Email</span> otros_ticket.html</div>
+          <div class="node-body" style="font-size:9px">"Nº Ticket #{id} – {subject}"</div>
+        </div>
+        <div class="node n-airtable" style="padding:6px 8px"><div class="node-head" style="font-size:9px"><span class="badge" style="font-size:7px">AT</span> "Se deriva gestor" / humano</div></div>
+        <div class="node-body" style="font-size:9px;color:var(--muted);text-align:center">sin update_crm_item</div>
+      </div>
+      <div class="cat-card">
+        <div class="cat-name">resena_google</div>
+        <div class="node n-bitrix" style="padding:5px 8px"><div class="node-head" style="font-size:9px"><span class="badge" style="font-size:7px">Bitrix</span> Busca contacto</div></div>
+        <div class="node n-email" style="padding:5px 8px">
+          <div class="node-head" style="font-size:9px"><span class="badge" style="font-size:7px">Email</span> resena_ticket.html</div>
+          <div class="node-body" style="font-size:9px">"Reseña – Nº Ticket #{id}"</div>
+        </div>
+        <div class="node n-bitrix" style="padding:5px 8px">
+          <div class="node-head" style="font-size:9px"><span class="badge" style="font-size:7px">Timeline</span></div>
+          <div class="node-body" style="font-size:9px">✓ "Dejó una reseña en google."<br>✗ + email no en bitrix + datos</div>
+        </div>
+        <div class="node n-airtable" style="padding:5px 8px"><div class="node-head" style="font-size:9px"><span class="badge" style="font-size:7px">AT</span> "Se deriva gestor" / humano</div></div>
+        <div class="node-body" style="font-size:9px;color:var(--muted);text-align:center">sin update_crm_item</div>
+      </div>
+    </div>
+
+    <!-- moroso + desestima -->
+    <div class="g2" style="gap:7px;margin-bottom:7px">
+      <div class="cat-card">
+        <div class="cat-name">moroso</div>
+        <div class="node n-email" style="padding:6px 8px">
+          <div class="node-head" style="font-size:10px"><span class="badge" style="font-size:8px">Email</span> moroso.html</div>
+          <div class="node-body" style="font-size:9px">"Aviso importante..."</div>
+        </div>
+        <div class="node n-bitrix" style="padding:6px 8px">
+          <div class="node-head" style="font-size:10px"><span class="badge" style="font-size:8px">Bitrix</span> update 1034</div>
+          <div class="node-body"><span class="stage-pill s-client">CLIENT</span> · <em>"43712"</em><br>Timeline: "acceso inhabilitado...<br>Nombre/Apellido/Tel/Email"</div>
+        </div>
+        <div class="node n-airtable" style="padding:6px 8px"><div class="node-head" style="font-size:9px"><span class="badge" style="font-size:7px">AT</span> "Enlace a web" / bot</div></div>
+      </div>
+      <div class="cat-card">
+        <div class="cat-name">desestima_oferta</div>
+        <div class="node n-email" style="padding:6px 8px">
+          <div class="node-head" style="font-size:10px"><span class="badge" style="font-size:8px">Email</span> desestima.html</div>
+          <div class="node-body" style="font-size:9px">"Agradecemos su interés..."</div>
+        </div>
+        <div class="node n-bitrix" style="padding:6px 8px">
+          <div class="node-head" style="font-size:10px"><span class="badge" style="font-size:8px">Bitrix</span> update 1034</div>
+          <div class="node-body"><span class="stage-pill s-prep">PREP</span><br>Timeline: "El usuario DESESTIMA...<br>Nombre/Apellido/Tel/Email"</div>
+        </div>
+        <div class="node n-airtable" style="padding:6px 8px"><div class="node-head" style="font-size:9px"><span class="badge" style="font-size:7px">AT</span> "Enlace a web" / bot</div></div>
+      </div>
+    </div>
+
+    <!-- foto_salida full -->
+    <div class="cat-card" style="grid-column:1/-1">
+      <div class="cat-name">foto_salida</div>
+      <div class="g2" style="gap:8px">
+        <div class="stack">
+          <div class="node n-bitrix" style="padding:6px 8px"><div class="node-head" style="font-size:10px"><span class="badge" style="font-size:8px">Bitrix</span> Busca contacto por fromEmail</div></div>
+          <div class="arr"><div class="arr-line"></div><div class="arr-tip">▼</div></div>
+          <div class="node n-email" style="padding:6px 8px">
+            <div class="node-head" style="font-size:10px"><span class="badge" style="font-size:8px">Email</span> foto_salida_ticket.html</div>
+            <div class="node-body" style="font-size:9px">Asunto: "Nº Ticket #{id}"</div>
+          </div>
+        </div>
+        <div class="g2" style="gap:6px">
+          <div class="stack">
+            <span class="br br-y" style="font-size:9px;text-align:center">✓ Contacto existe</span>
+            <div class="node n-bitrix" style="padding:6px 8px">
+              <div class="node-head" style="font-size:9px"><span class="badge" style="font-size:7px">Bitrix</span> update 1034</div>
+              <div class="node-body"><span class="stage-pill s-success">SUCCESS</span><br>Timeline: "Se reenvió URL fotos..."</div>
+            </div>
+          </div>
+          <div class="stack">
+            <span class="br br-n" style="font-size:9px;text-align:center">✗ Sin contacto</span>
+            <div class="node n-bitrix" style="padding:6px 8px">
+              <div class="node-head" style="font-size:9px"><span class="badge" style="font-size:7px">Bitrix</span> update 1034</div>
+              <div class="node-body"><span class="stage-pill s-client">CLIENT</span> · <em>"20"</em><br>Timeline: "quiere subir fotos...<br>correo no registrado. Datos..."</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="arr"><div class="arr-line"></div><div class="arr-tip">▼</div></div>
+      <div class="node n-airtable" style="padding:6px 8px"><div class="node-head" style="font-size:10px"><span class="badge" style="font-size:8px">AT</span> Clasificación: "Se deriva con gestor" · humano</div></div>
+    </div>
+
+  </div><!-- fin otros servicios -->
+</div><!-- fin g3 routing -->
+
+<!-- ══ TABLA STAGES ════════════════════════════════════════════════════ -->
+<hr class="sep" style="margin:24px 0 16px">
+<div style="text-align:center;margin-bottom:12px;font-size:10px;font-weight:700;
+  text-transform:uppercase;letter-spacing:1px;color:var(--muted)">StageIds SPA 1034</div>
+<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+  <div class="node" style="min-width:200px;text-align:center">
+    <span class="stage-pill s-new" style="font-size:11px">DT1034_120:NEW</span>
+    <div class="node-body" style="margin-top:5px">Creación inicial del ticket<br>al llegar el 1er email</div>
+  </div>
+  <div class="node" style="min-width:200px;text-align:center">
+    <span class="stage-pill s-prep" style="font-size:11px">DT1034_120:PREPARATION</span>
+    <div class="node-body" style="margin-top:5px">cambio_titular · desestima_oferta</div>
+  </div>
+  <div class="node" style="min-width:200px;text-align:center">
+    <span class="stage-pill s-client" style="font-size:11px">DT1034_120:CLIENT</span>
+    <div class="node-body" style="margin-top:5px">Requiere humano · moroso<br>foto_salida sin contacto</div>
+  </div>
+  <div class="node" style="min-width:220px;text-align:center">
+    <span class="stage-pill s-success" style="font-size:11px">DT1034_120:SUCCESS</span>
+    <div class="node-body" style="margin-top:5px">Bot resolvió · area_general<br>area_cliente · mudanza · materiales<br>foto_salida con contacto</div>
+  </div>
+</div>
+
+</div><!-- fin wrap -->
 </body>
 </html>

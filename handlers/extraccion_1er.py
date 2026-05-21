@@ -151,12 +151,34 @@ async def run(args: dict) -> dict:
     contact_found   = len(bitrix_contacts) > 0
 
     if contact_found:
-        return await _with_contact(args, gpt_data, from_email, email_to, subject, has_attach, bitrix_contacts[0], stage_id)
+        return await _with_contact(args, gpt_data, from_email, email_to, subject, has_attach, bitrix_contacts[0], stage_id, body)
     else:
-        return await _without_contact(args, gpt_data, from_email, email_to, subject, has_attach, stage_id)
+        return await _without_contact(args, gpt_data, from_email, email_to, subject, has_attach, stage_id, body)
 
 
-async def _with_contact(args, gpt_data, from_email, email_to, subject, has_attach, contact, stage_id="DT1034_120:NEW"):
+def _build_timeline_comment(from_email, subject, has_attach, gpt_data, nombre, apellido, body):
+    adjuntos = "Sí" if has_attach else "No"
+    telefono  = gpt_data.get("telefono", "")
+    centro    = gpt_data.get("centro", "")
+    prioridad = gpt_data.get("prioridad", "")
+    body_text = (body or "").strip()[:3000]
+    return (
+        f"📧 Correo recibido\n"
+        f"De: {from_email}\n"
+        f"Asunto: {subject}\n"
+        f"Adjuntos: {adjuntos}\n"
+        f"\n"
+        f"Nombre: {nombre} {apellido}\n"
+        f"Teléfono: {telefono}\n"
+        f"Centro: {centro}\n"
+        f"Prioridad: {prioridad}\n"
+        f"\n"
+        f"--- Mensaje ---\n"
+        f"{body_text}"
+    )
+
+
+async def _with_contact(args, gpt_data, from_email, email_to, subject, has_attach, contact, stage_id="DT1034_120:NEW", body=""):
     contact_id  = contact["ID"]
     nombre_bx   = contact.get("NAME", gpt_data.get("nombre", ""))
     apellido_bx = contact.get("LAST_NAME", gpt_data.get("apellido", ""))
@@ -177,10 +199,10 @@ async def _with_contact(args, gpt_data, from_email, email_to, subject, has_attac
     )
     at_id = at_record.get("id", "")
 
-    if has_attach:
+    if ticket_id:
         await bitrix.add_timeline_comment(
             "dynamic_1034", ticket_id,
-            f"📧 CORREO RECIBIDO de {from_email}:\nAsunto: {subject}"
+            _build_timeline_comment(from_email, subject, has_attach, gpt_data, nombre_bx, apellido_bx, body),
         )
 
     logger.info(f"[1.1] Item 1034 (contacto existente) | ticket_id={ticket_id} | at={at_id}")
@@ -193,7 +215,7 @@ async def _with_contact(args, gpt_data, from_email, email_to, subject, has_attac
     }
 
 
-async def _without_contact(args, gpt_data, from_email, email_to, subject, has_attach, stage_id="DT1034_120:NEW"):
+async def _without_contact(args, gpt_data, from_email, email_to, subject, has_attach, stage_id="DT1034_120:NEW", body=""):
     contact_resp = await bitrix.create_contact({
         "NAME":        gpt_data.get("nombre", ""),
         "LAST_NAME":   gpt_data.get("apellido", ""),
@@ -222,8 +244,14 @@ async def _without_contact(args, gpt_data, from_email, email_to, subject, has_at
     )
     at_id = at_record.get("id", "")
 
-    if has_attach:
-        await bitrix.add_timeline_comment("dynamic_1034", ticket_id, "Archivos adjuntos: ")
+    if ticket_id:
+        await bitrix.add_timeline_comment(
+            "dynamic_1034", ticket_id,
+            _build_timeline_comment(
+                from_email, subject, has_attach, gpt_data,
+                gpt_data.get("nombre", ""), gpt_data.get("apellido", ""), body,
+            ),
+        )
 
     logger.info(f"[1.1] Item 1034 (contacto nuevo) | ticket_id={ticket_id} | at={at_id}")
     return {

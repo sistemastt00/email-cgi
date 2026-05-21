@@ -89,13 +89,13 @@
                                     [
                                         {
                                             "a": "{{1.categoria_correo}}",
-                                            "o": "text:notequal",
-                                            "b": "franquicia"
+                                            "b": "franquicia",
+                                            "o": "text:notequal"
                                         },
                                         {
                                             "a": "{{1.tipo_correo}}",
-                                            "o": "text:equal",
-                                            "b": "accion"
+                                            "b": "accion",
+                                            "o": "text:equal"
                                         }
                                     ]
                                 ]
@@ -2471,62 +2471,62 @@
                             },
                             "mapper": {
                                 "model": "gpt-4.1",
-                                "rawText": "{{11.fromEmail}} {{11.fullTextBody}}",
                                 "prompt": "Actúa como experto en estructurar datos extraídos de correos con información no estructurada. A continuación se indica los rótulos de los datos que se requiere extraer:\nLos datos que se van a extraer son del emisor del correo.\nEn caso, el cliente no haya indicado Nombre y/o Apellido, indicar \" \". En caso no indique DNI NIF CIF NIE Pasaporte rellenar con \"00000000\". En caso NO encuentres Teléfono Móvil colocar \"000000000\". Luego, para el resto de casos completar con \"No indica\". Para el \"Nombre de la Compañía\" en cuerpo del correo debe indicar expresamente el nombre de la compañía a la que pertenece el From Email. En caso no haya nombre de la compañía completa con \"No indica\". En el campo de la compañía no consideres a \"Tu Trastero\".\nAsimismo, verifica si el correo contiene un attachment y en la columna \"Contiene Attachmente\" indica \"Si\", en caso haya un adjunto\" o \"No\", cuando no haya adjunto.\nFinalmente, verifica los siguiente niveles de prioridad:\n- **baja:** son incidencias leves sin potencial de daños propios ni a terceros y no genera un impacto negativo en el cliente.\n- **media:** son incidencias con potencial medio de daños propios y a terceros, y genera un impacto negativo en el cliente.\n- **alta:** son incidencias con potencial alto de daños propios y a terceros, y genera un alto impacto negativo en el cliente.",
+                                "rawText": "{{11.fromEmail}} {{11.fullTextBody}}",
                                 "parameters": [
                                     {
                                         "name": "nombre",
-                                        "description": "nombre del usuario",
                                         "type": "string",
-                                        "isRequired": false
+                                        "isRequired": false,
+                                        "description": "nombre del usuario"
                                     },
                                     {
                                         "name": "apellido",
-                                        "description": "apellido del usuario",
                                         "type": "string",
-                                        "isRequired": false
+                                        "isRequired": false,
+                                        "description": "apellido del usuario"
                                     },
                                     {
                                         "name": "dni",
-                                        "description": " DNI / NIF / CIF / NIE / Pasaporte del usuario",
                                         "type": "string",
-                                        "isRequired": false
+                                        "isRequired": false,
+                                        "description": " DNI / NIF / CIF / NIE / Pasaporte del usuario"
                                     },
                                     {
                                         "name": "telefono",
-                                        "description": "telefono del usuario",
                                         "type": "string",
-                                        "isRequired": false
+                                        "isRequired": false,
+                                        "description": "telefono del usuario"
                                     },
                                     {
                                         "name": "email",
-                                        "description": "email del usuario",
                                         "type": "string",
-                                        "isRequired": false
+                                        "isRequired": false,
+                                        "description": "email del usuario"
                                     },
                                     {
                                         "name": "n_contrato",
-                                        "description": "número de contrato del cliente",
                                         "type": "string",
-                                        "isRequired": false
+                                        "isRequired": false,
+                                        "description": "número de contrato del cliente"
                                     },
                                     {
                                         "name": "n_modulo",
-                                        "description": "número de módulo de trastero del cliente",
                                         "type": "string",
-                                        "isRequired": false
+                                        "isRequired": false,
+                                        "description": "número de módulo de trastero del cliente"
                                     },
                                     {
                                         "name": "centro",
-                                        "description": "Centro donde el cliente tiene su módulo alquilado y puede ser uno de la siguiente lista {{13.array[].Centro}}",
                                         "type": "string",
-                                        "isRequired": false
+                                        "isRequired": false,
+                                        "description": "Centro donde el cliente tiene su módulo alquilado y puede ser uno de la siguiente lista {{13.array[].Centro}}"
                                     },
                                     {
                                         "name": "prioridad",
-                                        "description": "baja, media o  alta",
                                         "type": "string",
-                                        "isRequired": false
+                                        "isRequired": false,
+                                        "description": "baja, media o  alta"
                                     }
                                 ]
                             },
@@ -2536,15 +2536,6 @@
                                     "y": 300
                                 },
                                 "restore": {
-                                    "parameters": {
-                                        "__IMTCONN__": {
-                                            "label": "My OpenAI connection",
-                                            "data": {
-                                                "scoped": "true",
-                                                "connection": "openai-gpt-3"
-                                            }
-                                        }
-                                    },
                                     "expect": {
                                         "model": {
                                             "mode": "chose",
@@ -2666,6 +2657,15 @@
                                         "objectDefinitions": {
                                             "mode": "chose"
                                         }
+                                    },
+                                    "parameters": {
+                                        "__IMTCONN__": {
+                                            "data": {
+                                                "scoped": "true",
+                                                "connection": "openai-gpt-3"
+                                            },
+                                            "label": "My OpenAI connection"
+                                        }
                                     }
                                 },
                                 "parameters": [
@@ -2697,21 +2697,20 @@
                                     },
                                     {
                                         "name": "parameters",
-                                        "type": "array",
-                                        "label": "Structured Data Definition",
-                                        "required": true,
                                         "spec": {
+                                            "name": "value",
                                             "spec": [],
                                             "type": "collection",
-                                            "label": "Data Definition",
-                                            "name": "value"
-                                        }
+                                            "label": "Data Definition"
+                                        },
+                                        "type": "array",
+                                        "label": "Structured Data Definition",
+                                        "required": true
                                     },
                                     {
                                         "name": "objectDefinitions",
-                                        "type": "array",
-                                        "label": "Object Definitions",
                                         "spec": {
+                                            "name": "value",
                                             "spec": [
                                                 {
                                                     "name": "name",
@@ -2741,9 +2740,10 @@
                                                 }
                                             ],
                                             "type": "collection",
-                                            "label": "Object Definition",
-                                            "name": "value"
-                                        }
+                                            "label": "Object Definition"
+                                        },
+                                        "type": "array",
+                                        "label": "Object Definitions"
                                     }
                                 ],
                                 "interface": [
@@ -2792,6 +2792,7 @@
                             "version": 1,
                             "parameters": {},
                             "mapper": {
+                                "scope": "roundtrip",
                                 "variables": [
                                     {
                                         "name": "prioridad",
@@ -2801,8 +2802,7 @@
                                         "name": "assignedById",
                                         "value": "{{if(2.`__IMTLENGTH__` > 0; 2.ASSIGNED_BY_ID; \"6358\")}}"
                                     }
-                                ],
-                                "scope": "roundtrip"
+                                ]
                             },
                             "metadata": {
                                 "designer": {
@@ -2811,35 +2811,35 @@
                                 },
                                 "restore": {
                                     "expect": {
+                                        "scope": {
+                                            "label": "One cycle"
+                                        },
                                         "variables": {
                                             "items": [
                                                 null,
                                                 null
                                             ]
-                                        },
-                                        "scope": {
-                                            "label": "One cycle"
                                         }
                                     }
                                 },
                                 "expect": [
                                     {
                                         "name": "variables",
-                                        "type": "array",
-                                        "label": "Variables",
                                         "spec": [
                                             {
                                                 "name": "name",
-                                                "label": "Variable name",
                                                 "type": "text",
+                                                "label": "Variable name",
                                                 "required": true
                                             },
                                             {
                                                 "name": "value",
-                                                "label": "Variable value",
-                                                "type": "any"
+                                                "type": "any",
+                                                "label": "Variable value"
                                             }
-                                        ]
+                                        ],
+                                        "type": "array",
+                                        "label": "Variables"
                                     },
                                     {
                                         "name": "scope",
@@ -2857,13 +2857,13 @@
                                 "interface": [
                                     {
                                         "name": "prioridad",
-                                        "label": "prioridad",
-                                        "type": "any"
+                                        "type": "any",
+                                        "label": "prioridad"
                                     },
                                     {
                                         "name": "assignedById",
-                                        "label": "assignedById",
-                                        "type": "any"
+                                        "type": "any",
+                                        "label": "assignedById"
                                     }
                                 ]
                             }
@@ -3017,27 +3017,27 @@
                                                     [
                                                         {
                                                             "a": "{{2.`__IMTLENGTH__`}}",
-                                                            "o": "number:greater",
-                                                            "b": "0"
+                                                            "b": "0",
+                                                            "o": "number:greater"
                                                         },
                                                         {
                                                             "a": "{{1.categoria_correo}}",
-                                                            "o": "text:notequal",
-                                                            "b": "franquicia"
+                                                            "b": "franquicia",
+                                                            "o": "text:notequal"
                                                         }
                                                     ]
                                                 ]
                                             },
                                             "mapper": {
                                                 "url": "crm.item.add",
+                                                "body": "{\r\n  \"entityTypeId\": 1034,\r\n  \"fields\": {\n    \"title\":\"Email CGI: Usuario requiere {{1.bot_humano}} - {{1.categoria_correo}}\",\n    \"assignedById\":\"{{60.assignedById}}\",\n    \"stageId\": \"{{60.prioridad}}\",\n    \"contactId\": \"{{2.ID}}\",\n    \"sourceId\":\"EMAIL\",\n    \"sourceDescription\":\"email-cgi\"\n   }\n}",
                                                 "method": "POST",
                                                 "headers": [
                                                     {
                                                         "key": "Content-Type",
                                                         "value": "application/json"
                                                     }
-                                                ],
-                                                "body": "{\r\n  \"entityTypeId\": 1034,\r\n  \"fields\": {\n    \"title\":\"Email CGI: Usuario requiere {{1.bot_humano}} - {{1.categoria_correo}}\",\n    \"assignedById\":\"{{60.assignedById}}\",\n    \"stageId\": \"{{60.prioridad}}\",\n    \"contactId\": \"{{2.ID}}\",\n    \"sourceId\":\"EMAIL\",\n    \"sourceDescription\":\"email-cgi\"\n   }\n}"
+                                                ]
                                             },
                                             "metadata": {
                                                 "designer": {
@@ -3046,16 +3046,10 @@
                                                     "name": "SPA Ticket - Nuevo"
                                                 },
                                                 "restore": {
-                                                    "parameters": {
-                                                        "__IMTCONN__": {
-                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)",
-                                                            "data": {
-                                                                "scoped": "true",
-                                                                "connection": "bitrix24"
-                                                            }
-                                                        }
-                                                    },
                                                     "expect": {
+                                                        "qs": {
+                                                            "mode": "chose"
+                                                        },
                                                         "method": {
                                                             "mode": "chose",
                                                             "label": "POST"
@@ -3065,9 +3059,15 @@
                                                             "items": [
                                                                 null
                                                             ]
-                                                        },
-                                                        "qs": {
-                                                            "mode": "chose"
+                                                        }
+                                                    },
+                                                    "parameters": {
+                                                        "__IMTCONN__": {
+                                                            "data": {
+                                                                "scoped": "true",
+                                                                "connection": "bitrix24"
+                                                            },
+                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)"
                                                         }
                                                     }
                                                 },
@@ -3103,8 +3103,6 @@
                                                     },
                                                     {
                                                         "name": "headers",
-                                                        "type": "array",
-                                                        "label": "Headers",
                                                         "spec": [
                                                             {
                                                                 "name": "key",
@@ -3116,12 +3114,12 @@
                                                                 "type": "text",
                                                                 "label": "Value"
                                                             }
-                                                        ]
+                                                        ],
+                                                        "type": "array",
+                                                        "label": "Headers"
                                                     },
                                                     {
                                                         "name": "qs",
-                                                        "type": "array",
-                                                        "label": "Query String",
                                                         "spec": [
                                                             {
                                                                 "name": "key",
@@ -3133,7 +3131,9 @@
                                                                 "type": "text",
                                                                 "label": "Value"
                                                             }
-                                                        ]
+                                                        ],
+                                                        "type": "array",
+                                                        "label": "Query String"
                                                     },
                                                     {
                                                         "name": "body",
@@ -3152,14 +3152,14 @@
                                             },
                                             "mapper": {
                                                 "url": "crm.activity.binding.add",
+                                                "body": "{\r\n  \"activityId\": {{69.body.result[1].ID}},\r\n  \"entityTypeId\": 1,\r\n  \"entityId\": {{54.body.result.item.id}}\n}",
                                                 "method": "POST",
                                                 "headers": [
                                                     {
                                                         "key": "Content-Type",
                                                         "value": "application/json"
                                                     }
-                                                ],
-                                                "body": "{\r\n  \"activityId\": {{69.body.result[1].ID}},\r\n  \"entityTypeId\": 1,\r\n  \"entityId\": {{54.body.result.item.id}}\n}"
+                                                ]
                                             },
                                             "metadata": {
                                                 "designer": {
@@ -3168,16 +3168,10 @@
                                                     "name": "vincula_email"
                                                 },
                                                 "restore": {
-                                                    "parameters": {
-                                                        "__IMTCONN__": {
-                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)",
-                                                            "data": {
-                                                                "scoped": "true",
-                                                                "connection": "bitrix24"
-                                                            }
-                                                        }
-                                                    },
                                                     "expect": {
+                                                        "qs": {
+                                                            "mode": "chose"
+                                                        },
                                                         "method": {
                                                             "mode": "chose",
                                                             "label": "POST"
@@ -3187,9 +3181,15 @@
                                                             "items": [
                                                                 null
                                                             ]
-                                                        },
-                                                        "qs": {
-                                                            "mode": "chose"
+                                                        }
+                                                    },
+                                                    "parameters": {
+                                                        "__IMTCONN__": {
+                                                            "data": {
+                                                                "scoped": "true",
+                                                                "connection": "bitrix24"
+                                                            },
+                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)"
                                                         }
                                                     }
                                                 },
@@ -3225,8 +3225,6 @@
                                                     },
                                                     {
                                                         "name": "headers",
-                                                        "type": "array",
-                                                        "label": "Headers",
                                                         "spec": [
                                                             {
                                                                 "name": "key",
@@ -3238,12 +3236,12 @@
                                                                 "type": "text",
                                                                 "label": "Value"
                                                             }
-                                                        ]
+                                                        ],
+                                                        "type": "array",
+                                                        "label": "Headers"
                                                     },
                                                     {
                                                         "name": "qs",
-                                                        "type": "array",
-                                                        "label": "Query String",
                                                         "spec": [
                                                             {
                                                                 "name": "key",
@@ -3255,7 +3253,9 @@
                                                                 "type": "text",
                                                                 "label": "Value"
                                                             }
-                                                        ]
+                                                        ],
+                                                        "type": "array",
+                                                        "label": "Query String"
                                                     },
                                                     {
                                                         "name": "body",
@@ -3275,27 +3275,27 @@
                                             "filter": null,
                                             "mapper": {
                                                 "base": "appMNiPmgPOBdXZxt",
-                                                "typecast": false,
-                                                "useColumnId": false,
                                                 "table": "tblFsUGpeqIvAnEVh",
                                                 "record": {
-                                                    "fldI9gglSHnvp0ptM": "{{1.thread_id}}",
+                                                    "fld5mQVmKfGTbTI6j": "{{54.body.result.item.id}}",
+                                                    "fldD5UfZHBGw8VnB9": "{{1.categoria_correo}}",
                                                     "fldGQIcSIN49d4OzB": "{{11.subject}}",
-                                                    "fldkbeuamIponQYBs": "{{11.fromEmail}}",
-                                                    "fldZvZhDdcQdc0zxq": "{{11.to[].email}}",
+                                                    "fldGQUW9FLFW7glj9": "{{1.categoria_correo_api}}",
                                                     "fldHgTlccdFZMzHUU": "{{7.nombre}}",
+                                                    "fldI9gglSHnvp0ptM": "{{1.thread_id}}",
+                                                    "fldPeM5wlULywrkmD": "{{1.tipo_correo}}",
                                                     "fldQpoEAFbHYN7TmP": "{{7.apellido}}",
-                                                    "fldrIiOucUDZMiUXW": "{{7.dni}}",
-                                                    "fldkENBRVsvYqJX10": "{{7.telefono}}",
+                                                    "fldZvZhDdcQdc0zxq": "{{11.to[].email}}",
                                                     "flddKn7zZbx4JxG2C": "{{7.email}}",
                                                     "fldhg38Me05r19rBb": "{{7.n_contrato}}",
-                                                    "fldv20T36rftFfXLu": "{{7.n_modulo}}",
+                                                    "fldkENBRVsvYqJX10": "{{7.telefono}}",
                                                     "fldkQKHpXP7eQuD3E": "{{7.centro}}",
-                                                    "fldGQUW9FLFW7glj9": "{{1.categoria_correo_api}}",
-                                                    "fldPeM5wlULywrkmD": "{{1.tipo_correo}}",
-                                                    "fld5mQVmKfGTbTI6j": "{{54.body.result.item.id}}",
-                                                    "fldD5UfZHBGw8VnB9": "{{1.categoria_correo}}"
-                                                }
+                                                    "fldkbeuamIponQYBs": "{{11.fromEmail}}",
+                                                    "fldrIiOucUDZMiUXW": "{{7.dni}}",
+                                                    "fldv20T36rftFfXLu": "{{7.n_modulo}}"
+                                                },
+                                                "typecast": false,
+                                                "useColumnId": false
                                             },
                                             "metadata": {
                                                 "designer": {
@@ -3304,127 +3304,127 @@
                                                     "name": "Datos"
                                                 },
                                                 "restore": {
-                                                    "parameters": {
-                                                        "__IMTCONN__": {
-                                                            "label": "My Airtable OAuth connection MasIP (User ID: usrhEfequCBBlG5d3)",
-                                                            "data": {
-                                                                "scoped": "true",
-                                                                "connection": "airtable3"
-                                                            }
-                                                        }
-                                                    },
                                                     "expect": {
                                                         "base": {
                                                             "label": "Email CGI"
                                                         },
-                                                        "typecast": {
-                                                            "mode": "chose"
-                                                        },
-                                                        "useColumnId": {
-                                                            "mode": "chose"
-                                                        },
                                                         "table": {
+                                                            "label": "Datos extraídos",
                                                             "nested": [
                                                                 {
                                                                     "name": "record",
                                                                     "spec": [
                                                                         {
                                                                             "name": "fldI9gglSHnvp0ptM",
-                                                                            "label": "thread_id",
                                                                             "type": "text",
+                                                                            "label": "thread_id",
                                                                             "multiline": true
                                                                         },
                                                                         {
                                                                             "name": "fldGQIcSIN49d4OzB",
-                                                                            "label": "asunto",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "asunto"
                                                                         },
                                                                         {
                                                                             "name": "fldkbeuamIponQYBs",
-                                                                            "label": "from_email",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "from_email"
                                                                         },
                                                                         {
                                                                             "name": "fldZvZhDdcQdc0zxq",
-                                                                            "label": "to_email",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "to_email"
                                                                         },
                                                                         {
                                                                             "name": "fldHgTlccdFZMzHUU",
-                                                                            "label": "nombre",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "nombre"
                                                                         },
                                                                         {
                                                                             "name": "fldQpoEAFbHYN7TmP",
-                                                                            "label": "apellido",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "apellido"
                                                                         },
                                                                         {
                                                                             "name": "fldrIiOucUDZMiUXW",
-                                                                            "label": "dni",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "dni"
                                                                         },
                                                                         {
                                                                             "name": "fldkENBRVsvYqJX10",
-                                                                            "label": "telefono",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "telefono"
                                                                         },
                                                                         {
                                                                             "name": "flddKn7zZbx4JxG2C",
-                                                                            "label": "email",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "email"
                                                                         },
                                                                         {
                                                                             "name": "fldhg38Me05r19rBb",
-                                                                            "label": "n_contrato",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "n_contrato"
                                                                         },
                                                                         {
                                                                             "name": "fldv20T36rftFfXLu",
-                                                                            "label": "n_modulo",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "n_modulo"
                                                                         },
                                                                         {
                                                                             "name": "fldkQKHpXP7eQuD3E",
-                                                                            "label": "centro",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "centro"
                                                                         },
                                                                         {
                                                                             "name": "fldGQUW9FLFW7glj9",
-                                                                            "label": "categoria_api",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "categoria_api"
                                                                         },
                                                                         {
                                                                             "name": "fldPeM5wlULywrkmD",
-                                                                            "label": "tipo",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "tipo"
                                                                         },
                                                                         {
                                                                             "name": "fld798KlRWk1EYT5g",
-                                                                            "label": "codigo_generado",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "codigo_generado"
                                                                         },
                                                                         {
                                                                             "name": "fldiGEfwffi6SSteD",
-                                                                            "label": "lead_id",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "lead_id"
                                                                         },
                                                                         {
                                                                             "name": "fld5mQVmKfGTbTI6j",
-                                                                            "label": "ticket_id",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "ticket_id"
                                                                         },
                                                                         {
                                                                             "name": "fldD5UfZHBGw8VnB9",
-                                                                            "label": "categoria_label",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "categoria_label"
                                                                         }
                                                                     ],
                                                                     "type": "collection",
                                                                     "label": "Record"
                                                                 }
-                                                            ],
-                                                            "label": "Datos extraídos"
+                                                            ]
+                                                        },
+                                                        "typecast": {
+                                                            "mode": "chose"
+                                                        },
+                                                        "useColumnId": {
+                                                            "mode": "chose"
+                                                        }
+                                                    },
+                                                    "parameters": {
+                                                        "__IMTCONN__": {
+                                                            "data": {
+                                                                "scoped": "true",
+                                                                "connection": "airtable3"
+                                                            },
+                                                            "label": "My Airtable OAuth connection MasIP (User ID: usrhEfequCBBlG5d3)"
                                                         }
                                                     }
                                                 },
@@ -3463,8 +3463,6 @@
                                                     },
                                                     {
                                                         "name": "record",
-                                                        "type": "collection",
-                                                        "label": "Record",
                                                         "spec": [
                                                             {
                                                                 "name": "fldI9gglSHnvp0ptM",
@@ -3556,7 +3554,9 @@
                                                                 "type": "text",
                                                                 "label": "categoria_label"
                                                             }
-                                                        ]
+                                                        ],
+                                                        "type": "collection",
+                                                        "label": "Record"
                                                     }
                                                 ],
                                                 "interface": [
@@ -3572,99 +3572,99 @@
                                                     },
                                                     {
                                                         "name": "thread_id",
-                                                        "label": "thread_id",
                                                         "type": "text",
+                                                        "label": "thread_id",
                                                         "multiline": true
                                                     },
                                                     {
                                                         "name": "fecha_creacion",
-                                                        "label": "fecha_creacion",
-                                                        "type": "date"
+                                                        "type": "date",
+                                                        "label": "fecha_creacion"
                                                     },
                                                     {
                                                         "name": "asunto",
-                                                        "label": "asunto",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "asunto"
                                                     },
                                                     {
                                                         "name": "from_email",
-                                                        "label": "from_email",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "from_email"
                                                     },
                                                     {
                                                         "name": "to_email",
-                                                        "label": "to_email",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "to_email"
                                                     },
                                                     {
                                                         "name": "nombre",
-                                                        "label": "nombre",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "nombre"
                                                     },
                                                     {
                                                         "name": "apellido",
-                                                        "label": "apellido",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "apellido"
                                                     },
                                                     {
                                                         "name": "dni",
-                                                        "label": "dni",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "dni"
                                                     },
                                                     {
                                                         "name": "telefono",
-                                                        "label": "telefono",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "telefono"
                                                     },
                                                     {
                                                         "name": "email",
-                                                        "label": "email",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "email"
                                                     },
                                                     {
                                                         "name": "n_contrato",
-                                                        "label": "n_contrato",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "n_contrato"
                                                     },
                                                     {
                                                         "name": "n_modulo",
-                                                        "label": "n_modulo",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "n_modulo"
                                                     },
                                                     {
                                                         "name": "centro",
-                                                        "label": "centro",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "centro"
                                                     },
                                                     {
                                                         "name": "categoria_api",
-                                                        "label": "categoria_api",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "categoria_api"
                                                     },
                                                     {
                                                         "name": "tipo",
-                                                        "label": "tipo",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "tipo"
                                                     },
                                                     {
                                                         "name": "codigo_generado",
-                                                        "label": "codigo_generado",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "codigo_generado"
                                                     },
                                                     {
                                                         "name": "lead_id",
-                                                        "label": "lead_id",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "lead_id"
                                                     },
                                                     {
                                                         "name": "ticket_id",
-                                                        "label": "ticket_id",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "ticket_id"
                                                     },
                                                     {
                                                         "name": "categoria_label",
-                                                        "label": "categoria_label",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "categoria_label"
                                                     }
                                                 ]
                                             }
@@ -3675,8 +3675,8 @@
                                             "version": 1,
                                             "parameters": {},
                                             "mapper": {
-                                                "status": "200",
                                                 "body": "{\n  \"nombre\":\"{{2.NAME}}\",\n   \"apellido\":\"{{2.LAST_NAME}}\",\n   \"email\":\"{{11.fromEmail}}\",\n   \"dni\":\"{{7.dni}}\",\n   \"n_modulo\":\"{{7.n_contrato}}\",  \n   \"n_contrato\":\"{{7.n_contrato}}\",\n   \"telefono\":\"{{7.telefono}}\",  \n   \"lead_id\":\"\",\n   \"ticket_id\":\"{{54.body.result.item.id}}\",\n   \"centro\":\"{{7.centro}}\",\n   \"datos_extraidos_id\":\"{{67.id}}\",\n   \"cliente\":\"true\"\n  }",
+                                                "status": "200",
                                                 "headers": [
                                                     {
                                                         "key": "Content-Type",
@@ -3704,10 +3704,10 @@
                                                         "name": "status",
                                                         "type": "uinteger",
                                                         "label": "Status",
+                                                        "required": true,
                                                         "validate": {
                                                             "min": 100
-                                                        },
-                                                        "required": true
+                                                        }
                                                     },
                                                     {
                                                         "name": "body",
@@ -3716,16 +3716,11 @@
                                                     },
                                                     {
                                                         "name": "headers",
-                                                        "type": "array",
-                                                        "label": "Custom headers",
-                                                        "validate": {
-                                                            "maxItems": 16
-                                                        },
                                                         "spec": [
                                                             {
                                                                 "name": "key",
-                                                                "label": "Key",
                                                                 "type": "text",
+                                                                "label": "Key",
                                                                 "required": true,
                                                                 "validate": {
                                                                     "max": 256
@@ -3733,14 +3728,19 @@
                                                             },
                                                             {
                                                                 "name": "value",
-                                                                "label": "Value",
                                                                 "type": "text",
+                                                                "label": "Value",
                                                                 "required": true,
                                                                 "validate": {
                                                                     "max": 4096
                                                                 }
                                                             }
-                                                        ]
+                                                        ],
+                                                        "type": "array",
+                                                        "label": "Custom headers",
+                                                        "validate": {
+                                                            "maxItems": 16
+                                                        }
                                                     }
                                                 ],
                                                 "advanced": true
@@ -3774,7 +3774,7 @@
                                                         "value": "application/json"
                                                     }
                                                 ],
-                                                "body": "{\r\n  \"fields\": {\r\n    \"ENTITY_ID\": {{54.body.result.item.id}},\r\n    \"ENTITY_TYPE\": \"dynamic_1034\",\r\n    \"COMMENT\": \"📧 CORREO RECIBIDO de {{11.fromEmail}}:\\nAsunto: {{11.subject}}\"\r\n  }\r\n}"
+                                                "body": "{\r\n  \"fields\": {\r\n    \"ENTITY_ID\": {{54.body.result.item.id}},\r\n    \"ENTITY_TYPE\": \"dynamic_1034\",\r\n    \"COMMENT\": \"📧 CORREO RECIBIDO de {{11.fromEmail}}\\nAsunto: {{11.subject}}\"\r\n  }\r\n}"
                                             },
                                             "metadata": {
                                                 "designer": {
@@ -3897,13 +3897,13 @@
                                                     [
                                                         {
                                                             "a": "{{2.`__IMTLENGTH__`}}",
-                                                            "o": "text:equal",
-                                                            "b": "0"
+                                                            "b": "0",
+                                                            "o": "text:equal"
                                                         },
                                                         {
                                                             "a": "{{1.categoria_correo}}",
-                                                            "o": "text:notequal",
-                                                            "b": "franquicia"
+                                                            "b": "franquicia",
+                                                            "o": "text:notequal"
                                                         }
                                                     ]
                                                 ]
@@ -7822,14 +7822,14 @@
                                             },
                                             "mapper": {
                                                 "url": "crm.item.add",
+                                                "body": "{\r\n  \"entityTypeId\": 1034,\r\n  \"fields\": {\n    \"title\":\"Email CGI: Usuario requiere {{1.bot_humano}} - {{1.categoria_correo}}\",\n    \"assignedById\":\"{{60.assignedById}}\",\n    \"stageId\": \"{{60.prioridad}}\",\n    \"contactId\": \"{{23.id}}\",\n    \"sourceId\":\"EMAIL\",\n    \"sourceDescription\":\"email-cgi\"\n   }\n}",
                                                 "method": "POST",
                                                 "headers": [
                                                     {
                                                         "key": "Content-Type",
                                                         "value": "application/json"
                                                     }
-                                                ],
-                                                "body": "{\r\n  \"entityTypeId\": 1034,\r\n  \"fields\": {\n    \"title\":\"Email CGI: Usuario requiere {{1.bot_humano}} - {{1.categoria_correo}}\",\n    \"assignedById\":\"{{60.assignedById}}\",\n    \"stageId\": \"{{60.prioridad}}\",\n    \"contactId\": \"{{23.id}}\",\n    \"sourceId\":\"EMAIL\",\n    \"sourceDescription\":\"email-cgi\"\n   }\n}"
+                                                ]
                                             },
                                             "metadata": {
                                                 "designer": {
@@ -7838,16 +7838,10 @@
                                                     "name": "SPA Ticket - Nuevo"
                                                 },
                                                 "restore": {
-                                                    "parameters": {
-                                                        "__IMTCONN__": {
-                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)",
-                                                            "data": {
-                                                                "scoped": "true",
-                                                                "connection": "bitrix24"
-                                                            }
-                                                        }
-                                                    },
                                                     "expect": {
+                                                        "qs": {
+                                                            "mode": "chose"
+                                                        },
                                                         "method": {
                                                             "mode": "chose",
                                                             "label": "POST"
@@ -7857,9 +7851,15 @@
                                                             "items": [
                                                                 null
                                                             ]
-                                                        },
-                                                        "qs": {
-                                                            "mode": "chose"
+                                                        }
+                                                    },
+                                                    "parameters": {
+                                                        "__IMTCONN__": {
+                                                            "data": {
+                                                                "scoped": "true",
+                                                                "connection": "bitrix24"
+                                                            },
+                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)"
                                                         }
                                                     }
                                                 },
@@ -7895,8 +7895,6 @@
                                                     },
                                                     {
                                                         "name": "headers",
-                                                        "type": "array",
-                                                        "label": "Headers",
                                                         "spec": [
                                                             {
                                                                 "name": "key",
@@ -7908,12 +7906,12 @@
                                                                 "type": "text",
                                                                 "label": "Value"
                                                             }
-                                                        ]
+                                                        ],
+                                                        "type": "array",
+                                                        "label": "Headers"
                                                     },
                                                     {
                                                         "name": "qs",
-                                                        "type": "array",
-                                                        "label": "Query String",
                                                         "spec": [
                                                             {
                                                                 "name": "key",
@@ -7925,7 +7923,9 @@
                                                                 "type": "text",
                                                                 "label": "Value"
                                                             }
-                                                        ]
+                                                        ],
+                                                        "type": "array",
+                                                        "label": "Query String"
                                                     },
                                                     {
                                                         "name": "body",
@@ -7944,14 +7944,14 @@
                                             },
                                             "mapper": {
                                                 "url": "crm.activity.binding.add",
+                                                "body": "{\r\n  \"activityId\": {{69.body.result[1].ID}},\r\n  \"entityTypeId\": 1,\r\n  \"entityId\": {{55.body.result.item.id}}\n}",
                                                 "method": "POST",
                                                 "headers": [
                                                     {
                                                         "key": "Content-Type",
                                                         "value": "application/json"
                                                     }
-                                                ],
-                                                "body": "{\r\n  \"activityId\": {{69.body.result[1].ID}},\r\n  \"entityTypeId\": 1,\r\n  \"entityId\": {{55.body.result.item.id}}\n}"
+                                                ]
                                             },
                                             "metadata": {
                                                 "designer": {
@@ -7960,16 +7960,10 @@
                                                     "name": "vincula_email"
                                                 },
                                                 "restore": {
-                                                    "parameters": {
-                                                        "__IMTCONN__": {
-                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)",
-                                                            "data": {
-                                                                "scoped": "true",
-                                                                "connection": "bitrix24"
-                                                            }
-                                                        }
-                                                    },
                                                     "expect": {
+                                                        "qs": {
+                                                            "mode": "chose"
+                                                        },
                                                         "method": {
                                                             "mode": "chose",
                                                             "label": "POST"
@@ -7979,9 +7973,15 @@
                                                             "items": [
                                                                 null
                                                             ]
-                                                        },
-                                                        "qs": {
-                                                            "mode": "chose"
+                                                        }
+                                                    },
+                                                    "parameters": {
+                                                        "__IMTCONN__": {
+                                                            "data": {
+                                                                "scoped": "true",
+                                                                "connection": "bitrix24"
+                                                            },
+                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)"
                                                         }
                                                     }
                                                 },
@@ -8017,8 +8017,6 @@
                                                     },
                                                     {
                                                         "name": "headers",
-                                                        "type": "array",
-                                                        "label": "Headers",
                                                         "spec": [
                                                             {
                                                                 "name": "key",
@@ -8030,12 +8028,12 @@
                                                                 "type": "text",
                                                                 "label": "Value"
                                                             }
-                                                        ]
+                                                        ],
+                                                        "type": "array",
+                                                        "label": "Headers"
                                                     },
                                                     {
                                                         "name": "qs",
-                                                        "type": "array",
-                                                        "label": "Query String",
                                                         "spec": [
                                                             {
                                                                 "name": "key",
@@ -8047,7 +8045,9 @@
                                                                 "type": "text",
                                                                 "label": "Value"
                                                             }
-                                                        ]
+                                                        ],
+                                                        "type": "array",
+                                                        "label": "Query String"
                                                     },
                                                     {
                                                         "name": "body",
@@ -8066,27 +8066,27 @@
                                             },
                                             "mapper": {
                                                 "base": "appMNiPmgPOBdXZxt",
-                                                "typecast": false,
-                                                "useColumnId": false,
                                                 "table": "tblFsUGpeqIvAnEVh",
                                                 "record": {
-                                                    "fldI9gglSHnvp0ptM": "{{1.thread_id}}",
+                                                    "fld5mQVmKfGTbTI6j": "{{55.body.result.item.id}}",
+                                                    "fldD5UfZHBGw8VnB9": "{{1.categoria_correo}}",
                                                     "fldGQIcSIN49d4OzB": "{{11.subject}}",
-                                                    "fldkbeuamIponQYBs": "{{11.fromEmail}}",
-                                                    "fldZvZhDdcQdc0zxq": "{{11.to[].email}}",
+                                                    "fldGQUW9FLFW7glj9": "{{1.categoria_correo_api}}",
                                                     "fldHgTlccdFZMzHUU": "{{7.nombre}}",
+                                                    "fldI9gglSHnvp0ptM": "{{1.thread_id}}",
+                                                    "fldPeM5wlULywrkmD": "{{1.tipo_correo}}",
                                                     "fldQpoEAFbHYN7TmP": "{{7.apellido}}",
-                                                    "fldrIiOucUDZMiUXW": "{{7.dni}}",
-                                                    "fldkENBRVsvYqJX10": "{{7.telefono}}",
+                                                    "fldZvZhDdcQdc0zxq": "{{11.to[].email}}",
                                                     "flddKn7zZbx4JxG2C": "{{7.email}}",
                                                     "fldhg38Me05r19rBb": "{{7.n_contrato}}",
-                                                    "fldv20T36rftFfXLu": "{{7.n_modulo}}",
+                                                    "fldkENBRVsvYqJX10": "{{7.telefono}}",
                                                     "fldkQKHpXP7eQuD3E": "{{7.centro}}",
-                                                    "fldGQUW9FLFW7glj9": "{{1.categoria_correo_api}}",
-                                                    "fldPeM5wlULywrkmD": "{{1.tipo_correo}}",
-                                                    "fld5mQVmKfGTbTI6j": "{{55.body.result.item.id}}",
-                                                    "fldD5UfZHBGw8VnB9": "{{1.categoria_correo}}"
-                                                }
+                                                    "fldkbeuamIponQYBs": "{{11.fromEmail}}",
+                                                    "fldrIiOucUDZMiUXW": "{{7.dni}}",
+                                                    "fldv20T36rftFfXLu": "{{7.n_modulo}}"
+                                                },
+                                                "typecast": false,
+                                                "useColumnId": false
                                             },
                                             "metadata": {
                                                 "designer": {
@@ -8095,127 +8095,127 @@
                                                     "name": "Datos"
                                                 },
                                                 "restore": {
-                                                    "parameters": {
-                                                        "__IMTCONN__": {
-                                                            "label": "My Airtable OAuth connection MasIP (User ID: usrhEfequCBBlG5d3)",
-                                                            "data": {
-                                                                "scoped": "true",
-                                                                "connection": "airtable3"
-                                                            }
-                                                        }
-                                                    },
                                                     "expect": {
                                                         "base": {
                                                             "label": "Email CGI"
                                                         },
-                                                        "typecast": {
-                                                            "mode": "chose"
-                                                        },
-                                                        "useColumnId": {
-                                                            "mode": "chose"
-                                                        },
                                                         "table": {
+                                                            "label": "Datos extraídos",
                                                             "nested": [
                                                                 {
                                                                     "name": "record",
                                                                     "spec": [
                                                                         {
                                                                             "name": "fldI9gglSHnvp0ptM",
-                                                                            "label": "thread_id",
                                                                             "type": "text",
+                                                                            "label": "thread_id",
                                                                             "multiline": true
                                                                         },
                                                                         {
                                                                             "name": "fldGQIcSIN49d4OzB",
-                                                                            "label": "asunto",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "asunto"
                                                                         },
                                                                         {
                                                                             "name": "fldkbeuamIponQYBs",
-                                                                            "label": "from_email",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "from_email"
                                                                         },
                                                                         {
                                                                             "name": "fldZvZhDdcQdc0zxq",
-                                                                            "label": "to_email",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "to_email"
                                                                         },
                                                                         {
                                                                             "name": "fldHgTlccdFZMzHUU",
-                                                                            "label": "nombre",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "nombre"
                                                                         },
                                                                         {
                                                                             "name": "fldQpoEAFbHYN7TmP",
-                                                                            "label": "apellido",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "apellido"
                                                                         },
                                                                         {
                                                                             "name": "fldrIiOucUDZMiUXW",
-                                                                            "label": "dni",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "dni"
                                                                         },
                                                                         {
                                                                             "name": "fldkENBRVsvYqJX10",
-                                                                            "label": "telefono",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "telefono"
                                                                         },
                                                                         {
                                                                             "name": "flddKn7zZbx4JxG2C",
-                                                                            "label": "email",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "email"
                                                                         },
                                                                         {
                                                                             "name": "fldhg38Me05r19rBb",
-                                                                            "label": "n_contrato",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "n_contrato"
                                                                         },
                                                                         {
                                                                             "name": "fldv20T36rftFfXLu",
-                                                                            "label": "n_modulo",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "n_modulo"
                                                                         },
                                                                         {
                                                                             "name": "fldkQKHpXP7eQuD3E",
-                                                                            "label": "centro",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "centro"
                                                                         },
                                                                         {
                                                                             "name": "fldGQUW9FLFW7glj9",
-                                                                            "label": "categoria_api",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "categoria_api"
                                                                         },
                                                                         {
                                                                             "name": "fldPeM5wlULywrkmD",
-                                                                            "label": "tipo",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "tipo"
                                                                         },
                                                                         {
                                                                             "name": "fld798KlRWk1EYT5g",
-                                                                            "label": "codigo_generado",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "codigo_generado"
                                                                         },
                                                                         {
                                                                             "name": "fldiGEfwffi6SSteD",
-                                                                            "label": "lead_id",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "lead_id"
                                                                         },
                                                                         {
                                                                             "name": "fld5mQVmKfGTbTI6j",
-                                                                            "label": "ticket_id",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "ticket_id"
                                                                         },
                                                                         {
                                                                             "name": "fldD5UfZHBGw8VnB9",
-                                                                            "label": "categoria_label",
-                                                                            "type": "text"
+                                                                            "type": "text",
+                                                                            "label": "categoria_label"
                                                                         }
                                                                     ],
                                                                     "type": "collection",
                                                                     "label": "Record"
                                                                 }
-                                                            ],
-                                                            "label": "Datos extraídos"
+                                                            ]
+                                                        },
+                                                        "typecast": {
+                                                            "mode": "chose"
+                                                        },
+                                                        "useColumnId": {
+                                                            "mode": "chose"
+                                                        }
+                                                    },
+                                                    "parameters": {
+                                                        "__IMTCONN__": {
+                                                            "data": {
+                                                                "scoped": "true",
+                                                                "connection": "airtable3"
+                                                            },
+                                                            "label": "My Airtable OAuth connection MasIP (User ID: usrhEfequCBBlG5d3)"
                                                         }
                                                     }
                                                 },
@@ -8254,8 +8254,6 @@
                                                     },
                                                     {
                                                         "name": "record",
-                                                        "type": "collection",
-                                                        "label": "Record",
                                                         "spec": [
                                                             {
                                                                 "name": "fldI9gglSHnvp0ptM",
@@ -8347,7 +8345,9 @@
                                                                 "type": "text",
                                                                 "label": "categoria_label"
                                                             }
-                                                        ]
+                                                        ],
+                                                        "type": "collection",
+                                                        "label": "Record"
                                                     }
                                                 ],
                                                 "interface": [
@@ -8363,99 +8363,99 @@
                                                     },
                                                     {
                                                         "name": "thread_id",
-                                                        "label": "thread_id",
                                                         "type": "text",
+                                                        "label": "thread_id",
                                                         "multiline": true
                                                     },
                                                     {
                                                         "name": "fecha_creacion",
-                                                        "label": "fecha_creacion",
-                                                        "type": "date"
+                                                        "type": "date",
+                                                        "label": "fecha_creacion"
                                                     },
                                                     {
                                                         "name": "asunto",
-                                                        "label": "asunto",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "asunto"
                                                     },
                                                     {
                                                         "name": "from_email",
-                                                        "label": "from_email",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "from_email"
                                                     },
                                                     {
                                                         "name": "to_email",
-                                                        "label": "to_email",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "to_email"
                                                     },
                                                     {
                                                         "name": "nombre",
-                                                        "label": "nombre",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "nombre"
                                                     },
                                                     {
                                                         "name": "apellido",
-                                                        "label": "apellido",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "apellido"
                                                     },
                                                     {
                                                         "name": "dni",
-                                                        "label": "dni",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "dni"
                                                     },
                                                     {
                                                         "name": "telefono",
-                                                        "label": "telefono",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "telefono"
                                                     },
                                                     {
                                                         "name": "email",
-                                                        "label": "email",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "email"
                                                     },
                                                     {
                                                         "name": "n_contrato",
-                                                        "label": "n_contrato",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "n_contrato"
                                                     },
                                                     {
                                                         "name": "n_modulo",
-                                                        "label": "n_modulo",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "n_modulo"
                                                     },
                                                     {
                                                         "name": "centro",
-                                                        "label": "centro",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "centro"
                                                     },
                                                     {
                                                         "name": "categoria_api",
-                                                        "label": "categoria_api",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "categoria_api"
                                                     },
                                                     {
                                                         "name": "tipo",
-                                                        "label": "tipo",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "tipo"
                                                     },
                                                     {
                                                         "name": "codigo_generado",
-                                                        "label": "codigo_generado",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "codigo_generado"
                                                     },
                                                     {
                                                         "name": "lead_id",
-                                                        "label": "lead_id",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "lead_id"
                                                     },
                                                     {
                                                         "name": "ticket_id",
-                                                        "label": "ticket_id",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "ticket_id"
                                                     },
                                                     {
                                                         "name": "categoria_label",
-                                                        "label": "categoria_label",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "categoria_label"
                                                     }
                                                 ]
                                             }
@@ -8466,8 +8466,8 @@
                                             "version": 1,
                                             "parameters": {},
                                             "mapper": {
-                                                "status": "200",
                                                 "body": "{\n  \"nombre\":\"{{7.nombre}}\",\n   \"apellido\":\"{{7.apellido}}\",\n   \"email\":\"{{11.fromEmail}}\",\n   \"dni\":\"{{7.dni}}\",\n   \"n_modulo\":\"{{7.n_contrato}}\",  \n   \"n_contrato\":\"{{7.n_contrato}}\",\n   \"telefono\":\"{{7.telefono}}\",  \n   \"lead_id\":\"\",\n   \"ticket_id\":\"{{55.body.result.item.id}}\",\n   \"centro\":\"{{7.centro}}\",\n   \"datos_extraidos_id\":\"{{68.id}}\",\n   \"cliente\":\"false\"\n  }",
+                                                "status": "200",
                                                 "headers": [
                                                     {
                                                         "key": "Content-Type",
@@ -8495,10 +8495,10 @@
                                                         "name": "status",
                                                         "type": "uinteger",
                                                         "label": "Status",
+                                                        "required": true,
                                                         "validate": {
                                                             "min": 100
-                                                        },
-                                                        "required": true
+                                                        }
                                                     },
                                                     {
                                                         "name": "body",
@@ -8507,16 +8507,11 @@
                                                     },
                                                     {
                                                         "name": "headers",
-                                                        "type": "array",
-                                                        "label": "Custom headers",
-                                                        "validate": {
-                                                            "maxItems": 16
-                                                        },
                                                         "spec": [
                                                             {
                                                                 "name": "key",
-                                                                "label": "Key",
                                                                 "type": "text",
+                                                                "label": "Key",
                                                                 "required": true,
                                                                 "validate": {
                                                                     "max": 256
@@ -8524,14 +8519,19 @@
                                                             },
                                                             {
                                                                 "name": "value",
-                                                                "label": "Value",
                                                                 "type": "text",
+                                                                "label": "Value",
                                                                 "required": true,
                                                                 "validate": {
                                                                     "max": 4096
                                                                 }
                                                             }
-                                                        ]
+                                                        ],
+                                                        "type": "array",
+                                                        "label": "Custom headers",
+                                                        "validate": {
+                                                            "maxItems": 16
+                                                        }
                                                     }
                                                 ],
                                                 "advanced": true
@@ -8565,7 +8565,7 @@
                                                         "value": "application/json"
                                                     }
                                                 ],
-                                                "body": "{\r\n  \"fields\": {\r\n    \"ENTITY_ID\":{{55.body.result.item.id}},\r\n    \"ENTITY_TYPE\": \"dynamic_1034\",\r\n    \"COMMENT\": \"Archivos adjuntos: \"\r\n}\r\n}"
+                                                "body": "{\r\n  \"fields\": {\r\n    \"ENTITY_ID\":{{55.body.result.item.id}},\r\n    \"ENTITY_TYPE\": \"dynamic_1034\",\r\n    \"COMMENT\": \"📧 CORREO RECIBIDO de {{11.fromEmail}}\\nAsunto: {{11.subject}}\"\r\n}\r\n}"
                                             },
                                             "metadata": {
                                                 "designer": {
@@ -8688,8 +8688,8 @@
                                                     [
                                                         {
                                                             "a": "{{1.categoria_correo}}",
-                                                            "o": "text:equal",
-                                                            "b": "franquicia"
+                                                            "b": "franquicia",
+                                                            "o": "text:equal"
                                                         }
                                                     ]
                                                 ]
@@ -13055,24 +13055,24 @@
                                             },
                                             "mapper": {
                                                 "base": "appMNiPmgPOBdXZxt",
-                                                "typecast": false,
-                                                "useColumnId": false,
                                                 "table": "tblFsUGpeqIvAnEVh",
                                                 "record": {
-                                                    "fldI9gglSHnvp0ptM": "{{1.thread_id}}",
+                                                    "fldD5UfZHBGw8VnB9": "{{1.categoria_correo}}",
                                                     "fldGQIcSIN49d4OzB": "{{11.subject}}",
-                                                    "fldkbeuamIponQYBs": "{{11.fromEmail}}",
-                                                    "fldZvZhDdcQdc0zxq": "{{11.to[].email}}",
-                                                    "fldHgTlccdFZMzHUU": "{{7.nombre}}",
-                                                    "fldQpoEAFbHYN7TmP": "{{7.apellido}}",
-                                                    "fldrIiOucUDZMiUXW": "{{7.dni}}",
-                                                    "fldkENBRVsvYqJX10": "{{7.telefono}}",
-                                                    "flddKn7zZbx4JxG2C": "{{11.fromEmail}}",
                                                     "fldGQUW9FLFW7glj9": "{{1.categoria_correo_api}}",
+                                                    "fldHgTlccdFZMzHUU": "{{7.nombre}}",
+                                                    "fldI9gglSHnvp0ptM": "{{1.thread_id}}",
                                                     "fldPeM5wlULywrkmD": "{{1.tipo_correo}}",
+                                                    "fldQpoEAFbHYN7TmP": "{{7.apellido}}",
+                                                    "fldZvZhDdcQdc0zxq": "{{11.to[].email}}",
+                                                    "flddKn7zZbx4JxG2C": "{{11.fromEmail}}",
                                                     "fldiGEfwffi6SSteD": "169_{{33.body.result.item.id}}",
-                                                    "fldD5UfZHBGw8VnB9": "{{1.categoria_correo}}"
-                                                }
+                                                    "fldkENBRVsvYqJX10": "{{7.telefono}}",
+                                                    "fldkbeuamIponQYBs": "{{11.fromEmail}}",
+                                                    "fldrIiOucUDZMiUXW": "{{7.dni}}"
+                                                },
+                                                "typecast": false,
+                                                "useColumnId": false
                                             },
                                             "metadata": {
                                                 "designer": {
@@ -13081,26 +13081,12 @@
                                                     "name": "Datos"
                                                 },
                                                 "restore": {
-                                                    "parameters": {
-                                                        "__IMTCONN__": {
-                                                            "label": "My Airtable OAuth connection MasIP (User ID: usrhEfequCBBlG5d3)",
-                                                            "data": {
-                                                                "scoped": "true",
-                                                                "connection": "airtable3"
-                                                            }
-                                                        }
-                                                    },
                                                     "expect": {
                                                         "base": {
                                                             "label": "Email CGI"
                                                         },
-                                                        "typecast": {
-                                                            "mode": "chose"
-                                                        },
-                                                        "useColumnId": {
-                                                            "mode": "chose"
-                                                        },
                                                         "table": {
+                                                            "label": "Datos extraídos",
                                                             "nested": [
                                                                 {
                                                                     "name": "record",
@@ -13195,8 +13181,22 @@
                                                                     "type": "collection",
                                                                     "label": "Record"
                                                                 }
-                                                            ],
-                                                            "label": "Datos extraídos"
+                                                            ]
+                                                        },
+                                                        "typecast": {
+                                                            "mode": "chose"
+                                                        },
+                                                        "useColumnId": {
+                                                            "mode": "chose"
+                                                        }
+                                                    },
+                                                    "parameters": {
+                                                        "__IMTCONN__": {
+                                                            "data": {
+                                                                "scoped": "true",
+                                                                "connection": "airtable3"
+                                                            },
+                                                            "label": "My Airtable OAuth connection MasIP (User ID: usrhEfequCBBlG5d3)"
                                                         }
                                                     }
                                                 },
@@ -13235,8 +13235,6 @@
                                                     },
                                                     {
                                                         "name": "record",
-                                                        "type": "collection",
-                                                        "label": "Record",
                                                         "spec": [
                                                             {
                                                                 "name": "fldI9gglSHnvp0ptM",
@@ -13323,7 +13321,9 @@
                                                                 "type": "text",
                                                                 "label": "categoria_label"
                                                             }
-                                                        ]
+                                                        ],
+                                                        "type": "collection",
+                                                        "label": "Record"
                                                     }
                                                 ],
                                                 "interface": [
@@ -13339,99 +13339,99 @@
                                                     },
                                                     {
                                                         "name": "thread_id",
-                                                        "label": "thread_id",
                                                         "type": "text",
+                                                        "label": "thread_id",
                                                         "multiline": true
                                                     },
                                                     {
                                                         "name": "fecha_creacion",
-                                                        "label": "fecha_creacion",
-                                                        "type": "date"
+                                                        "type": "date",
+                                                        "label": "fecha_creacion"
                                                     },
                                                     {
                                                         "name": "asunto",
-                                                        "label": "asunto",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "asunto"
                                                     },
                                                     {
                                                         "name": "from_email",
-                                                        "label": "from_email",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "from_email"
                                                     },
                                                     {
                                                         "name": "to_email",
-                                                        "label": "to_email",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "to_email"
                                                     },
                                                     {
                                                         "name": "nombre",
-                                                        "label": "nombre",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "nombre"
                                                     },
                                                     {
                                                         "name": "apellido",
-                                                        "label": "apellido",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "apellido"
                                                     },
                                                     {
                                                         "name": "dni",
-                                                        "label": "dni",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "dni"
                                                     },
                                                     {
                                                         "name": "telefono",
-                                                        "label": "telefono",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "telefono"
                                                     },
                                                     {
                                                         "name": "email",
-                                                        "label": "email",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "email"
                                                     },
                                                     {
                                                         "name": "n_contrato",
-                                                        "label": "n_contrato",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "n_contrato"
                                                     },
                                                     {
                                                         "name": "n_modulo",
-                                                        "label": "n_modulo",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "n_modulo"
                                                     },
                                                     {
                                                         "name": "centro",
-                                                        "label": "centro",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "centro"
                                                     },
                                                     {
                                                         "name": "categoria_api",
-                                                        "label": "categoria_api",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "categoria_api"
                                                     },
                                                     {
                                                         "name": "tipo",
-                                                        "label": "tipo",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "tipo"
                                                     },
                                                     {
                                                         "name": "codigo_generado",
-                                                        "label": "codigo_generado",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "codigo_generado"
                                                     },
                                                     {
                                                         "name": "lead_id",
-                                                        "label": "lead_id",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "lead_id"
                                                     },
                                                     {
                                                         "name": "ticket_id",
-                                                        "label": "ticket_id",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "ticket_id"
                                                     },
                                                     {
                                                         "name": "categoria_label",
-                                                        "label": "categoria_label",
-                                                        "type": "text"
+                                                        "type": "text",
+                                                        "label": "categoria_label"
                                                     }
                                                 ]
                                             }
@@ -13532,8 +13532,8 @@
                                     [
                                         {
                                             "a": "{{1.tipo_correo}}",
-                                            "o": "text:notequal",
-                                            "b": "accion"
+                                            "b": "accion",
+                                            "o": "text:notequal"
                                         }
                                     ]
                                 ]

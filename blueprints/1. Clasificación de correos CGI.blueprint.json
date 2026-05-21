@@ -465,53 +465,53 @@
                     [
                         {
                             "a": "{{1.fromEmail}}",
-                            "b": "@telefacil.com",
-                            "o": "text:notcontain"
+                            "o": "text:notcontain",
+                            "b": "@telefacil.com"
                         },
                         {
                             "a": "{{1.fromEmail}}",
-                            "b": "noreply@",
-                            "o": "text:notcontain"
+                            "o": "text:notcontain",
+                            "b": "noreply@"
                         },
                         {
                             "a": "{{1.fromEmail}}",
-                            "b": "@e.fundacionmapfre.org",
-                            "o": "text:notcontain"
+                            "o": "text:notcontain",
+                            "b": "@e.fundacionmapfre.org"
                         },
                         {
                             "a": "{{1.fromEmail}}",
-                            "b": "@alcobendas.org",
-                            "o": "text:notcontain"
+                            "o": "text:notcontain",
+                            "b": "@alcobendas.org"
                         },
                         {
                             "a": "{{1.fromEmail}}",
-                            "b": "@hyperionup.com",
-                            "o": "text:notcontain"
+                            "o": "text:notcontain",
+                            "b": "@hyperionup.com"
                         },
                         {
                             "a": "{{1.fromEmail}}",
-                            "b": "newsletter",
-                            "o": "text:notcontain"
+                            "o": "text:notcontain",
+                            "b": "newsletter"
                         },
                         {
                             "a": "{{1.fromEmail}}",
-                            "b": "info@necesitasrespirar.com",
-                            "o": "text:notcontain"
+                            "o": "text:notcontain",
+                            "b": "info@"
                         },
                         {
                             "a": "{{1.fromEmail}}",
-                            "b": "@norauto.es",
-                            "o": "text:notcontain"
+                            "o": "text:notcontain",
+                            "b": "@norauto.es"
                         },
                         {
                             "a": "{{1.fromEmail}}",
-                            "b": "noreply.",
-                            "o": "text:notcontain"
+                            "o": "text:notcontain",
+                            "b": "noreply."
                         },
                         {
                             "a": "{{1.fromEmail}}",
-                            "b": "Dimitri@lcd-phone.com",
-                            "o": "text:notcontain"
+                            "o": "text:notcontain",
+                            "b": "Dimitri@lcd-phone.com"
                         }
                     ]
                 ]
@@ -3561,14 +3561,14 @@
                                             },
                                             "mapper": {
                                                 "url": "crm.item.update",
-                                                "body": "{\r\n  \"entityTypeId\": 1034,\n  \"id\":{{21.data.ticket_id}},\r\n  \"fields\": {\n    \"stageId\": \"DT1034_120:SUCCESS\",\n    \"assignedById\":\"6358\"\n  }\n}",
                                                 "method": "POST",
                                                 "headers": [
                                                     {
                                                         "key": "Content-Type",
                                                         "value": "application/json"
                                                     }
-                                                ]
+                                                ],
+                                                "body": "{\r\n  \"entityTypeId\": 1034,\n  \"id\":{{21.data.ticket_id}},\r\n  \"fields\": {\n    \"stageId\": \"DT1034_120:SUCCESS\",\n    \"assignedById\":6358\n  }\n}"
                                             },
                                             "metadata": {
                                                 "designer": {
@@ -3577,10 +3577,16 @@
                                                     "name": "SPA Ticket - Update"
                                                 },
                                                 "restore": {
+                                                    "parameters": {
+                                                        "__IMTCONN__": {
+                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)",
+                                                            "data": {
+                                                                "scoped": "true",
+                                                                "connection": "bitrix24"
+                                                            }
+                                                        }
+                                                    },
                                                     "expect": {
-                                                        "qs": {
-                                                            "mode": "chose"
-                                                        },
                                                         "method": {
                                                             "mode": "chose",
                                                             "label": "POST"
@@ -3590,15 +3596,9 @@
                                                             "items": [
                                                                 null
                                                             ]
-                                                        }
-                                                    },
-                                                    "parameters": {
-                                                        "__IMTCONN__": {
-                                                            "data": {
-                                                                "scoped": "true",
-                                                                "connection": "bitrix24"
-                                                            },
-                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)"
+                                                        },
+                                                        "qs": {
+                                                            "mode": "chose"
                                                         }
                                                     }
                                                 },
@@ -3634,6 +3634,8 @@
                                                     },
                                                     {
                                                         "name": "headers",
+                                                        "type": "array",
+                                                        "label": "Headers",
                                                         "spec": [
                                                             {
                                                                 "name": "key",
@@ -3645,12 +3647,12 @@
                                                                 "type": "text",
                                                                 "label": "Value"
                                                             }
-                                                        ],
-                                                        "type": "array",
-                                                        "label": "Headers"
+                                                        ]
                                                     },
                                                     {
                                                         "name": "qs",
+                                                        "type": "array",
+                                                        "label": "Query String",
                                                         "spec": [
                                                             {
                                                                 "name": "key",
@@ -3662,9 +3664,7 @@
                                                                 "type": "text",
                                                                 "label": "Value"
                                                             }
-                                                        ],
-                                                        "type": "array",
-                                                        "label": "Query String"
+                                                        ]
                                                     },
                                                     {
                                                         "name": "body",
@@ -3683,14 +3683,14 @@
                                             },
                                             "mapper": {
                                                 "url": "crm.timeline.comment.add",
-                                                "body": "{\r\n  \"fields\": {\r\n    \"ENTITY_ID\": {{1.ticket_id}},\r\n    \"ENTITY_TYPE\": \"dynamic_1034\",\r\n    \"COMMENT\": \"Se envió enlace a web al CLIENTE para que solicite presupuesto.\"\r\n}\r\n}",
                                                 "method": "POST",
                                                 "headers": [
                                                     {
                                                         "key": "Content-Type",
                                                         "value": "application/json"
                                                     }
-                                                ]
+                                                ],
+                                                "body": "{\r\n  \"fields\": {\r\n    \"ENTITY_ID\": {{1.ticket_id}},\r\n    \"ENTITY_TYPE\": \"dynamic_1034\",\r\n    \"COMMENT\": \"Se envió enlace a web al CLIENTE para que solicite presupuesto.\"\r\n}\r\n}"
                                             },
                                             "metadata": {
                                                 "designer": {
@@ -3699,10 +3699,16 @@
                                                     "name": "Comentario en timeline"
                                                 },
                                                 "restore": {
+                                                    "parameters": {
+                                                        "__IMTCONN__": {
+                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)",
+                                                            "data": {
+                                                                "scoped": "true",
+                                                                "connection": "bitrix24"
+                                                            }
+                                                        }
+                                                    },
                                                     "expect": {
-                                                        "qs": {
-                                                            "mode": "chose"
-                                                        },
                                                         "method": {
                                                             "mode": "chose",
                                                             "label": "POST"
@@ -3712,15 +3718,9 @@
                                                             "items": [
                                                                 null
                                                             ]
-                                                        }
-                                                    },
-                                                    "parameters": {
-                                                        "__IMTCONN__": {
-                                                            "data": {
-                                                                "scoped": "true",
-                                                                "connection": "bitrix24"
-                                                            },
-                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)"
+                                                        },
+                                                        "qs": {
+                                                            "mode": "chose"
                                                         }
                                                     }
                                                 },
@@ -3756,6 +3756,8 @@
                                                     },
                                                     {
                                                         "name": "headers",
+                                                        "type": "array",
+                                                        "label": "Headers",
                                                         "spec": [
                                                             {
                                                                 "name": "key",
@@ -3767,12 +3769,12 @@
                                                                 "type": "text",
                                                                 "label": "Value"
                                                             }
-                                                        ],
-                                                        "type": "array",
-                                                        "label": "Headers"
+                                                        ]
                                                     },
                                                     {
                                                         "name": "qs",
+                                                        "type": "array",
+                                                        "label": "Query String",
                                                         "spec": [
                                                             {
                                                                 "name": "key",
@@ -3784,9 +3786,7 @@
                                                                 "type": "text",
                                                                 "label": "Value"
                                                             }
-                                                        ],
-                                                        "type": "array",
-                                                        "label": "Query String"
+                                                        ]
                                                     },
                                                     {
                                                         "name": "body",
@@ -4239,14 +4239,14 @@
                                             },
                                             "mapper": {
                                                 "url": "crm.item.update",
-                                                "body": "{\r\n  \"entityTypeId\": 1034,\n  \"id\":{{21.data.ticket_id}},\r\n  \"fields\": {\n    \"stageId\": \"DT1034_120:SUCCESS\",\n    \"assignedById\":\"6358\"\n  }\n}",
                                                 "method": "POST",
                                                 "headers": [
                                                     {
                                                         "key": "Content-Type",
                                                         "value": "application/json"
                                                     }
-                                                ]
+                                                ],
+                                                "body": "{\r\n  \"entityTypeId\": 1034,\n  \"id\":{{21.data.ticket_id}},\r\n  \"fields\": {\n    \"stageId\": \"DT1034_120:SUCCESS\",\n    \"assignedById\":6358\n  }\n}"
                                             },
                                             "metadata": {
                                                 "designer": {
@@ -4255,10 +4255,16 @@
                                                     "name": "SPA Ticket - Update"
                                                 },
                                                 "restore": {
+                                                    "parameters": {
+                                                        "__IMTCONN__": {
+                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)",
+                                                            "data": {
+                                                                "scoped": "true",
+                                                                "connection": "bitrix24"
+                                                            }
+                                                        }
+                                                    },
                                                     "expect": {
-                                                        "qs": {
-                                                            "mode": "chose"
-                                                        },
                                                         "method": {
                                                             "mode": "chose",
                                                             "label": "POST"
@@ -4268,15 +4274,9 @@
                                                             "items": [
                                                                 null
                                                             ]
-                                                        }
-                                                    },
-                                                    "parameters": {
-                                                        "__IMTCONN__": {
-                                                            "data": {
-                                                                "scoped": "true",
-                                                                "connection": "bitrix24"
-                                                            },
-                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)"
+                                                        },
+                                                        "qs": {
+                                                            "mode": "chose"
                                                         }
                                                     }
                                                 },
@@ -4312,6 +4312,8 @@
                                                     },
                                                     {
                                                         "name": "headers",
+                                                        "type": "array",
+                                                        "label": "Headers",
                                                         "spec": [
                                                             {
                                                                 "name": "key",
@@ -4323,12 +4325,12 @@
                                                                 "type": "text",
                                                                 "label": "Value"
                                                             }
-                                                        ],
-                                                        "type": "array",
-                                                        "label": "Headers"
+                                                        ]
                                                     },
                                                     {
                                                         "name": "qs",
+                                                        "type": "array",
+                                                        "label": "Query String",
                                                         "spec": [
                                                             {
                                                                 "name": "key",
@@ -4340,9 +4342,7 @@
                                                                 "type": "text",
                                                                 "label": "Value"
                                                             }
-                                                        ],
-                                                        "type": "array",
-                                                        "label": "Query String"
+                                                        ]
                                                     },
                                                     {
                                                         "name": "body",
@@ -4361,14 +4361,14 @@
                                             },
                                             "mapper": {
                                                 "url": "crm.timeline.comment.add",
-                                                "body": "{\r\n  \"fields\": {\r\n    \"ENTITY_ID\": {{21.data.ticket_id}},\r\n    \"ENTITY_TYPE\": \"dynamic_1034\",\r\n    \"COMMENT\": \"Respuesta automática EXITOSA. \\n A la solicitud de {{15.categoria}} se generó la siguiente RESPUESTA AUTOMÁTICA: Enlace a {{15.categoria}} de la web Tu Trastero.\"\r\n}\r\n}",
                                                 "method": "POST",
                                                 "headers": [
                                                     {
                                                         "key": "Content-Type",
                                                         "value": "application/json"
                                                     }
-                                                ]
+                                                ],
+                                                "body": "{\r\n  \"fields\": {\r\n    \"ENTITY_ID\": {{21.data.ticket_id}},\r\n    \"ENTITY_TYPE\": \"dynamic_1034\",\r\n    \"COMMENT\": \"Respuesta automática EXITOSA.\\nA la solicitud de {{15.categoria}} se generó la siguiente RESPUESTA AUTOMÁTICA: Enlace a {{15.categoria}} de la web Tu Trastero.\"\r\n}\r\n}"
                                             },
                                             "metadata": {
                                                 "designer": {
@@ -4377,10 +4377,16 @@
                                                     "name": "Comentario en timeline"
                                                 },
                                                 "restore": {
+                                                    "parameters": {
+                                                        "__IMTCONN__": {
+                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)",
+                                                            "data": {
+                                                                "scoped": "true",
+                                                                "connection": "bitrix24"
+                                                            }
+                                                        }
+                                                    },
                                                     "expect": {
-                                                        "qs": {
-                                                            "mode": "chose"
-                                                        },
                                                         "method": {
                                                             "mode": "chose",
                                                             "label": "POST"
@@ -4390,15 +4396,9 @@
                                                             "items": [
                                                                 null
                                                             ]
-                                                        }
-                                                    },
-                                                    "parameters": {
-                                                        "__IMTCONN__": {
-                                                            "data": {
-                                                                "scoped": "true",
-                                                                "connection": "bitrix24"
-                                                            },
-                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)"
+                                                        },
+                                                        "qs": {
+                                                            "mode": "chose"
                                                         }
                                                     }
                                                 },
@@ -4434,6 +4434,8 @@
                                                     },
                                                     {
                                                         "name": "headers",
+                                                        "type": "array",
+                                                        "label": "Headers",
                                                         "spec": [
                                                             {
                                                                 "name": "key",
@@ -4445,12 +4447,12 @@
                                                                 "type": "text",
                                                                 "label": "Value"
                                                             }
-                                                        ],
-                                                        "type": "array",
-                                                        "label": "Headers"
+                                                        ]
                                                     },
                                                     {
                                                         "name": "qs",
+                                                        "type": "array",
+                                                        "label": "Query String",
                                                         "spec": [
                                                             {
                                                                 "name": "key",
@@ -4462,9 +4464,7 @@
                                                                 "type": "text",
                                                                 "label": "Value"
                                                             }
-                                                        ],
-                                                        "type": "array",
-                                                        "label": "Query String"
+                                                        ]
                                                     },
                                                     {
                                                         "name": "body",
@@ -5117,8 +5117,8 @@
                                                     [
                                                         {
                                                             "a": "{{15.categoria}}",
-                                                            "o": "text:equal",
-                                                            "b": "resena_google"
+                                                            "b": "resena_google",
+                                                            "o": "text:equal"
                                                         }
                                                     ]
                                                 ]
@@ -7110,14 +7110,14 @@
                                                             },
                                                             "mapper": {
                                                                 "url": "crm.timeline.comment.add",
-                                                                "body": "{\r\n  \"fields\": {\r\n    \"ENTITY_ID\": {{21.data.ticket_id}},\r\n    \"ENTITY_TYPE\": \"dynamic_1034\",\r\n    \"COMMENT\": \"Comunicarse con cliente. \\n\nNota: el correo del remitente no fue encontrado en la base de datos de Bitrix.\"\r\n}\r\n}",
                                                                 "method": "POST",
                                                                 "headers": [
                                                                     {
                                                                         "key": "Content-Type",
                                                                         "value": "application/json"
                                                                     }
-                                                                ]
+                                                                ],
+                                                                "body": "{\r\n  \"fields\": {\r\n    \"ENTITY_ID\": {{21.data.ticket_id}},\r\n    \"ENTITY_TYPE\": \"dynamic_1034\",\r\n    \"COMMENT\": \"Comunicarse con cliente.\\n\nDejó una reseña en google.\"\r\n}\r\n}"
                                                             },
                                                             "metadata": {
                                                                 "designer": {
@@ -7126,10 +7126,16 @@
                                                                     "name": "Comentario en timeline"
                                                                 },
                                                                 "restore": {
+                                                                    "parameters": {
+                                                                        "__IMTCONN__": {
+                                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)",
+                                                                            "data": {
+                                                                                "scoped": "true",
+                                                                                "connection": "bitrix24"
+                                                                            }
+                                                                        }
+                                                                    },
                                                                     "expect": {
-                                                                        "qs": {
-                                                                            "mode": "chose"
-                                                                        },
                                                                         "method": {
                                                                             "mode": "chose",
                                                                             "label": "POST"
@@ -7139,15 +7145,9 @@
                                                                             "items": [
                                                                                 null
                                                                             ]
-                                                                        }
-                                                                    },
-                                                                    "parameters": {
-                                                                        "__IMTCONN__": {
-                                                                            "data": {
-                                                                                "scoped": "true",
-                                                                                "connection": "bitrix24"
-                                                                            },
-                                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)"
+                                                                        },
+                                                                        "qs": {
+                                                                            "mode": "chose"
                                                                         }
                                                                     }
                                                                 },
@@ -7183,6 +7183,8 @@
                                                                     },
                                                                     {
                                                                         "name": "headers",
+                                                                        "type": "array",
+                                                                        "label": "Headers",
                                                                         "spec": [
                                                                             {
                                                                                 "name": "key",
@@ -7194,12 +7196,12 @@
                                                                                 "type": "text",
                                                                                 "label": "Value"
                                                                             }
-                                                                        ],
-                                                                        "type": "array",
-                                                                        "label": "Headers"
+                                                                        ]
                                                                     },
                                                                     {
                                                                         "name": "qs",
+                                                                        "type": "array",
+                                                                        "label": "Query String",
                                                                         "spec": [
                                                                             {
                                                                                 "name": "key",
@@ -7211,9 +7213,7 @@
                                                                                 "type": "text",
                                                                                 "label": "Value"
                                                                             }
-                                                                        ],
-                                                                        "type": "array",
-                                                                        "label": "Query String"
+                                                                        ]
                                                                     },
                                                                     {
                                                                         "name": "body",
@@ -7679,14 +7679,14 @@
                                                             },
                                                             "mapper": {
                                                                 "url": "crm.timeline.comment.add",
-                                                                "body": "{\r\n  \"fields\": {\r\n    \"ENTITY_ID\": {{21.data.ticket_id}},\r\n    \"ENTITY_TYPE\": \"dynamic_1034\",\r\n    \"COMMENT\": \"Comunicarse con cliente. \\n NAME: {{21.nombre}}\",  LAST_NAME: {{21.nombre}},  PHONE: {{21.telefone}}, EMAIL: {{21.email}}\"\r\n}\r\n}",
                                                                 "method": "POST",
                                                                 "headers": [
                                                                     {
                                                                         "key": "Content-Type",
                                                                         "value": "application/json"
                                                                     }
-                                                                ]
+                                                                ],
+                                                                "body": "{\r\n  \"fields\": {\r\n    \"ENTITY_ID\": {{21.data.ticket_id}},\r\n    \"ENTITY_TYPE\": \"dynamic_1034\",\r\n    \"COMMENT\": \"Comunicarse con cliente.\\n\nDejó una reseña en google.\\n El email del usuario no está en bitrix.\\n Nombre: {{21.data.nombre}}\"\\n Apellido: {{21.data.apellido}}\\n Teléfono: {{21.data.telefono}}\\n Email: {{21.data.email}}\"\r\n}\r\n}"
                                                             },
                                                             "metadata": {
                                                                 "designer": {
@@ -7695,10 +7695,16 @@
                                                                     "name": "Comentario en timeline"
                                                                 },
                                                                 "restore": {
+                                                                    "parameters": {
+                                                                        "__IMTCONN__": {
+                                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)",
+                                                                            "data": {
+                                                                                "scoped": "true",
+                                                                                "connection": "bitrix24"
+                                                                            }
+                                                                        }
+                                                                    },
                                                                     "expect": {
-                                                                        "qs": {
-                                                                            "mode": "chose"
-                                                                        },
                                                                         "method": {
                                                                             "mode": "chose",
                                                                             "label": "POST"
@@ -7708,15 +7714,9 @@
                                                                             "items": [
                                                                                 null
                                                                             ]
-                                                                        }
-                                                                    },
-                                                                    "parameters": {
-                                                                        "__IMTCONN__": {
-                                                                            "data": {
-                                                                                "scoped": "true",
-                                                                                "connection": "bitrix24"
-                                                                            },
-                                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)"
+                                                                        },
+                                                                        "qs": {
+                                                                            "mode": "chose"
                                                                         }
                                                                     }
                                                                 },
@@ -7752,6 +7752,8 @@
                                                                     },
                                                                     {
                                                                         "name": "headers",
+                                                                        "type": "array",
+                                                                        "label": "Headers",
                                                                         "spec": [
                                                                             {
                                                                                 "name": "key",
@@ -7763,12 +7765,12 @@
                                                                                 "type": "text",
                                                                                 "label": "Value"
                                                                             }
-                                                                        ],
-                                                                        "type": "array",
-                                                                        "label": "Headers"
+                                                                        ]
                                                                     },
                                                                     {
                                                                         "name": "qs",
+                                                                        "type": "array",
+                                                                        "label": "Query String",
                                                                         "spec": [
                                                                             {
                                                                                 "name": "key",
@@ -7780,9 +7782,7 @@
                                                                                 "type": "text",
                                                                                 "label": "Value"
                                                                             }
-                                                                        ],
-                                                                        "type": "array",
-                                                                        "label": "Query String"
+                                                                        ]
                                                                     },
                                                                     {
                                                                         "name": "body",
@@ -8252,14 +8252,14 @@
                                             },
                                             "mapper": {
                                                 "url": "crm.item.update",
-                                                "body": "{\r\n  \"entityTypeId\": 1034,\n  \"id\":{{21.data.ticket_id}},\r\n  \"fields\": {\n    \"stageId\": \"DT1034_120:CLIENT\",\n    \"assignedById\":\"43712\"\n  }\n}",
                                                 "method": "POST",
                                                 "headers": [
                                                     {
                                                         "key": "Content-Type",
                                                         "value": "application/json"
                                                     }
-                                                ]
+                                                ],
+                                                "body": "{\r\n  \"entityTypeId\": 1034,\n  \"id\":{{21.data.ticket_id}},\r\n  \"fields\": {\n    \"stageId\": \"DT1034_120:CLIENT\",\n    \"assignedById\":43712\n  }\n}"
                                             },
                                             "metadata": {
                                                 "designer": {
@@ -8268,10 +8268,16 @@
                                                     "name": "SPA Ticket - Update"
                                                 },
                                                 "restore": {
+                                                    "parameters": {
+                                                        "__IMTCONN__": {
+                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)",
+                                                            "data": {
+                                                                "scoped": "true",
+                                                                "connection": "bitrix24"
+                                                            }
+                                                        }
+                                                    },
                                                     "expect": {
-                                                        "qs": {
-                                                            "mode": "chose"
-                                                        },
                                                         "method": {
                                                             "mode": "chose",
                                                             "label": "POST"
@@ -8281,15 +8287,9 @@
                                                             "items": [
                                                                 null
                                                             ]
-                                                        }
-                                                    },
-                                                    "parameters": {
-                                                        "__IMTCONN__": {
-                                                            "data": {
-                                                                "scoped": "true",
-                                                                "connection": "bitrix24"
-                                                            },
-                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)"
+                                                        },
+                                                        "qs": {
+                                                            "mode": "chose"
                                                         }
                                                     }
                                                 },
@@ -8325,6 +8325,8 @@
                                                     },
                                                     {
                                                         "name": "headers",
+                                                        "type": "array",
+                                                        "label": "Headers",
                                                         "spec": [
                                                             {
                                                                 "name": "key",
@@ -8336,12 +8338,12 @@
                                                                 "type": "text",
                                                                 "label": "Value"
                                                             }
-                                                        ],
-                                                        "type": "array",
-                                                        "label": "Headers"
+                                                        ]
                                                     },
                                                     {
                                                         "name": "qs",
+                                                        "type": "array",
+                                                        "label": "Query String",
                                                         "spec": [
                                                             {
                                                                 "name": "key",
@@ -8353,9 +8355,7 @@
                                                                 "type": "text",
                                                                 "label": "Value"
                                                             }
-                                                        ],
-                                                        "type": "array",
-                                                        "label": "Query String"
+                                                        ]
                                                     },
                                                     {
                                                         "name": "body",
@@ -8374,14 +8374,14 @@
                                             },
                                             "mapper": {
                                                 "url": "crm.timeline.comment.add",
-                                                "body": "{\r\n  \"fields\": {\r\n    \"ENTITY_ID\": {{21.data.ticket_id}},\r\n    \"ENTITY_TYPE\": \"dynamic_1034\",\r\n    \"COMMENT\": \"Se indicó al CLIENTE que el acceso a su trastero será inhabilitado en caso de impago. \\n NAME: {{21.data.nombre}}\",  LAST_NAME: {{21.data.apellido}},  PHONE: {{21.data.telefono}}, EMAIL: {{21.data.email}}\"\r\n}\r\n}",
                                                 "method": "POST",
                                                 "headers": [
                                                     {
                                                         "key": "Content-Type",
                                                         "value": "application/json"
                                                     }
-                                                ]
+                                                ],
+                                                "body": "{\r\n  \"fields\": {\r\n    \"ENTITY_ID\": {{21.data.ticket_id}},\r\n    \"ENTITY_TYPE\": \"dynamic_1034\",\r\n    \"COMMENT\": \"Se indicó al CLIENTE que el acceso a su trastero será inhabilitado en caso de impago.\\n Nombre: {{21.data.nombre}}\"\\n Apellido: {{21.data.apellido}}\\n Teléfono: {{21.data.telefono}}\\n Email: {{21.data.email}}\"\r\n}\r\n}"
                                             },
                                             "metadata": {
                                                 "designer": {
@@ -8390,10 +8390,16 @@
                                                     "name": "Comentario en timeline"
                                                 },
                                                 "restore": {
+                                                    "parameters": {
+                                                        "__IMTCONN__": {
+                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)",
+                                                            "data": {
+                                                                "scoped": "true",
+                                                                "connection": "bitrix24"
+                                                            }
+                                                        }
+                                                    },
                                                     "expect": {
-                                                        "qs": {
-                                                            "mode": "chose"
-                                                        },
                                                         "method": {
                                                             "mode": "chose",
                                                             "label": "POST"
@@ -8403,15 +8409,9 @@
                                                             "items": [
                                                                 null
                                                             ]
-                                                        }
-                                                    },
-                                                    "parameters": {
-                                                        "__IMTCONN__": {
-                                                            "data": {
-                                                                "scoped": "true",
-                                                                "connection": "bitrix24"
-                                                            },
-                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)"
+                                                        },
+                                                        "qs": {
+                                                            "mode": "chose"
                                                         }
                                                     }
                                                 },
@@ -8447,6 +8447,8 @@
                                                     },
                                                     {
                                                         "name": "headers",
+                                                        "type": "array",
+                                                        "label": "Headers",
                                                         "spec": [
                                                             {
                                                                 "name": "key",
@@ -8458,12 +8460,12 @@
                                                                 "type": "text",
                                                                 "label": "Value"
                                                             }
-                                                        ],
-                                                        "type": "array",
-                                                        "label": "Headers"
+                                                        ]
                                                     },
                                                     {
                                                         "name": "qs",
+                                                        "type": "array",
+                                                        "label": "Query String",
                                                         "spec": [
                                                             {
                                                                 "name": "key",
@@ -8475,9 +8477,7 @@
                                                                 "type": "text",
                                                                 "label": "Value"
                                                             }
-                                                        ],
-                                                        "type": "array",
-                                                        "label": "Query String"
+                                                        ]
                                                     },
                                                     {
                                                         "name": "body",
@@ -9052,14 +9052,14 @@
                                             },
                                             "mapper": {
                                                 "url": "crm.item.update",
-                                                "body": "{\r\n  \"entityTypeId\": 1034,\n  \"id\":{{21.data.ticket_id}},\r\n  \"fields\": {\n    \"stageId\": \"DT1034_120:PREPARATION\"\n  }\n}",
                                                 "method": "POST",
                                                 "headers": [
                                                     {
                                                         "key": "Content-Type",
                                                         "value": "application/json"
                                                     }
-                                                ]
+                                                ],
+                                                "body": "{\r\n  \"entityTypeId\": 1034,\n  \"id\":{{21.data.ticket_id}},\r\n  \"fields\": {\n    \"stageId\": \"DT1034_120:PREPARATION\"\n  }\n}"
                                             },
                                             "metadata": {
                                                 "designer": {
@@ -9068,10 +9068,16 @@
                                                     "name": "SPA Ticket - Update"
                                                 },
                                                 "restore": {
+                                                    "parameters": {
+                                                        "__IMTCONN__": {
+                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)",
+                                                            "data": {
+                                                                "scoped": "true",
+                                                                "connection": "bitrix24"
+                                                            }
+                                                        }
+                                                    },
                                                     "expect": {
-                                                        "qs": {
-                                                            "mode": "chose"
-                                                        },
                                                         "method": {
                                                             "mode": "chose",
                                                             "label": "POST"
@@ -9081,15 +9087,9 @@
                                                             "items": [
                                                                 null
                                                             ]
-                                                        }
-                                                    },
-                                                    "parameters": {
-                                                        "__IMTCONN__": {
-                                                            "data": {
-                                                                "scoped": "true",
-                                                                "connection": "bitrix24"
-                                                            },
-                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)"
+                                                        },
+                                                        "qs": {
+                                                            "mode": "chose"
                                                         }
                                                     }
                                                 },
@@ -9125,6 +9125,8 @@
                                                     },
                                                     {
                                                         "name": "headers",
+                                                        "type": "array",
+                                                        "label": "Headers",
                                                         "spec": [
                                                             {
                                                                 "name": "key",
@@ -9136,12 +9138,12 @@
                                                                 "type": "text",
                                                                 "label": "Value"
                                                             }
-                                                        ],
-                                                        "type": "array",
-                                                        "label": "Headers"
+                                                        ]
                                                     },
                                                     {
                                                         "name": "qs",
+                                                        "type": "array",
+                                                        "label": "Query String",
                                                         "spec": [
                                                             {
                                                                 "name": "key",
@@ -9153,9 +9155,7 @@
                                                                 "type": "text",
                                                                 "label": "Value"
                                                             }
-                                                        ],
-                                                        "type": "array",
-                                                        "label": "Query String"
+                                                        ]
                                                     },
                                                     {
                                                         "name": "body",
@@ -9174,14 +9174,14 @@
                                             },
                                             "mapper": {
                                                 "url": "crm.timeline.comment.add",
-                                                "body": "{\r\n  \"fields\": {\r\n    \"ENTITY_ID\": {{21.data.ticket_id}},\r\n    \"ENTITY_TYPE\": \"dynamic_1034\",\r\n    \"COMMENT\": \"El CLIENTE DESESTIMA la oferta por la contratación de su módulo. \\n NAME: {{21.data.nombre}}\",  LAST_NAME: {{21.data.apellido}},  PHONE: {{21.data.telefono}}, EMAIL: {{21.data.email}}\"\r\n}\r\n}",
                                                 "method": "POST",
                                                 "headers": [
                                                     {
                                                         "key": "Content-Type",
                                                         "value": "application/json"
                                                     }
-                                                ]
+                                                ],
+                                                "body": "{\r\n  \"fields\": {\r\n    \"ENTITY_ID\": {{21.data.ticket_id}},\r\n    \"ENTITY_TYPE\": \"dynamic_1034\",\r\n    \"COMMENT\": \"El usuario DESESTIMA la oferta por la contratación de su módulo.\\n Nombre: {{21.data.nombre}}\"\\n Apellido: {{21.data.apellido}}\\n Teléfono: {{21.data.telefono}}\\n Email: {{21.data.email}}\"\r\n}\r\n}"
                                             },
                                             "metadata": {
                                                 "designer": {
@@ -9190,10 +9190,16 @@
                                                     "name": "Comentario en timeline"
                                                 },
                                                 "restore": {
+                                                    "parameters": {
+                                                        "__IMTCONN__": {
+                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)",
+                                                            "data": {
+                                                                "scoped": "true",
+                                                                "connection": "bitrix24"
+                                                            }
+                                                        }
+                                                    },
                                                     "expect": {
-                                                        "qs": {
-                                                            "mode": "chose"
-                                                        },
                                                         "method": {
                                                             "mode": "chose",
                                                             "label": "POST"
@@ -9203,15 +9209,9 @@
                                                             "items": [
                                                                 null
                                                             ]
-                                                        }
-                                                    },
-                                                    "parameters": {
-                                                        "__IMTCONN__": {
-                                                            "data": {
-                                                                "scoped": "true",
-                                                                "connection": "bitrix24"
-                                                            },
-                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)"
+                                                        },
+                                                        "qs": {
+                                                            "mode": "chose"
                                                         }
                                                     }
                                                 },
@@ -9247,6 +9247,8 @@
                                                     },
                                                     {
                                                         "name": "headers",
+                                                        "type": "array",
+                                                        "label": "Headers",
                                                         "spec": [
                                                             {
                                                                 "name": "key",
@@ -9258,12 +9260,12 @@
                                                                 "type": "text",
                                                                 "label": "Value"
                                                             }
-                                                        ],
-                                                        "type": "array",
-                                                        "label": "Headers"
+                                                        ]
                                                     },
                                                     {
                                                         "name": "qs",
+                                                        "type": "array",
+                                                        "label": "Query String",
                                                         "spec": [
                                                             {
                                                                 "name": "key",
@@ -9275,9 +9277,7 @@
                                                                 "type": "text",
                                                                 "label": "Value"
                                                             }
-                                                        ],
-                                                        "type": "array",
-                                                        "label": "Query String"
+                                                        ]
                                                     },
                                                     {
                                                         "name": "body",
@@ -14010,14 +14010,14 @@
                                                                 "to": [
                                                                     "{{1.fromEmail}}"
                                                                 ],
+                                                                "subject": "Fotos para completar la salida de su módulo",
+                                                                "bodyType": "rawHtml",
+                                                                "from": "Tu Trastero",
                                                                 "bcc": [
                                                                     "iacgi@tutrastero.com",
                                                                     "sistemas@tutrastero.com"
                                                                 ],
-                                                                "from": "Tu Trastero",
-                                                                "content": "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\r\n<html dir=\"ltr\" xmlns=\"http://www.w3.org/1999/xhtml\" xmlns:o=\"urn:schemas-microsoft-com:office:office\" lang=\"es\">\r\n <head>\r\n  <meta charset=\"UTF-8\">\r\n  <meta content=\"width=device-width, initial-scale=1\" name=\"viewport\">\r\n  <meta name=\"x-apple-disable-message-reformatting\">\r\n  <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\r\n  <meta content=\"telephone=no\" name=\"format-detection\">\r\n  <title>CGI Foto Salida - tutrastero</title><!--[if (mso 16)]>\r\n    <style type=\"text/css\">\r\n    a {text-decoration: none;}\r\n    </style>\r\n    <![endif]--><!--[if gte mso 9]><style>sup { font-size: 100% !important; }</style><![endif]--><!--[if gte mso 9]>\r\n<noscript>\r\n         <xml>\r\n           <o:OfficeDocumentSettings>\r\n           <o:AllowPNG></o:AllowPNG>\r\n           <o:PixelsPerInch>96</o:PixelsPerInch>\r\n           </o:OfficeDocumentSettings>\r\n         </xml>\r\n      </noscript>\r\n<![endif]--><!--[if mso]><xml>\r\n    <w:WordDocument xmlns:w=\"urn:schemas-microsoft-com:office:word\">\r\n      <w:DontUseAdvancedTypographyReadingMail/>\r\n    </w:WordDocument>\r\n    </xml><![endif]-->\r\n  <style type=\"text/css\">.rollover:hover .rollover-first {\r\n  max-height:0px!important;\r\n  display:none!important;\r\n}\r\n.rollover:hover .rollover-second {\r\n  max-height:none!important;\r\n  display:block!important;\r\n}\r\n.rollover span {\r\n  font-size:0px;\r\n}\r\nu + .body img ~ div div {\r\n  display:none;\r\n}\r\n#outlook a {\r\n  padding:0;\r\n}\r\nspan.MsoHyperlink,\r\nspan.MsoHyperlinkFollowed {\r\n  color:inherit;\r\n  mso-style-priority:99;\r\n}\r\na.u {\r\n  mso-style-priority:100!important;\r\n  text-decoration:none!important;\r\n}\r\na[x-apple-data-detectors],\r\n#MessageViewBody a {\r\n  color:inherit!important;\r\n  text-decoration:none!important;\r\n  font-size:inherit!important;\r\n  font-family:inherit!important;\r\n  font-weight:inherit!important;\r\n  line-height:inherit!important;\r\n}\r\n.i {\r\n  display:none;\r\n  float:left;\r\n  overflow:hidden;\r\n  width:0;\r\n  max-height:0;\r\n  line-height:0;\r\n  mso-hide:all;\r\n}\r\n@media only screen and (max-width:600px) {.bk { padding-right:0px!important } .bj { padding:20px!important }  *[class=\"gmail-fix\"] { display:none!important } p, a { line-height:150%!important } h1, h1 a { line-height:120%!important } h2, h2 a { line-height:120%!important } h3, h3 a { line-height:120%!important } h4, h4 a { line-height:120%!important } h5, h5 a { line-height:120%!important } h6, h6 a { line-height:120%!important }  .bg p { } .bf p { } .be p { } h1 { font-size:36px!important; text-align:left } h2 { font-size:26px!important; text-align:left } h3 { font-size:20px!important; text-align:left } h4 { font-size:24px!important; text-align:left } h5 { font-size:20px!important; text-align:left } h6 { font-size:16px!important; text-align:left }        .bh p, .bh a { font-size:14px!important } .bg p, .bg a { font-size:14px!important } .bf p, .bf a { font-size:14px!important } .be p, .be a { font-size:12px!important }      .ba .rollover:hover .rollover-second, .bb .rollover:hover .rollover-second, .bc .rollover:hover .rollover-second { display:inline!important }  .z { display:inline-table } a.u, button.u { font-size:20px!important; padding:10px 20px 10px 20px!important; line-height:120%!important } a.u, button.u, .y { display:inline-block!important }    .n table, .o table, .p table, .n, .p, .o { width:100%!important; max-width:600px!important } .adapt-img { width:100%!important; height:auto!important }          .h-auto { height:auto!important }     }\r\n@media screen and (max-width:384px) {.mail-message-content { width:414px!important } }</style>\r\n </head>\r\n <body class=\"body\" style=\"width:100%;height:100%;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;padding:0;Margin:0\">\r\n  <div dir=\"ltr\" class=\"es-wrapper-color\" lang=\"es\" style=\"background-color:#FFFFFF\"><!--[if gte mso 9]>\r\n\t\t\t<v:background xmlns:v=\"urn:schemas-microsoft-com:vml\" fill=\"t\">\r\n\t\t\t\t<v:fill type=\"tile\" color=\"#fff\" origin=\"0.5, 0\" position=\"0.5, 0\"></v:fill>\r\n\t\t\t</v:background>\r\n\t\t<![endif]-->\r\n   <table width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" class=\"es-wrapper\" role=\"none\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px;padding:0;Margin:0;width:100%;height:100%;background-repeat:repeat;background-position:center top;background-color:#FFFFFF\">\r\n     <tr>\r\n      <td valign=\"top\" style=\"padding:0;Margin:0\">\r\n       <table cellpadding=\"0\" cellspacing=\"0\" align=\"center\" class=\"o\" role=\"none\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px;width:100%;table-layout:fixed !important;background-color:transparent;background-repeat:repeat;background-position:center top\">\r\n         <tr>\r\n          <td align=\"center\" style=\"padding:0;Margin:0\">\r\n           <table bgcolor=\"#ffffff\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\" class=\"bh\" role=\"none\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px;background-color:transparent;width:600px\">\r\n             <tr>\r\n              <td align=\"left\" style=\"Margin:0;padding-top:10px;padding-right:20px;padding-bottom:10px;padding-left:20px\">\r\n               <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" role=\"none\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                 <tr>\r\n                  <td valign=\"top\" align=\"center\" class=\"bk\" style=\"padding:0;Margin:0;width:560px\">\r\n                   <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" role=\"presentation\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                     <tr>\r\n                      <td align=\"center\" style=\"padding:0;Margin:0;padding-bottom:10px;font-size:0px\"><a target=\"_blank\" href=\"https://tutrastero.com/es/\" style=\"mso-line-height-rule:exactly;text-decoration:underline;color:#666666;font-size:14px\"><img src=\"https://holcqv.stripocdn.email/content/guids/CABINET_919ce8fd7f58c2840e854953c4ed3c482eae34e1c2343e5f2a9178c0f557e6ec/images/tutrasterologocabeceraemail_Xa3.jpg\" alt=\"TuTrastero.com\" title=\"TuTrastero.com\" width=\"560\" class=\"adapt-img\" style=\"display:block;font-size:14px;border:0;outline:none;text-decoration:none;margin:0\"></a></td>\r\n                     </tr>\r\n                   </table></td>\r\n                 </tr>\r\n               </table></td>\r\n             </tr>\r\n           </table></td>\r\n         </tr>\r\n       </table>\r\n       <table cellpadding=\"0\" cellspacing=\"0\" align=\"center\" class=\"n\" role=\"none\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px;width:100%;table-layout:fixed !important\">\r\n         <tr>\r\n          <td align=\"center\" style=\"padding:0;Margin:0\">\r\n           <table bgcolor=\"#ffffff\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\" class=\"bg\" role=\"none\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px;background-color:#FFFFFF;width:600px\">\r\n             <tr>\r\n              <td align=\"left\" style=\"padding:10px;Margin:0\">\r\n               <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" role=\"none\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                 <tr>\r\n                  <td align=\"center\" valign=\"top\" style=\"padding:0;Margin:0;width:580px\">\r\n                   <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" role=\"presentation\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                     <tr>\r\n                      <td align=\"center\" style=\"padding:0;Margin:0;padding-top:10px;padding-bottom:10px;font-size:0px\"><img src=\"https://holcqv.stripocdn.email/content/guids/CABINET_222641a5fbc95de18f4b301f08ca1015938bea668b050ddba2d02353f876cd96/images/image_Azl.jpeg\" alt=\"\" height=\"305\" class=\"adapt-img\" style=\"display:block;font-size:14px;border:0;outline:none;text-decoration:none;margin:0\"></td>\r\n                     </tr>\r\n                   </table></td>\r\n                 </tr>\r\n               </table></td>\r\n             </tr>\r\n           </table></td>\r\n         </tr>\r\n       </table>\r\n       <table cellpadding=\"0\" cellspacing=\"0\" align=\"center\" class=\"n\" role=\"none\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px;width:100%;table-layout:fixed !important\">\r\n         <tr class=\"es-visible-simple-html-only\">\r\n          <td align=\"center\" class=\"es-stripe-html\" style=\"padding:0;Margin:0\">\r\n           <table bgcolor=\"#ffffff\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\" class=\"bg\" role=\"none\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px;background-color:#FFFFFF;width:600px\">\r\n             <tr>\r\n              <td align=\"left\" style=\"padding:0;Margin:0;padding-right:20px;padding-bottom:10px;padding-left:20px\">\r\n               <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" role=\"none\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                 <tr>\r\n                  <td align=\"left\" style=\"padding:0;Margin:0;width:560px\">\r\n                   <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" role=\"presentation\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                     <tr>\r\n                      <td align=\"left\" class=\"c\" style=\"padding:20px;Margin:0\"><p style=\"Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px;text-align:justify\">Estimado/a {{21.data.nombre}}<br><br></p><p style=\"Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px\">Hemos recibido su consulta. Le confirmamos que, para <strong>completar el proceso de salida</strong> de su módulo, es necesario que nos adjunte las fotografías del estado del mismo.</p><p style=\"Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px\"><br></p><p style=\"Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px\">Puede <strong>subir las imágenes</strong> fácilmente a través del siguiente botón:</p><p style=\"Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px\"></p></td>\r\n                     </tr>\r\n                     <tr>\r\n                      <td align=\"center\" style=\"padding:0;Margin:0\"><span class=\"y\" style=\"border-style:solid;border-color:#333333;background:#333333;border-width:2px;display:inline-block;border-radius:5px;width:auto\"><a href=\"{{85.UF_CRM_1764084208817}}\" target=\"_blank\" class=\"u\" style=\"mso-style-priority:100 !important;text-decoration:none !important;mso-line-height-rule:exactly;color:#FFFFFF;font-size:20px;padding:20px 30px;display:inline-block;background:#333333;border-radius:5px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-weight:bold;font-style:normal;line-height:24px;width:auto;text-align:center;letter-spacing:0;mso-padding-alt:0;mso-border-alt:10px solid #333333\">Subir fotos</a></span></td>\r\n                     </tr>\r\n                     <tr>\r\n                      <td align=\"left\" class=\"a\" style=\"padding:20px;Margin:0\"><p style=\"Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px\">Si usted no ha realizado esta solicitud o tiene problemas para acceder, por favor, contacte con su asesor comercial en el 900 902 791.</p><p style=\"Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px\"></p></td>\r\n                     </tr>\r\n                   </table></td>\r\n                 </tr>\r\n               </table></td>\r\n             </tr>\r\n             <tr></tr>\r\n             <tr>\r\n              <td align=\"left\" style=\"Margin:0;padding-right:20px;padding-bottom:10px;padding-left:20px;padding-top:15px\">\r\n               <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" role=\"none\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                 <tr>\r\n                  <td align=\"left\" style=\"padding:0;Margin:0;width:560px\">\r\n                   <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" role=\"presentation\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                     <tr>\r\n                      <td align=\"center\" style=\"padding:20px;Margin:0;font-size:0\">\r\n                       <table width=\"100%\" height=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" class=\"z\" role=\"presentation\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                         <tr>\r\n                          <td style=\"padding:0;Margin:0;background:none;height:0px;width:100%;margin:0px;border-bottom:1px solid #cccccc\"></td>\r\n                         </tr>\r\n                       </table></td>\r\n                     </tr>\r\n                   </table></td>\r\n                 </tr>\r\n                 <tr>\r\n                  <td align=\"left\" style=\"padding:0;Margin:0;width:560px\">\r\n                   <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                     <tr>\r\n                      <td align=\"center\" style=\"padding:0;Margin:0;font-size:0px\"><a target=\"_blank\" href=\"https://tutrastero.com/es/productos/empresa-de-mudanzas-en-madrid/\" style=\"mso-line-height-rule:exactly;text-decoration:underline;color:#5C68E2;font-size:14px\"><img src=\"https://holcqv.stripocdn.email/content/guids/CABINET_919ce8fd7f58c2840e854953c4ed3c482eae34e1c2343e5f2a9178c0f557e6ec/images/tutrasteromudanzasycajasdecartonemail_oJe.jpg\" alt=\"¿Necesitas hacer una mudanza?\" width=\"560\" title=\"¿Necesitas hacer una mudanza?\" class=\"adapt-img\" style=\"display:block;font-size:14px;border:0;outline:none;text-decoration:none;margin:0\"></a></td>\r\n                     </tr>\r\n                     <tr>\r\n                      <td align=\"center\" style=\"padding:25px;Margin:0;font-size:0\">\r\n                       <table width=\"100%\" height=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" role=\"presentation\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                         <tr>\r\n                          <td style=\"padding:0;Margin:0;height:0px;width:100%;margin:0px;border-bottom:0px solid #cccccc;background:unset\"></td>\r\n                         </tr>\r\n                       </table></td>\r\n                     </tr>\r\n                     <tr>\r\n                      <td align=\"center\" style=\"padding:0;Margin:0;font-size:0px\"><a target=\"_blank\" href=\"https://tutrastero.com/es/\" style=\"mso-line-height-rule:exactly;text-decoration:underline;color:#5C68E2;font-size:14px\"><img title=\"TuTrastero.com\" src=\"https://holcqv.stripocdn.email/content/guids/CABINET_919ce8fd7f58c2840e854953c4ed3c482eae34e1c2343e5f2a9178c0f557e6ec/images/tutrastero20aniversario_QCO.jpg\" alt=\"TuTrastero.com\" width=\"560\" class=\"adapt-img\" style=\"display:block;font-size:14px;border:0;outline:none;text-decoration:none;margin:0\"></a></td>\r\n                     </tr>\r\n                   </table></td>\r\n                 </tr>\r\n               </table></td>\r\n             </tr>\r\n           </table></td>\r\n         </tr>\r\n       </table>\r\n       <table cellpadding=\"0\" cellspacing=\"0\" align=\"center\" class=\"p\" role=\"none\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px;width:100%;table-layout:fixed !important;background-color:transparent;background-repeat:repeat;background-position:center top\">\r\n         <tr>\r\n          <td align=\"center\" style=\"padding:0;Margin:0\">\r\n           <table align=\"center\" cellpadding=\"0\" cellspacing=\"0\" class=\"bf\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px;background-color:transparent;width:640px\" role=\"none\">\r\n             <tr>\r\n              <td align=\"left\" style=\"Margin:0;padding-right:20px;padding-left:20px;padding-top:20px;padding-bottom:20px\">\r\n               <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" role=\"none\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                 <tr>\r\n                  <td align=\"left\" style=\"padding:0;Margin:0;width:600px\">\r\n                   <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" role=\"presentation\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                     <tr>\r\n                      <td style=\"padding:0;Margin:0\">\r\n                       <table cellspacing=\"0\" width=\"100%\" border=\"0\" cellpadding=\"0\" class=\"bxBlockCode\" role=\"presentation\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                        <tbody class=\"bxBlockOut\">\r\n                         <tr>\r\n                          <td valign=\"top\" class=\"bxBlockPadding bxBlockInn bxBlockInnCode\" style=\"padding:0px;Margin:0\"><span style=\"font-family:Arial;font-size:13px;color:#363636\"> Síguenos en las redes: </span><br><br><a href=\"https://www.facebook.com/tutrastero\" title=\"Facebook Tu Trastero\" style=\"mso-line-height-rule:exactly;text-decoration:underline;color:#333333;font-size:12px;display:inline-block\"><img alt=\"Facebook Tu Trastero\" height=\"20\" src=\"https://tutrastero.com/img/icono-facebook-tu-trastero.png\" width=\"20\" style=\"display:block;font-size:14px;border:0;outline:none;text-decoration:none;margin:0\"></a><a href=\"https://www.instagram.com/tutrastero_/\" title=\"Instagram Tu Trastero\" style=\"mso-line-height-rule:exactly;text-decoration:underline;color:#333333;font-size:12px;display:inline-block\"><img alt=\"Instagram Tu Trastero\" height=\"20\" src=\"https://tutrastero.com/img/icono-instagram-tu-trastero.png\" width=\"20\" style=\"display:block;font-size:14px;border:0;outline:none;text-decoration:none;margin:0\"></a><a href=\"https://twitter.com/tutrastero_\" title=\"Twitter Tu Trastero\" style=\"mso-line-height-rule:exactly;text-decoration:underline;color:#333333;font-size:12px;display:inline-block\"><img height=\"20\" src=\"https://tutrastero.com/img/icono-twitter-tu-trastero.png\" width=\"20\" alt=\"Twitter Tu Trastero\" style=\"display:block;font-size:14px;border:0;outline:none;text-decoration:none;margin:0\"></a><a href=\"https://www.pinterest.es/tutrastero/\" title=\"Pinterest Tu Trastero\" style=\"mso-line-height-rule:exactly;text-decoration:underline;color:#333333;font-size:12px;display:inline-block\"><img alt=\"Pinterest Tu Trastero\" height=\"20\" src=\"https://tutrastero.com/img/icono-pinterest-tu-trastero.png\" width=\"20\" style=\"display:block;font-size:14px;border:0;outline:none;text-decoration:none;margin:0\"></a><a href=\"https://www.youtube.com/@tutrasterocom\" title=\"Youtube Tu Trastero\" style=\"mso-line-height-rule:exactly;text-decoration:underline;color:#333333;font-size:12px;display:inline-block\"><img width=\"20\" alt=\"Youtube Tu Trastero\" height=\"20\" src=\"https://tutrastero.com/img/icono-youtube-tu-trastero.png\" style=\"display:block;font-size:14px;border:0;outline:none;text-decoration:none;margin:0\"></a><a href=\"https://www.linkedin.com/company/tu-trastero/\" title=\"LinkedIn Tu Trastero\" style=\"mso-line-height-rule:exactly;text-decoration:underline;color:#333333;font-size:12px;display:inline-block\"><img height=\"20\" src=\"https://tutrastero.com/img/icono-linkedin-tu-trastero.png\" width=\"20\" alt=\"LinkedIn Tu Trastero\" style=\"display:block;font-size:14px;border:0;outline:none;text-decoration:none;margin:0\"></a></td>\r\n                         </tr>\r\n                       </table></td>\r\n                     </tr>\r\n                     <tr>\r\n                      <td align=\"center\" style=\"padding:20px;Margin:0;font-size:0\">\r\n                       <table border=\"0\" width=\"100%\" height=\"100%\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                         <tr>\r\n                          <td style=\"padding:0;Margin:0;border-bottom:0px solid #cccccc;background:unset;height:0px;width:100%;margin:0px\"></td>\r\n                         </tr>\r\n                       </table></td>\r\n                     </tr>\r\n                     <tr>\r\n                      <td align=\"left\" style=\"padding:0;Margin:0;padding-bottom:35px\"><p style=\"Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:13.5px;letter-spacing:0;color:#333333;font-size:9px\">Aviso Legal: Este mensaje y sus archivos adjuntos van dirigidos exclusivamente a su destinatario, pudiendo contener información confidencial sometida a secreto profesional. No está permitida su comunicación, reproducción o distribución sin la autorización expresa de TU TRASTERO TU OTRO ESPACIO, S.L.. Si usted no es el destinatario final, por favor elimínelo e infórmenos por esta vía.</p><p style=\"Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:13.5px;letter-spacing:0;color:#333333;font-size:9px\">Protección de datos: De conformidad con lo dispuesto en las normativas vigentes en protección de datos personales, el Reglamento (UE) 2016/679 de 27 de abril de 2016 (GDPR) y la Ley Orgánica (ES) 15/1999 de 13 de diciembre (LOPD), le informamos que los datos personales y dirección de correo electrónico, recabados del propio interesado o de fuentes públicas, serán tratados bajo la responsabilidad de TU TRASTERO TU OTRO ESPACIO, S.L. para el envío de comunicaciones sobre nuestros productos y servicios y se conservarán mientras exista un interés mutuo para ello. Los datos no serán comunicados a terceros, salvo obligación legal. Le informamos que puede ejercer los derechos de acceso, rectificación, portabilidad y supresión de sus datos y los de limitación y oposición a su tratamiento dirigiéndose a c/ Reyes Católicos 12 - 28108 Alcobendas, Madrid o enviando un mensaje al correo electrónico a <a href=\"mailto:cgi@tutrastero.com\" target=\"_blank\" style=\"mso-line-height-rule:exactly;text-decoration:underline;color:#333333;font-size:9px\">cgi@tutrastero.com</a> o en el enlace más abajo. Si considera que el tratamiento no se ajusta a la normativa vigente, podrá presentar una reclamación ante la autoridad de control en <a href=\"http://www.agpd.es\" target=\"_blank\" style=\"mso-line-height-rule:exactly;text-decoration:underline;color:#333333;font-size:9px\">www.agpd.es</a>.<br><br>*Consulta condiciones.&nbsp;</p></td>\r\n                     </tr>\r\n                   </table></td>\r\n                 </tr>\r\n               </table></td>\r\n             </tr>\r\n           </table></td>\r\n         </tr>\r\n       </table>\r\n       <table cellpadding=\"0\" cellspacing=\"0\" align=\"center\" class=\"n\" role=\"none\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px;width:100%;table-layout:fixed !important\">\r\n         <tr>\r\n          <td align=\"center\" style=\"padding:0;Margin:0\">\r\n           <table align=\"center\" cellpadding=\"0\" cellspacing=\"0\" bgcolor=\"#00000000\" class=\"bg\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px;background-color:transparent;width:600px\" role=\"none\">\r\n             <tr>\r\n              <td align=\"left\" style=\"padding:0;Margin:0\">\r\n               <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" role=\"none\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                 <tr>\r\n                  <td align=\"center\" valign=\"top\" class=\"bj\" style=\"padding:0;Margin:0;width:600px\">\r\n                   <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" role=\"presentation\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                     <tr>\r\n                      <td align=\"left\" height=\"89\" class=\"be h-auto\" style=\"padding:0;Margin:0;padding-bottom:35px\"><p style=\"Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:13.5px;letter-spacing:0;color:#333333;font-size:9px\">Este email se ha enviado a &nbsp;EMAIL<br>Hss recibido recibido este emial porque te has suscrito a alguna de nuestras Newsletter, puedes cancelar tu suscripción en el siguiente enlace:<br><br>Copyright© 2024 Tu Trastero - Tu Otro Espacio. Todos los derechos reservados.</p></td>\r\n                     </tr>\r\n                   </table></td>\r\n                 </tr>\r\n               </table></td>\r\n             </tr>\r\n           </table></td>\r\n         </tr>\r\n       </table></td>\r\n     </tr>\r\n   </table>\r\n  </div>\r\n </body>\r\n</html>",
-                                                                "subject": "Fotos para completar la salida de su módulo",
-                                                                "bodyType": "rawHtml"
+                                                                "content": "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\r\n<html dir=\"ltr\" xmlns=\"http://www.w3.org/1999/xhtml\" xmlns:o=\"urn:schemas-microsoft-com:office:office\" lang=\"es\">\r\n <head>\r\n  <meta charset=\"UTF-8\">\r\n  <meta content=\"width=device-width, initial-scale=1\" name=\"viewport\">\r\n  <meta name=\"x-apple-disable-message-reformatting\">\r\n  <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\r\n  <meta content=\"telephone=no\" name=\"format-detection\">\r\n  <title>CGI Foto Salida - tutrastero</title><!--[if (mso 16)]>\r\n    <style type=\"text/css\">\r\n    a {text-decoration: none;}\r\n    </style>\r\n    <![endif]--><!--[if gte mso 9]><style>sup { font-size: 100% !important; }</style><![endif]--><!--[if gte mso 9]>\r\n<noscript>\r\n         <xml>\r\n           <o:OfficeDocumentSettings>\r\n           <o:AllowPNG></o:AllowPNG>\r\n           <o:PixelsPerInch>96</o:PixelsPerInch>\r\n           </o:OfficeDocumentSettings>\r\n         </xml>\r\n      </noscript>\r\n<![endif]--><!--[if mso]><xml>\r\n    <w:WordDocument xmlns:w=\"urn:schemas-microsoft-com:office:word\">\r\n      <w:DontUseAdvancedTypographyReadingMail/>\r\n    </w:WordDocument>\r\n    </xml><![endif]-->\r\n  <style type=\"text/css\">.rollover:hover .rollover-first {\r\n  max-height:0px!important;\r\n  display:none!important;\r\n}\r\n.rollover:hover .rollover-second {\r\n  max-height:none!important;\r\n  display:block!important;\r\n}\r\n.rollover span {\r\n  font-size:0px;\r\n}\r\nu + .body img ~ div div {\r\n  display:none;\r\n}\r\n#outlook a {\r\n  padding:0;\r\n}\r\nspan.MsoHyperlink,\r\nspan.MsoHyperlinkFollowed {\r\n  color:inherit;\r\n  mso-style-priority:99;\r\n}\r\na.u {\r\n  mso-style-priority:100!important;\r\n  text-decoration:none!important;\r\n}\r\na[x-apple-data-detectors],\r\n#MessageViewBody a {\r\n  color:inherit!important;\r\n  text-decoration:none!important;\r\n  font-size:inherit!important;\r\n  font-family:inherit!important;\r\n  font-weight:inherit!important;\r\n  line-height:inherit!important;\r\n}\r\n.i {\r\n  display:none;\r\n  float:left;\r\n  overflow:hidden;\r\n  width:0;\r\n  max-height:0;\r\n  line-height:0;\r\n  mso-hide:all;\r\n}\r\n@media only screen and (max-width:600px) {.bk { padding-right:0px!important } .bj { padding:20px!important }  *[class=\"gmail-fix\"] { display:none!important } p, a { line-height:150%!important } h1, h1 a { line-height:120%!important } h2, h2 a { line-height:120%!important } h3, h3 a { line-height:120%!important } h4, h4 a { line-height:120%!important } h5, h5 a { line-height:120%!important } h6, h6 a { line-height:120%!important }  .bg p { } .bf p { } .be p { } h1 { font-size:36px!important; text-align:left } h2 { font-size:26px!important; text-align:left } h3 { font-size:20px!important; text-align:left } h4 { font-size:24px!important; text-align:left } h5 { font-size:20px!important; text-align:left } h6 { font-size:16px!important; text-align:left }        .bh p, .bh a { font-size:14px!important } .bg p, .bg a { font-size:14px!important } .bf p, .bf a { font-size:14px!important } .be p, .be a { font-size:12px!important }      .ba .rollover:hover .rollover-second, .bb .rollover:hover .rollover-second, .bc .rollover:hover .rollover-second { display:inline!important }  .z { display:inline-table } a.u, button.u { font-size:20px!important; padding:10px 20px 10px 20px!important; line-height:120%!important } a.u, button.u, .y { display:inline-block!important }    .n table, .o table, .p table, .n, .p, .o { width:100%!important; max-width:600px!important } .adapt-img { width:100%!important; height:auto!important }          .h-auto { height:auto!important }     }\r\n@media screen and (max-width:384px) {.mail-message-content { width:414px!important } }</style>\r\n </head>\r\n <body class=\"body\" style=\"width:100%;height:100%;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;padding:0;Margin:0\">\r\n  <div dir=\"ltr\" class=\"es-wrapper-color\" lang=\"es\" style=\"background-color:#FFFFFF\"><!--[if gte mso 9]>\r\n\t\t\t<v:background xmlns:v=\"urn:schemas-microsoft-com:vml\" fill=\"t\">\r\n\t\t\t\t<v:fill type=\"tile\" color=\"#fff\" origin=\"0.5, 0\" position=\"0.5, 0\"></v:fill>\r\n\t\t\t</v:background>\r\n\t\t<![endif]-->\r\n   <table width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" class=\"es-wrapper\" role=\"none\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px;padding:0;Margin:0;width:100%;height:100%;background-repeat:repeat;background-position:center top;background-color:#FFFFFF\">\r\n     <tr>\r\n      <td valign=\"top\" style=\"padding:0;Margin:0\">\r\n       <table cellpadding=\"0\" cellspacing=\"0\" align=\"center\" class=\"o\" role=\"none\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px;width:100%;table-layout:fixed !important;background-color:transparent;background-repeat:repeat;background-position:center top\">\r\n         <tr>\r\n          <td align=\"center\" style=\"padding:0;Margin:0\">\r\n           <table bgcolor=\"#ffffff\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\" class=\"bh\" role=\"none\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px;background-color:transparent;width:600px\">\r\n             <tr>\r\n              <td align=\"left\" style=\"Margin:0;padding-top:10px;padding-right:20px;padding-bottom:10px;padding-left:20px\">\r\n               <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" role=\"none\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                 <tr>\r\n                  <td valign=\"top\" align=\"center\" class=\"bk\" style=\"padding:0;Margin:0;width:560px\">\r\n                   <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" role=\"presentation\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                     <tr>\r\n                      <td align=\"center\" style=\"padding:0;Margin:0;padding-bottom:10px;font-size:0px\"><a target=\"_blank\" href=\"https://tutrastero.com/es/\" style=\"mso-line-height-rule:exactly;text-decoration:underline;color:#666666;font-size:14px\"><img src=\"https://holcqv.stripocdn.email/content/guids/CABINET_919ce8fd7f58c2840e854953c4ed3c482eae34e1c2343e5f2a9178c0f557e6ec/images/tutrasterologocabeceraemail_Xa3.jpg\" alt=\"TuTrastero.com\" title=\"TuTrastero.com\" width=\"560\" class=\"adapt-img\" style=\"display:block;font-size:14px;border:0;outline:none;text-decoration:none;margin:0\"></a></td>\r\n                     </tr>\r\n                   </table></td>\r\n                 </tr>\r\n               </table></td>\r\n             </tr>\r\n           </table></td>\r\n         </tr>\r\n       </table>\r\n       <table cellpadding=\"0\" cellspacing=\"0\" align=\"center\" class=\"n\" role=\"none\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px;width:100%;table-layout:fixed !important\">\r\n         <tr>\r\n          <td align=\"center\" style=\"padding:0;Margin:0\">\r\n           <table bgcolor=\"#ffffff\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\" class=\"bg\" role=\"none\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px;background-color:#FFFFFF;width:600px\">\r\n             <tr>\r\n              <td align=\"left\" style=\"padding:10px;Margin:0\">\r\n               <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" role=\"none\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                 <tr>\r\n                  <td align=\"center\" valign=\"top\" style=\"padding:0;Margin:0;width:580px\">\r\n                   <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" role=\"presentation\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                     <tr>\r\n                      <td align=\"center\" style=\"padding:0;Margin:0;padding-top:10px;padding-bottom:10px;font-size:0px\"><img src=\"https://holcqv.stripocdn.email/content/guids/CABINET_222641a5fbc95de18f4b301f08ca1015938bea668b050ddba2d02353f876cd96/images/image_Azl.jpeg\" alt=\"\" height=\"305\" class=\"adapt-img\" style=\"display:block;font-size:14px;border:0;outline:none;text-decoration:none;margin:0\"></td>\r\n                     </tr>\r\n                   </table></td>\r\n                 </tr>\r\n               </table></td>\r\n             </tr>\r\n           </table></td>\r\n         </tr>\r\n       </table>\r\n       <table cellpadding=\"0\" cellspacing=\"0\" align=\"center\" class=\"n\" role=\"none\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px;width:100%;table-layout:fixed !important\">\r\n         <tr class=\"es-visible-simple-html-only\">\r\n          <td align=\"center\" class=\"es-stripe-html\" style=\"padding:0;Margin:0\">\r\n           <table bgcolor=\"#ffffff\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\" class=\"bg\" role=\"none\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px;background-color:#FFFFFF;width:600px\">\r\n             <tr>\r\n              <td align=\"left\" style=\"padding:0;Margin:0;padding-right:20px;padding-bottom:10px;padding-left:20px\">\r\n               <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" role=\"none\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                 <tr>\r\n                  <td align=\"left\" style=\"padding:0;Margin:0;width:560px\">\r\n                   <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" role=\"presentation\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                     <tr>\r\n                      <td align=\"left\" class=\"c\" style=\"padding:20px;Margin:0\"><p style=\"Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px;text-align:justify\">Estimado/a {{21.data.nombre}}<br><br></p><p style=\"Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px\">Hemos recibido su consulta. Le confirmamos que, para <strong>completar el proceso de salida</strong> de su módulo, es necesario que nos adjunte las fotografías del estado del mismo.</p><p style=\"Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px\"><br></p><p style=\"Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px\">Puede <strong>subir las imágenes</strong> fácilmente a través del siguiente botón:</p><p style=\"Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px\"></p></td>\r\n                     </tr>\r\n                     <tr>\r\n                      <td align=\"center\" style=\"padding:0;Margin:0\"><span class=\"y\" style=\"border-style:solid;border-color:#333333;background:#333333;border-width:2px;display:inline-block;border-radius:5px;width:auto\"><a href=\"{{85.UF_CRM_1764084208817}}\" target=\"_blank\" class=\"u\" style=\"mso-style-priority:100 !important;text-decoration:none !important;mso-line-height-rule:exactly;color:#FFFFFF;font-size:20px;padding:20px 30px;display:inline-block;background:#333333;border-radius:5px;font-family:arial, 'helvetica neue', helvetica, sans-serif;font-weight:bold;font-style:normal;line-height:24px;width:auto;text-align:center;letter-spacing:0;mso-padding-alt:0;mso-border-alt:10px solid #333333\">Subir fotos</a></span></td>\r\n                     </tr>\r\n                     <tr>\r\n                      <td align=\"left\" class=\"a\" style=\"padding:20px;Margin:0\"><p style=\"Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px\">Si usted no ha realizado esta solicitud o tiene problemas para acceder, por favor, contacte con su asesor comercial en el 900 902 791.</p><p style=\"Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px\"></p></td>\r\n                     </tr>\r\n                   </table></td>\r\n                 </tr>\r\n               </table></td>\r\n             </tr>\r\n             <tr></tr>\r\n             <tr>\r\n              <td align=\"left\" style=\"Margin:0;padding-right:20px;padding-bottom:10px;padding-left:20px;padding-top:15px\">\r\n               <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" role=\"none\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                 <tr>\r\n                  <td align=\"left\" style=\"padding:0;Margin:0;width:560px\">\r\n                   <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" role=\"presentation\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                     <tr>\r\n                      <td align=\"center\" style=\"padding:20px;Margin:0;font-size:0\">\r\n                       <table width=\"100%\" height=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" class=\"z\" role=\"presentation\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                         <tr>\r\n                          <td style=\"padding:0;Margin:0;background:none;height:0px;width:100%;margin:0px;border-bottom:1px solid #cccccc\"></td>\r\n                         </tr>\r\n                       </table></td>\r\n                     </tr>\r\n                   </table></td>\r\n                 </tr>\r\n                 <tr>\r\n                  <td align=\"left\" style=\"padding:0;Margin:0;width:560px\">\r\n                   <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                     <tr>\r\n                      <td align=\"center\" style=\"padding:0;Margin:0;font-size:0px\"><a target=\"_blank\" href=\"https://tutrastero.com/es/productos/empresa-de-mudanzas-en-madrid/\" style=\"mso-line-height-rule:exactly;text-decoration:underline;color:#5C68E2;font-size:14px\"><img src=\"https://holcqv.stripocdn.email/content/guids/CABINET_919ce8fd7f58c2840e854953c4ed3c482eae34e1c2343e5f2a9178c0f557e6ec/images/tutrasteromudanzasycajasdecartonemail_oJe.jpg\" alt=\"¿Necesitas hacer una mudanza?\" width=\"560\" title=\"¿Necesitas hacer una mudanza?\" class=\"adapt-img\" style=\"display:block;font-size:14px;border:0;outline:none;text-decoration:none;margin:0\"></a></td>\r\n                     </tr>\r\n                     <tr>\r\n                      <td align=\"center\" style=\"padding:25px;Margin:0;font-size:0\">\r\n                       <table width=\"100%\" height=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" role=\"presentation\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                         <tr>\r\n                          <td style=\"padding:0;Margin:0;height:0px;width:100%;margin:0px;border-bottom:0px solid #cccccc;background:unset\"></td>\r\n                         </tr>\r\n                       </table></td>\r\n                     </tr>\r\n                     <tr>\r\n                      <td align=\"center\" style=\"padding:0;Margin:0;font-size:0px\"><a target=\"_blank\" href=\"https://tutrastero.com/es/\" style=\"mso-line-height-rule:exactly;text-decoration:underline;color:#5C68E2;font-size:14px\"><img title=\"TuTrastero.com\" src=\"https://holcqv.stripocdn.email/content/guids/CABINET_919ce8fd7f58c2840e854953c4ed3c482eae34e1c2343e5f2a9178c0f557e6ec/images/tutrastero20aniversario_QCO.jpg\" alt=\"TuTrastero.com\" width=\"560\" class=\"adapt-img\" style=\"display:block;font-size:14px;border:0;outline:none;text-decoration:none;margin:0\"></a></td>\r\n                     </tr>\r\n                   </table></td>\r\n                 </tr>\r\n               </table></td>\r\n             </tr>\r\n           </table></td>\r\n         </tr>\r\n       </table>\r\n       <table cellpadding=\"0\" cellspacing=\"0\" align=\"center\" class=\"p\" role=\"none\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px;width:100%;table-layout:fixed !important;background-color:transparent;background-repeat:repeat;background-position:center top\">\r\n         <tr>\r\n          <td align=\"center\" style=\"padding:0;Margin:0\">\r\n           <table align=\"center\" cellpadding=\"0\" cellspacing=\"0\" class=\"bf\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px;background-color:transparent;width:640px\" role=\"none\">\r\n             <tr>\r\n              <td align=\"left\" style=\"Margin:0;padding-right:20px;padding-left:20px;padding-top:20px;padding-bottom:20px\">\r\n               <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" role=\"none\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                 <tr>\r\n                  <td align=\"left\" style=\"padding:0;Margin:0;width:600px\">\r\n                   <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" role=\"presentation\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                     <tr>\r\n                      <td style=\"padding:0;Margin:0\">\r\n                       <table cellspacing=\"0\" width=\"100%\" border=\"0\" cellpadding=\"0\" class=\"bxBlockCode\" role=\"presentation\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                        <tbody class=\"bxBlockOut\">\r\n                         <tr>\r\n                          <td valign=\"top\" class=\"bxBlockPadding bxBlockInn bxBlockInnCode\" style=\"padding:0px;Margin:0\"><span style=\"font-family:Arial;font-size:13px;color:#363636\"> Síguenos en las redes: </span><br><br><a href=\"https://www.facebook.com/tutrastero\" title=\"Facebook Tu Trastero\" style=\"mso-line-height-rule:exactly;text-decoration:underline;color:#333333;font-size:12px;display:inline-block\"><img alt=\"Facebook Tu Trastero\" height=\"20\" src=\"https://tutrastero.com/img/icono-facebook-tu-trastero.png\" width=\"20\" style=\"display:block;font-size:14px;border:0;outline:none;text-decoration:none;margin:0\"></a><a href=\"https://www.instagram.com/tutrastero_/\" title=\"Instagram Tu Trastero\" style=\"mso-line-height-rule:exactly;text-decoration:underline;color:#333333;font-size:12px;display:inline-block\"><img alt=\"Instagram Tu Trastero\" height=\"20\" src=\"https://tutrastero.com/img/icono-instagram-tu-trastero.png\" width=\"20\" style=\"display:block;font-size:14px;border:0;outline:none;text-decoration:none;margin:0\"></a><a href=\"https://twitter.com/tutrastero_\" title=\"Twitter Tu Trastero\" style=\"mso-line-height-rule:exactly;text-decoration:underline;color:#333333;font-size:12px;display:inline-block\"><img height=\"20\" src=\"https://tutrastero.com/img/icono-twitter-tu-trastero.png\" width=\"20\" alt=\"Twitter Tu Trastero\" style=\"display:block;font-size:14px;border:0;outline:none;text-decoration:none;margin:0\"></a><a href=\"https://www.pinterest.es/tutrastero/\" title=\"Pinterest Tu Trastero\" style=\"mso-line-height-rule:exactly;text-decoration:underline;color:#333333;font-size:12px;display:inline-block\"><img alt=\"Pinterest Tu Trastero\" height=\"20\" src=\"https://tutrastero.com/img/icono-pinterest-tu-trastero.png\" width=\"20\" style=\"display:block;font-size:14px;border:0;outline:none;text-decoration:none;margin:0\"></a><a href=\"https://www.youtube.com/@tutrasterocom\" title=\"Youtube Tu Trastero\" style=\"mso-line-height-rule:exactly;text-decoration:underline;color:#333333;font-size:12px;display:inline-block\"><img width=\"20\" alt=\"Youtube Tu Trastero\" height=\"20\" src=\"https://tutrastero.com/img/icono-youtube-tu-trastero.png\" style=\"display:block;font-size:14px;border:0;outline:none;text-decoration:none;margin:0\"></a><a href=\"https://www.linkedin.com/company/tu-trastero/\" title=\"LinkedIn Tu Trastero\" style=\"mso-line-height-rule:exactly;text-decoration:underline;color:#333333;font-size:12px;display:inline-block\"><img height=\"20\" src=\"https://tutrastero.com/img/icono-linkedin-tu-trastero.png\" width=\"20\" alt=\"LinkedIn Tu Trastero\" style=\"display:block;font-size:14px;border:0;outline:none;text-decoration:none;margin:0\"></a></td>\r\n                         </tr>\r\n                       </table></td>\r\n                     </tr>\r\n                     <tr>\r\n                      <td align=\"center\" style=\"padding:20px;Margin:0;font-size:0\">\r\n                       <table border=\"0\" width=\"100%\" height=\"100%\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                         <tr>\r\n                          <td style=\"padding:0;Margin:0;border-bottom:0px solid #cccccc;background:unset;height:0px;width:100%;margin:0px\"></td>\r\n                         </tr>\r\n                       </table></td>\r\n                     </tr>\r\n                     <tr>\r\n                      <td align=\"left\" style=\"padding:0;Margin:0;padding-bottom:35px\"><p style=\"Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:13.5px;letter-spacing:0;color:#333333;font-size:9px\">Aviso Legal: Este mensaje y sus archivos adjuntos van dirigidos exclusivamente a su destinatario, pudiendo contener información confidencial sometida a secreto profesional. No está permitida su comunicación, reproducción o distribución sin la autorización expresa de TU TRASTERO TU OTRO ESPACIO, S.L.. Si usted no es el destinatario final, por favor elimínelo e infórmenos por esta vía.</p><p style=\"Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:13.5px;letter-spacing:0;color:#333333;font-size:9px\">Protección de datos: De conformidad con lo dispuesto en las normativas vigentes en protección de datos personales, el Reglamento (UE) 2016/679 de 27 de abril de 2016 (GDPR) y la Ley Orgánica (ES) 15/1999 de 13 de diciembre (LOPD), le informamos que los datos personales y dirección de correo electrónico, recabados del propio interesado o de fuentes públicas, serán tratados bajo la responsabilidad de TU TRASTERO TU OTRO ESPACIO, S.L. para el envío de comunicaciones sobre nuestros productos y servicios y se conservarán mientras exista un interés mutuo para ello. Los datos no serán comunicados a terceros, salvo obligación legal. Le informamos que puede ejercer los derechos de acceso, rectificación, portabilidad y supresión de sus datos y los de limitación y oposición a su tratamiento dirigiéndose a c/ Reyes Católicos 12 - 28108 Alcobendas, Madrid o enviando un mensaje al correo electrónico a <a href=\"mailto:cgi@tutrastero.com\" target=\"_blank\" style=\"mso-line-height-rule:exactly;text-decoration:underline;color:#333333;font-size:9px\">cgi@tutrastero.com</a> o en el enlace más abajo. Si considera que el tratamiento no se ajusta a la normativa vigente, podrá presentar una reclamación ante la autoridad de control en <a href=\"http://www.agpd.es\" target=\"_blank\" style=\"mso-line-height-rule:exactly;text-decoration:underline;color:#333333;font-size:9px\">www.agpd.es</a>.<br><br>*Consulta condiciones.&nbsp;</p></td>\r\n                     </tr>\r\n                   </table></td>\r\n                 </tr>\r\n               </table></td>\r\n             </tr>\r\n           </table></td>\r\n         </tr>\r\n       </table>\r\n       <table cellpadding=\"0\" cellspacing=\"0\" align=\"center\" class=\"n\" role=\"none\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px;width:100%;table-layout:fixed !important\">\r\n         <tr>\r\n          <td align=\"center\" style=\"padding:0;Margin:0\">\r\n           <table align=\"center\" cellpadding=\"0\" cellspacing=\"0\" bgcolor=\"#00000000\" class=\"bg\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px;background-color:transparent;width:600px\" role=\"none\">\r\n             <tr>\r\n              <td align=\"left\" style=\"padding:0;Margin:0\">\r\n               <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" role=\"none\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                 <tr>\r\n                  <td align=\"center\" valign=\"top\" class=\"bj\" style=\"padding:0;Margin:0;width:600px\">\r\n                   <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" role=\"presentation\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-spacing:0px\">\r\n                     <tr>\r\n                      <td align=\"left\" height=\"89\" class=\"be h-auto\" style=\"padding:0;Margin:0;padding-bottom:35px\"><p style=\"Margin:0;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:13.5px;letter-spacing:0;color:#333333;font-size:9px\">Este email se ha enviado a &nbsp;EMAIL<br>Hss recibido recibido este emial porque te has suscrito a alguna de nuestras Newsletter, puedes cancelar tu suscripción en el siguiente enlace:<br><br>Copyright© 2024 Tu Trastero - Tu Otro Espacio. Todos los derechos reservados.</p></td>\r\n                     </tr>\r\n                   </table></td>\r\n                 </tr>\r\n               </table></td>\r\n             </tr>\r\n           </table></td>\r\n         </tr>\r\n       </table></td>\r\n     </tr>\r\n   </table>\r\n  </div>\r\n </body>\r\n</html>"
                                                             },
                                                             "metadata": {
                                                                 "designer": {
@@ -14025,15 +14025,33 @@
                                                                     "y": 2100
                                                                 },
                                                                 "restore": {
+                                                                    "parameters": {
+                                                                        "__IMTCONN__": {
+                                                                            "label": "My Gmail connection (cgi@tutrastero.com)",
+                                                                            "data": {
+                                                                                "scoped": "true",
+                                                                                "connection": "google-email"
+                                                                            }
+                                                                        }
+                                                                    },
                                                                     "expect": {
-                                                                        "cc": {
-                                                                            "mode": "chose"
-                                                                        },
                                                                         "to": {
                                                                             "mode": "chose",
                                                                             "items": [
                                                                                 null
                                                                             ]
+                                                                        },
+                                                                        "bodyType": {
+                                                                            "label": "Raw HTML"
+                                                                        },
+                                                                        "attachments": {
+                                                                            "mode": "chose"
+                                                                        },
+                                                                        "from": {
+                                                                            "mode": "edit"
+                                                                        },
+                                                                        "cc": {
+                                                                            "mode": "chose"
                                                                         },
                                                                         "bcc": {
                                                                             "mode": "chose",
@@ -14042,26 +14060,8 @@
                                                                                 null
                                                                             ]
                                                                         },
-                                                                        "from": {
-                                                                            "mode": "edit"
-                                                                        },
-                                                                        "bodyType": {
-                                                                            "label": "Raw HTML"
-                                                                        },
-                                                                        "attachments": {
-                                                                            "mode": "chose"
-                                                                        },
                                                                         "emailHeaders": {
                                                                             "mode": "chose"
-                                                                        }
-                                                                    },
-                                                                    "parameters": {
-                                                                        "__IMTCONN__": {
-                                                                            "data": {
-                                                                                "scoped": "true",
-                                                                                "connection": "google-email"
-                                                                            },
-                                                                            "label": "My Gmail connection (cgi@tutrastero.com)"
                                                                         }
                                                                     }
                                                                 },
@@ -14076,16 +14076,16 @@
                                                                 "expect": [
                                                                     {
                                                                         "name": "to",
+                                                                        "type": "array",
+                                                                        "label": "To",
+                                                                        "required": true,
                                                                         "spec": {
-                                                                            "name": "value",
                                                                             "type": "email",
                                                                             "label": "Recipient email address",
                                                                             "required": true,
-                                                                            "validate": true
-                                                                        },
-                                                                        "type": "array",
-                                                                        "label": "To",
-                                                                        "required": true
+                                                                            "validate": true,
+                                                                            "name": "value"
+                                                                        }
                                                                     },
                                                                     {
                                                                         "name": "subject",
@@ -14106,8 +14106,9 @@
                                                                     },
                                                                     {
                                                                         "name": "attachments",
+                                                                        "type": "array",
+                                                                        "label": "Attachments",
                                                                         "spec": {
-                                                                            "name": "value",
                                                                             "spec": [
                                                                                 {
                                                                                     "name": "filename",
@@ -14125,10 +14126,9 @@
                                                                                 }
                                                                             ],
                                                                             "type": "collection",
-                                                                            "label": "Attachment"
-                                                                        },
-                                                                        "type": "array",
-                                                                        "label": "Attachments"
+                                                                            "label": "Attachment",
+                                                                            "name": "value"
+                                                                        }
                                                                     },
                                                                     {
                                                                         "name": "from",
@@ -14137,28 +14137,29 @@
                                                                     },
                                                                     {
                                                                         "name": "cc",
-                                                                        "spec": {
-                                                                            "name": "value",
-                                                                            "type": "email",
-                                                                            "label": "Recipient email address"
-                                                                        },
                                                                         "type": "array",
-                                                                        "label": "CC recipients"
+                                                                        "label": "CC recipients",
+                                                                        "spec": {
+                                                                            "type": "email",
+                                                                            "label": "Recipient email address",
+                                                                            "name": "value"
+                                                                        }
                                                                     },
                                                                     {
                                                                         "name": "bcc",
-                                                                        "spec": {
-                                                                            "name": "value",
-                                                                            "type": "email",
-                                                                            "label": "Recipient email address"
-                                                                        },
                                                                         "type": "array",
-                                                                        "label": "BCC recipients"
+                                                                        "label": "BCC recipients",
+                                                                        "spec": {
+                                                                            "type": "email",
+                                                                            "label": "Recipient email address",
+                                                                            "name": "value"
+                                                                        }
                                                                     },
                                                                     {
                                                                         "name": "emailHeaders",
+                                                                        "type": "array",
+                                                                        "label": "Additional email headers",
                                                                         "spec": {
-                                                                            "name": "value",
                                                                             "spec": [
                                                                                 {
                                                                                     "name": "key",
@@ -14173,10 +14174,9 @@
                                                                                 }
                                                                             ],
                                                                             "type": "collection",
-                                                                            "label": "Email header"
-                                                                        },
-                                                                        "type": "array",
-                                                                        "label": "Additional email headers"
+                                                                            "label": "Email header",
+                                                                            "name": "value"
+                                                                        }
                                                                     },
                                                                     {
                                                                         "name": "content",
@@ -14196,14 +14196,14 @@
                                                             },
                                                             "mapper": {
                                                                 "url": "crm.item.update",
-                                                                "body": "{\r\n  \"entityTypeId\": 1034,\n  \"id\":{{21.data.ticket_id}},\r\n  \"fields\": {\n    \"stageId\": \"DT1034_120:SUCCESS\"\n  }\n}",
                                                                 "method": "POST",
                                                                 "headers": [
                                                                     {
                                                                         "key": "Content-Type",
                                                                         "value": "application/json"
                                                                     }
-                                                                ]
+                                                                ],
+                                                                "body": "{\r\n  \"entityTypeId\": 1034,\n  \"id\":{{21.data.ticket_id}},\r\n  \"fields\": {\n    \"stageId\": \"DT1034_120:SUCCESS\",\n    \"assignedById\":6358\n  }\n}"
                                                             },
                                                             "metadata": {
                                                                 "designer": {
@@ -14212,10 +14212,16 @@
                                                                     "name": "SPA Ticket - Update"
                                                                 },
                                                                 "restore": {
+                                                                    "parameters": {
+                                                                        "__IMTCONN__": {
+                                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)",
+                                                                            "data": {
+                                                                                "scoped": "true",
+                                                                                "connection": "bitrix24"
+                                                                            }
+                                                                        }
+                                                                    },
                                                                     "expect": {
-                                                                        "qs": {
-                                                                            "mode": "chose"
-                                                                        },
                                                                         "method": {
                                                                             "mode": "chose",
                                                                             "label": "POST"
@@ -14225,15 +14231,9 @@
                                                                             "items": [
                                                                                 null
                                                                             ]
-                                                                        }
-                                                                    },
-                                                                    "parameters": {
-                                                                        "__IMTCONN__": {
-                                                                            "data": {
-                                                                                "scoped": "true",
-                                                                                "connection": "bitrix24"
-                                                                            },
-                                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)"
+                                                                        },
+                                                                        "qs": {
+                                                                            "mode": "chose"
                                                                         }
                                                                     }
                                                                 },
@@ -14269,6 +14269,8 @@
                                                                     },
                                                                     {
                                                                         "name": "headers",
+                                                                        "type": "array",
+                                                                        "label": "Headers",
                                                                         "spec": [
                                                                             {
                                                                                 "name": "key",
@@ -14280,12 +14282,12 @@
                                                                                 "type": "text",
                                                                                 "label": "Value"
                                                                             }
-                                                                        ],
-                                                                        "type": "array",
-                                                                        "label": "Headers"
+                                                                        ]
                                                                     },
                                                                     {
                                                                         "name": "qs",
+                                                                        "type": "array",
+                                                                        "label": "Query String",
                                                                         "spec": [
                                                                             {
                                                                                 "name": "key",
@@ -14297,9 +14299,7 @@
                                                                                 "type": "text",
                                                                                 "label": "Value"
                                                                             }
-                                                                        ],
-                                                                        "type": "array",
-                                                                        "label": "Query String"
+                                                                        ]
                                                                     },
                                                                     {
                                                                         "name": "body",
@@ -14318,14 +14318,14 @@
                                                             },
                                                             "mapper": {
                                                                 "url": "crm.timeline.comment.add",
-                                                                "body": "{\r\n  \"fields\": {\r\n    \"ENTITY_ID\": {{21.data.ticket_id}},\r\n    \"ENTITY_TYPE\": \"dynamic_1034\",\r\n    \"COMMENT\": \"Se reenvió al cliente URL para que suba las fotos de estado del trastero.\"\r\n}\r\n}",
                                                                 "method": "POST",
                                                                 "headers": [
                                                                     {
                                                                         "key": "Content-Type",
                                                                         "value": "application/json"
                                                                     }
-                                                                ]
+                                                                ],
+                                                                "body": "{\r\n  \"fields\": {\r\n    \"ENTITY_ID\": {{21.data.ticket_id}},\r\n    \"ENTITY_TYPE\": \"dynamic_1034\",\r\n    \"COMMENT\": \"Se reenvió al cliente URL {{85.UF_CRM_1764084208817}} para que suba las fotos de estado del trastero.\"\r\n}\r\n}"
                                                             },
                                                             "metadata": {
                                                                 "designer": {
@@ -14334,10 +14334,16 @@
                                                                     "name": "Comentario en timeline"
                                                                 },
                                                                 "restore": {
+                                                                    "parameters": {
+                                                                        "__IMTCONN__": {
+                                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)",
+                                                                            "data": {
+                                                                                "scoped": "true",
+                                                                                "connection": "bitrix24"
+                                                                            }
+                                                                        }
+                                                                    },
                                                                     "expect": {
-                                                                        "qs": {
-                                                                            "mode": "chose"
-                                                                        },
                                                                         "method": {
                                                                             "mode": "chose",
                                                                             "label": "POST"
@@ -14347,15 +14353,9 @@
                                                                             "items": [
                                                                                 null
                                                                             ]
-                                                                        }
-                                                                    },
-                                                                    "parameters": {
-                                                                        "__IMTCONN__": {
-                                                                            "data": {
-                                                                                "scoped": "true",
-                                                                                "connection": "bitrix24"
-                                                                            },
-                                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)"
+                                                                        },
+                                                                        "qs": {
+                                                                            "mode": "chose"
                                                                         }
                                                                     }
                                                                 },
@@ -14391,6 +14391,8 @@
                                                                     },
                                                                     {
                                                                         "name": "headers",
+                                                                        "type": "array",
+                                                                        "label": "Headers",
                                                                         "spec": [
                                                                             {
                                                                                 "name": "key",
@@ -14402,12 +14404,12 @@
                                                                                 "type": "text",
                                                                                 "label": "Value"
                                                                             }
-                                                                        ],
-                                                                        "type": "array",
-                                                                        "label": "Headers"
+                                                                        ]
                                                                     },
                                                                     {
                                                                         "name": "qs",
+                                                                        "type": "array",
+                                                                        "label": "Query String",
                                                                         "spec": [
                                                                             {
                                                                                 "name": "key",
@@ -14419,9 +14421,7 @@
                                                                                 "type": "text",
                                                                                 "label": "Value"
                                                                             }
-                                                                        ],
-                                                                        "type": "array",
-                                                                        "label": "Query String"
+                                                                        ]
                                                                     },
                                                                     {
                                                                         "name": "body",
@@ -14887,14 +14887,14 @@
                                                             },
                                                             "mapper": {
                                                                 "url": "crm.item.update",
-                                                                "body": "{\r\n  \"entityTypeId\": 1034,\n  \"id\":{{21.data.ticket_id}},\r\n  \"fields\": {\n    \"stageId\": \"DT1034_120:CLIENT\",\n    \"assignedById\":20\n  }\n}",
                                                                 "method": "POST",
                                                                 "headers": [
                                                                     {
                                                                         "key": "Content-Type",
                                                                         "value": "application/json"
                                                                     }
-                                                                ]
+                                                                ],
+                                                                "body": "{\r\n  \"entityTypeId\": 1034,\n  \"id\":{{21.data.ticket_id}},\r\n  \"fields\": {\n    \"stageId\": \"DT1034_120:CLIENT\"\n  }\n}"
                                                             },
                                                             "metadata": {
                                                                 "designer": {
@@ -14903,10 +14903,16 @@
                                                                     "name": "SPA Ticket - Update"
                                                                 },
                                                                 "restore": {
+                                                                    "parameters": {
+                                                                        "__IMTCONN__": {
+                                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)",
+                                                                            "data": {
+                                                                                "scoped": "true",
+                                                                                "connection": "bitrix24"
+                                                                            }
+                                                                        }
+                                                                    },
                                                                     "expect": {
-                                                                        "qs": {
-                                                                            "mode": "chose"
-                                                                        },
                                                                         "method": {
                                                                             "mode": "chose",
                                                                             "label": "POST"
@@ -14916,15 +14922,9 @@
                                                                             "items": [
                                                                                 null
                                                                             ]
-                                                                        }
-                                                                    },
-                                                                    "parameters": {
-                                                                        "__IMTCONN__": {
-                                                                            "data": {
-                                                                                "scoped": "true",
-                                                                                "connection": "bitrix24"
-                                                                            },
-                                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)"
+                                                                        },
+                                                                        "qs": {
+                                                                            "mode": "chose"
                                                                         }
                                                                     }
                                                                 },
@@ -14960,6 +14960,8 @@
                                                                     },
                                                                     {
                                                                         "name": "headers",
+                                                                        "type": "array",
+                                                                        "label": "Headers",
                                                                         "spec": [
                                                                             {
                                                                                 "name": "key",
@@ -14971,12 +14973,12 @@
                                                                                 "type": "text",
                                                                                 "label": "Value"
                                                                             }
-                                                                        ],
-                                                                        "type": "array",
-                                                                        "label": "Headers"
+                                                                        ]
                                                                     },
                                                                     {
                                                                         "name": "qs",
+                                                                        "type": "array",
+                                                                        "label": "Query String",
                                                                         "spec": [
                                                                             {
                                                                                 "name": "key",
@@ -14988,9 +14990,7 @@
                                                                                 "type": "text",
                                                                                 "label": "Value"
                                                                             }
-                                                                        ],
-                                                                        "type": "array",
-                                                                        "label": "Query String"
+                                                                        ]
                                                                     },
                                                                     {
                                                                         "name": "body",
@@ -15009,14 +15009,14 @@
                                                             },
                                                             "mapper": {
                                                                 "url": "crm.timeline.comment.add",
-                                                                "body": "{\r\n  \"fields\": {\r\n    \"ENTITY_ID\": {{21.data.ticket_id}},\r\n    \"ENTITY_TYPE\": \"dynamic_1034\",\r\n    \"COMMENT\": \"Se reenvió al cliente URL para que suba las fotos de estado del trastero. \\n NAME: {{21.data.nombre}}\",  LAST_NAME: {{21.data.apellido}},  PHONE: {{21.data.telefono}}, EMAIL: {{21.data.email}}\"\r\n}\r\n}",
                                                                 "method": "POST",
                                                                 "headers": [
                                                                     {
                                                                         "key": "Content-Type",
                                                                         "value": "application/json"
                                                                     }
-                                                                ]
+                                                                ],
+                                                                "body": "{\r\n  \"fields\": {\r\n    \"ENTITY_ID\": {{21.data.ticket_id}},\r\n    \"ENTITY_TYPE\": \"dynamic_1034\",\r\n    \"COMMENT\": \"El usuario quiere subir las fotos del estado del trastero para proceder con la salida del trastero, pero su correo no está registrado.\\n Nombre: {{21.data.nombre}}\"\\n Apellido: {{21.data.apellido}}\\n Teléfono: {{21.data.telefono}}\\n Email: {{21.data.email}}\"\r\n}\r\n}"
                                                             },
                                                             "metadata": {
                                                                 "designer": {
@@ -15025,10 +15025,16 @@
                                                                     "name": "Comentario en timeline"
                                                                 },
                                                                 "restore": {
+                                                                    "parameters": {
+                                                                        "__IMTCONN__": {
+                                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)",
+                                                                            "data": {
+                                                                                "scoped": "true",
+                                                                                "connection": "bitrix24"
+                                                                            }
+                                                                        }
+                                                                    },
                                                                     "expect": {
-                                                                        "qs": {
-                                                                            "mode": "chose"
-                                                                        },
                                                                         "method": {
                                                                             "mode": "chose",
                                                                             "label": "POST"
@@ -15038,15 +15044,9 @@
                                                                             "items": [
                                                                                 null
                                                                             ]
-                                                                        }
-                                                                    },
-                                                                    "parameters": {
-                                                                        "__IMTCONN__": {
-                                                                            "data": {
-                                                                                "scoped": "true",
-                                                                                "connection": "bitrix24"
-                                                                            },
-                                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)"
+                                                                        },
+                                                                        "qs": {
+                                                                            "mode": "chose"
                                                                         }
                                                                     }
                                                                 },
@@ -15082,6 +15082,8 @@
                                                                     },
                                                                     {
                                                                         "name": "headers",
+                                                                        "type": "array",
+                                                                        "label": "Headers",
                                                                         "spec": [
                                                                             {
                                                                                 "name": "key",
@@ -15093,12 +15095,12 @@
                                                                                 "type": "text",
                                                                                 "label": "Value"
                                                                             }
-                                                                        ],
-                                                                        "type": "array",
-                                                                        "label": "Headers"
+                                                                        ]
                                                                     },
                                                                     {
                                                                         "name": "qs",
+                                                                        "type": "array",
+                                                                        "label": "Query String",
                                                                         "spec": [
                                                                             {
                                                                                 "name": "key",
@@ -15110,9 +15112,7 @@
                                                                                 "type": "text",
                                                                                 "label": "Value"
                                                                             }
-                                                                        ],
-                                                                        "type": "array",
-                                                                        "label": "Query String"
+                                                                        ]
                                                                     },
                                                                     {
                                                                         "name": "body",
@@ -15629,14 +15629,14 @@
                                                             },
                                                             "mapper": {
                                                                 "url": "crm.item.update",
-                                                                "body": "{\r\n  \"entityTypeId\": 1034,\n  \"id\":{{21.data.ticket_id}},\r\n  \"fields\": {\n    \"stageId\": \"DT1034_120:SUCCESS\",\n    \"assignedById\":\"6358\"\n  }\n}",
                                                                 "method": "POST",
                                                                 "headers": [
                                                                     {
                                                                         "key": "Content-Type",
                                                                         "value": "application/json"
                                                                     }
-                                                                ]
+                                                                ],
+                                                                "body": "{\r\n  \"entityTypeId\": 1034,\n  \"id\":{{21.data.ticket_id}},\r\n  \"fields\": {\n    \"stageId\": \"DT1034_120:SUCCESS\",\n    \"assignedById\":6358\n  }\n}"
                                                             },
                                                             "metadata": {
                                                                 "designer": {
@@ -15645,10 +15645,16 @@
                                                                     "name": "SPA Ticket - Update"
                                                                 },
                                                                 "restore": {
+                                                                    "parameters": {
+                                                                        "__IMTCONN__": {
+                                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)",
+                                                                            "data": {
+                                                                                "scoped": "true",
+                                                                                "connection": "bitrix24"
+                                                                            }
+                                                                        }
+                                                                    },
                                                                     "expect": {
-                                                                        "qs": {
-                                                                            "mode": "chose"
-                                                                        },
                                                                         "method": {
                                                                             "mode": "chose",
                                                                             "label": "POST"
@@ -15658,15 +15664,9 @@
                                                                             "items": [
                                                                                 null
                                                                             ]
-                                                                        }
-                                                                    },
-                                                                    "parameters": {
-                                                                        "__IMTCONN__": {
-                                                                            "data": {
-                                                                                "scoped": "true",
-                                                                                "connection": "bitrix24"
-                                                                            },
-                                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)"
+                                                                        },
+                                                                        "qs": {
+                                                                            "mode": "chose"
                                                                         }
                                                                     }
                                                                 },
@@ -15702,6 +15702,8 @@
                                                                     },
                                                                     {
                                                                         "name": "headers",
+                                                                        "type": "array",
+                                                                        "label": "Headers",
                                                                         "spec": [
                                                                             {
                                                                                 "name": "key",
@@ -15713,12 +15715,12 @@
                                                                                 "type": "text",
                                                                                 "label": "Value"
                                                                             }
-                                                                        ],
-                                                                        "type": "array",
-                                                                        "label": "Headers"
+                                                                        ]
                                                                     },
                                                                     {
                                                                         "name": "qs",
+                                                                        "type": "array",
+                                                                        "label": "Query String",
                                                                         "spec": [
                                                                             {
                                                                                 "name": "key",
@@ -15730,9 +15732,7 @@
                                                                                 "type": "text",
                                                                                 "label": "Value"
                                                                             }
-                                                                        ],
-                                                                        "type": "array",
-                                                                        "label": "Query String"
+                                                                        ]
                                                                     },
                                                                     {
                                                                         "name": "body",
@@ -16320,14 +16320,14 @@
                                                             },
                                                             "mapper": {
                                                                 "url": "crm.item.update",
-                                                                "body": "{\r\n  \"entityTypeId\": 1034,\n  \"id\":{{21.data.ticket_id}},\r\n  \"fields\": {\n    \"stageId\": \"DT1034_120:SUCCESS\",\n    \"assignedById\":\"6358\"\n  }\n}",
                                                                 "method": "POST",
                                                                 "headers": [
                                                                     {
                                                                         "key": "Content-Type",
                                                                         "value": "application/json"
                                                                     }
-                                                                ]
+                                                                ],
+                                                                "body": "{\r\n  \"entityTypeId\": 1034,\n  \"id\":{{21.data.ticket_id}},\r\n  \"fields\": {\n    \"stageId\": \"DT1034_120:SUCCESS\",\n    \"assignedById\":6358\n  }\n}"
                                                             },
                                                             "metadata": {
                                                                 "designer": {
@@ -16336,10 +16336,16 @@
                                                                     "name": "SPA Ticket - Update"
                                                                 },
                                                                 "restore": {
+                                                                    "parameters": {
+                                                                        "__IMTCONN__": {
+                                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)",
+                                                                            "data": {
+                                                                                "scoped": "true",
+                                                                                "connection": "bitrix24"
+                                                                            }
+                                                                        }
+                                                                    },
                                                                     "expect": {
-                                                                        "qs": {
-                                                                            "mode": "chose"
-                                                                        },
                                                                         "method": {
                                                                             "mode": "chose",
                                                                             "label": "POST"
@@ -16349,15 +16355,9 @@
                                                                             "items": [
                                                                                 null
                                                                             ]
-                                                                        }
-                                                                    },
-                                                                    "parameters": {
-                                                                        "__IMTCONN__": {
-                                                                            "data": {
-                                                                                "scoped": "true",
-                                                                                "connection": "bitrix24"
-                                                                            },
-                                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)"
+                                                                        },
+                                                                        "qs": {
+                                                                            "mode": "chose"
                                                                         }
                                                                     }
                                                                 },
@@ -16393,6 +16393,8 @@
                                                                     },
                                                                     {
                                                                         "name": "headers",
+                                                                        "type": "array",
+                                                                        "label": "Headers",
                                                                         "spec": [
                                                                             {
                                                                                 "name": "key",
@@ -16404,12 +16406,12 @@
                                                                                 "type": "text",
                                                                                 "label": "Value"
                                                                             }
-                                                                        ],
-                                                                        "type": "array",
-                                                                        "label": "Headers"
+                                                                        ]
                                                                     },
                                                                     {
                                                                         "name": "qs",
+                                                                        "type": "array",
+                                                                        "label": "Query String",
                                                                         "spec": [
                                                                             {
                                                                                 "name": "key",
@@ -16421,9 +16423,7 @@
                                                                                 "type": "text",
                                                                                 "label": "Value"
                                                                             }
-                                                                        ],
-                                                                        "type": "array",
-                                                                        "label": "Query String"
+                                                                        ]
                                                                     },
                                                                     {
                                                                         "name": "body",
@@ -17063,14 +17063,14 @@
                                                             },
                                                             "mapper": {
                                                                 "url": "crm.timeline.comment.add",
-                                                                "body": "{\r\n  \"fields\": {\r\n    \"ENTITY_ID\": {{21.data.ticket_id}},\r\n    \"ENTITY_TYPE\": \"dynamic_1034\",\r\n    \"COMMENT\": \"La solicitud del cliente no pudo ser clasificada y no fue respondida por el bot. \\n Comunicarse con el cliente. \\n NAME: {{21.data.nombre}}\",  LAST_NAME: {{21.data.apellido}},  PHONE: {{21.data.telefono}}, EMAIL: {{21.data.email}}\"\r\n}\r\n}",
                                                                 "method": "POST",
                                                                 "headers": [
                                                                     {
                                                                         "key": "Content-Type",
                                                                         "value": "application/json"
                                                                     }
-                                                                ]
+                                                                ],
+                                                                "body": "{\r\n  \"fields\": {\r\n    \"ENTITY_ID\": {{21.data.ticket_id}},\r\n    \"ENTITY_TYPE\": \"dynamic_1034\",\r\n    \"COMMENT\": \"La solicitud del usuario no pudo ser clasificada y no fue respondida por el bot.\\nComunicarse con el usuario.\\n Nombre: {{21.data.nombre}}\"\\n Apellido: {{21.data.apellido}}\\n Teléfono: {{21.data.telefono}}\\n Email: {{21.data.email}}\"\r\n}\r\n}"
                                                             },
                                                             "metadata": {
                                                                 "designer": {
@@ -17079,10 +17079,16 @@
                                                                     "name": "Comentario en timeline"
                                                                 },
                                                                 "restore": {
+                                                                    "parameters": {
+                                                                        "__IMTCONN__": {
+                                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)",
+                                                                            "data": {
+                                                                                "scoped": "true",
+                                                                                "connection": "bitrix24"
+                                                                            }
+                                                                        }
+                                                                    },
                                                                     "expect": {
-                                                                        "qs": {
-                                                                            "mode": "chose"
-                                                                        },
                                                                         "method": {
                                                                             "mode": "chose",
                                                                             "label": "POST"
@@ -17092,15 +17098,9 @@
                                                                             "items": [
                                                                                 null
                                                                             ]
-                                                                        }
-                                                                    },
-                                                                    "parameters": {
-                                                                        "__IMTCONN__": {
-                                                                            "data": {
-                                                                                "scoped": "true",
-                                                                                "connection": "bitrix24"
-                                                                            },
-                                                                            "label": "My Bitrix24 connection (sistemas@tutrastero.com)"
+                                                                        },
+                                                                        "qs": {
+                                                                            "mode": "chose"
                                                                         }
                                                                     }
                                                                 },
@@ -17136,6 +17136,8 @@
                                                                     },
                                                                     {
                                                                         "name": "headers",
+                                                                        "type": "array",
+                                                                        "label": "Headers",
                                                                         "spec": [
                                                                             {
                                                                                 "name": "key",
@@ -17147,12 +17149,12 @@
                                                                                 "type": "text",
                                                                                 "label": "Value"
                                                                             }
-                                                                        ],
-                                                                        "type": "array",
-                                                                        "label": "Headers"
+                                                                        ]
                                                                     },
                                                                     {
                                                                         "name": "qs",
+                                                                        "type": "array",
+                                                                        "label": "Query String",
                                                                         "spec": [
                                                                             {
                                                                                 "name": "key",
@@ -17164,9 +17166,7 @@
                                                                                 "type": "text",
                                                                                 "label": "Value"
                                                                             }
-                                                                        ],
-                                                                        "type": "array",
-                                                                        "label": "Query String"
+                                                                        ]
                                                                     },
                                                                     {
                                                                         "name": "body",
@@ -17778,13 +17778,13 @@
                                     [
                                         {
                                             "a": "{{5.bot_humano}}",
-                                            "b": "bot",
-                                            "o": "text:notequal"
+                                            "o": "text:notequal",
+                                            "b": "bot"
                                         },
                                         {
                                             "a": "{{2.fldPeM5wlULywrkmD}}",
-                                            "b": "Requerimiento",
-                                            "o": "text:equal"
+                                            "o": "text:equal",
+                                            "b": "accion"
                                         }
                                     ]
                                 ]

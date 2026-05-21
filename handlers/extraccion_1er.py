@@ -17,6 +17,7 @@ Lógica:
 Devuelve:
     {ticket_id, nombre, apellido, Cliente (bool), datos_extraidos_id}
 """
+import asyncio
 import logging
 import config
 from services import gmail, airtable, bitrix, openai_svc
@@ -205,6 +206,7 @@ async def _with_contact(args, gpt_data, from_email, email_to, subject, has_attac
             _build_timeline_comment(from_email, subject, has_attach, gpt_data, nombre_bx, apellido_bx, body),
         )
         try:
+            await asyncio.sleep(60)
             activity_id = await bitrix.find_email_activity(subject, from_email)
             if activity_id:
                 await bitrix.bind_activity_to_item(activity_id, 1034, ticket_id)
@@ -262,6 +264,7 @@ async def _without_contact(args, gpt_data, from_email, email_to, subject, has_at
             ),
         )
         try:
+            await asyncio.sleep(60)
             activity_id = await bitrix.find_email_activity(subject, from_email)
             if activity_id:
                 await bitrix.bind_activity_to_item(activity_id, 1034, ticket_id)

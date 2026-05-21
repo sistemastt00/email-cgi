@@ -76,3 +76,34 @@ async def add_timeline_comment(
             "COMMENT":     comment,
         }
     })
+
+
+# ─── Actividades / Email binding ──────────────────────────────────────────────
+
+async def find_email_activity(subject: str, from_email: str) -> int | None:
+    """
+    Busca la actividad de email (TYPE_ID=4) más reciente que coincida con el
+    asunto y el remitente. Devuelve el ID entero o None si no se encuentra.
+    """
+    data = await api_call("crm.activity.list", {
+        "order":  {"ID": "DESC"},
+        "filter": {"TYPE_ID": 4, "%SUBJECT": subject},
+        "select": ["ID", "SUBJECT", "COMMUNICATIONS"],
+        "start":  0,
+    })
+    results = data.get("result", [])
+    for act in results:
+        for comm in act.get("COMMUNICATIONS", []):
+            if comm.get("VALUE", "").lower() == from_email.lower():
+                return int(act["ID"])
+    # Fallback: primer resultado si coincide el asunto
+    return int(results[0]["ID"]) if results else None
+
+
+async def bind_activity_to_item(activity_id: int, entity_type_id: int, entity_id: str | int) -> dict:
+    """Vincula una actividad existente a un item CRM (crm.activity.binding.add)."""
+    return await api_call("crm.activity.binding.add", {
+        "activityId":   activity_id,
+        "entityTypeId": entity_type_id,
+        "entityId":     int(entity_id),
+    })

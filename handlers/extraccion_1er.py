@@ -204,6 +204,15 @@ async def _with_contact(args, gpt_data, from_email, email_to, subject, has_attac
             "dynamic_1034", ticket_id,
             _build_timeline_comment(from_email, subject, has_attach, gpt_data, nombre_bx, apellido_bx, body),
         )
+        try:
+            activity_id = await bitrix.find_email_activity(subject, from_email)
+            if activity_id:
+                await bitrix.bind_activity_to_item(activity_id, 1034, ticket_id)
+                logger.info(f"[1.1] Email activity {activity_id} vinculado al ticket {ticket_id}")
+            else:
+                logger.info(f"[1.1] No se encontró actividad email para vincular | subject={subject!r}")
+        except Exception as exc:
+            logger.warning(f"[1.1] No se pudo vincular actividad email: {exc}")
 
     logger.info(f"[1.1] Item 1034 (contacto existente) | ticket_id={ticket_id} | at={at_id}")
     return {
@@ -252,6 +261,15 @@ async def _without_contact(args, gpt_data, from_email, email_to, subject, has_at
                 gpt_data.get("nombre", ""), gpt_data.get("apellido", ""), body,
             ),
         )
+        try:
+            activity_id = await bitrix.find_email_activity(subject, from_email)
+            if activity_id:
+                await bitrix.bind_activity_to_item(activity_id, 1034, ticket_id)
+                logger.info(f"[1.1] Email activity {activity_id} vinculado al ticket {ticket_id}")
+            else:
+                logger.info(f"[1.1] No se encontró actividad email para vincular | subject={subject!r}")
+        except Exception as exc:
+            logger.warning(f"[1.1] No se pudo vincular actividad email: {exc}")
 
     logger.info(f"[1.1] Item 1034 (contacto nuevo) | ticket_id={ticket_id} | at={at_id}")
     return {

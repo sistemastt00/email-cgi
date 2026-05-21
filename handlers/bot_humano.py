@@ -81,7 +81,7 @@ async def run(args: dict) -> dict:
         # 5. Comentario en timeline
         await bitrix.add_timeline_comment(
             "dynamic_1034", ticket_id,
-            f"Comunicarse con el cliente. No se atendió al requerimiento. "
+            f"Comunicarse con el cliente. No se atendió al requerimiento.\n"
             f"El emisor del correo solicita la comunicación con un HUMANO para {categoria}",
         )
 

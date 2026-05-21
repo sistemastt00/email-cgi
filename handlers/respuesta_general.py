@@ -30,6 +30,8 @@ async def run(args: dict) -> dict:
     message_id = args.get("message_id", "")
     ticket_id  = args.get("ticket_id", "")
     nombre     = args.get("nombre", "")
+    apellido   = args.get("apellido", "")
+    telefono   = args.get("telefono", "")
     categoria  = args.get("categoria_correo", "")
     row        = args.get("row", "")
 
@@ -60,13 +62,19 @@ async def run(args: dict) -> dict:
             }
             if contact_id:
                 item_fields["contactId"] = contact_id
-            else:
-                item_fields["assignedById"] = "22"
             await bitrix.update_crm_item(1034, ticket_id, item_fields)
-            await bitrix.add_timeline_comment(
-                "dynamic_1034", ticket_id,
-                "Comunicarse con cliente: Cambio de trastero.",
-            )
+            if contact_id:
+                await bitrix.add_timeline_comment(
+                    "dynamic_1034", ticket_id,
+                    "Comunicarse con cliente: Cambio de trastero.",
+                )
+            else:
+                await bitrix.add_timeline_comment(
+                    "dynamic_1034", ticket_id,
+                    f"Comunicarse con usuario: Cambio de trastero.\n"
+                    f"El email del usuario no está en bitrix.\n"
+                    f"Nombre: {nombre}\nApellido: {apellido}\nTeléfono: {telefono}\nEmail: {from_email}",
+                )
 
         if clasif_id:
             await airtable.update_record(config.AT_TBL_CLASIFICACION, clasif_id, {

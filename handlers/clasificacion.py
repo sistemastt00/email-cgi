@@ -16,7 +16,7 @@ import collections
 import datetime
 import logging
 import config
-from services import gmail, airtable, bitrix, openai_svc
+from services import gmail, airtable, bitrix, openai_svc, telegram
 from handlers import correo_clasif, extraccion_1er, extraccion_cadena, bot_humano, respuesta_general, email_templates
 
 _lock = asyncio.Lock()
@@ -195,6 +195,11 @@ async def _process_email_inner(msg_stub: dict):
             logger.info(f"[1] 1.1 ok | {extrac_result}")
         except Exception as exc:
             logger.error(f"[1] Error en 1.1: {exc}", exc_info=True)
+            await telegram.send_alert(
+                f"⚠️ *Email CGI* — error en `extraccion_1er`\n"
+                f"📧 `{from_email}`\n"
+                f"❌ `{type(exc).__name__}: {str(exc)[:200]}`"
+            )
 
         ticket_id = extrac_result.get("ticket_id", "")
         nombre    = extrac_result.get("nombre", "")
@@ -565,3 +570,8 @@ async def process_new_emails():
                 await _process_email(msg)
             except Exception as exc:
                 logger.error(f"[1] Error procesando {msg.get('id')}: {exc}", exc_info=True)
+                await telegram.send_alert(
+                    f"⚠️ *Email CGI* — error procesando email\n"
+                    f"🆔 `{msg.get('id')}`\n"
+                    f"❌ `{type(exc).__name__}: {str(exc)[:200]}`"
+                )

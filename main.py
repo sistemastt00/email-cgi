@@ -23,6 +23,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 import base64
 import config
 from services import gmail as gmail_svc
+from services import telegram as telegram_svc
 from handlers import (
     clasificacion,
     correo_clasif,
@@ -69,6 +70,10 @@ async def _poller():
             await clasificacion.process_new_emails()
         except Exception as exc:
             logger.error(f"Poller error: {exc}", exc_info=True)
+            await telegram_svc.send_alert(
+                f"⚠️ *Email CGI* — error en `poller`\n"
+                f"❌ `{type(exc).__name__}: {str(exc)[:200]}`"
+            )
         await asyncio.sleep(interval)
 
 
@@ -86,6 +91,8 @@ async def _watch_renewer():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    await telegram_svc.send_alert("✅ *Email CGI* — servicio iniciado")
+
     tasks = [asyncio.create_task(_poller())]
 
     if config.PUBSUB_TOPIC:
@@ -104,6 +111,8 @@ async def lifespan(app: FastAPI):
             await t
         except asyncio.CancelledError:
             pass
+
+    await telegram_svc.send_alert("🔴 *Email CGI* — servicio detenido")
 
 app = FastAPI(title="Email CGI Bot", lifespan=lifespan)
 
@@ -150,6 +159,10 @@ async def webhook(request: Request):
         return result
     except Exception as exc:
         logger.error(f"Error en {name}: {exc}", exc_info=True)
+        await telegram_svc.send_alert(
+            f"⚠️ *Email CGI* — error en `{name}`\n"
+            f"❌ `{type(exc).__name__}: {str(exc)[:200]}`"
+        )
         return JSONResponse(status_code=500, content={"error": str(exc)})
 
 

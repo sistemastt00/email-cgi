@@ -49,6 +49,10 @@ DEPLOY_DIR   = os.getenv("DEPLOY_DIR",   "")   # ej: /opt/fastapi-email-cgi
 POLL_INTERVAL        = 60    # segundos — ciclo normal sin Pub/Sub
 POLL_INTERVAL_BACKUP = 300   # segundos — ciclo de respaldo cuando Pub/Sub está activo
 
+# ─── Telegram — alertas de error ─────────────────────────────────────────────
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
+TELEGRAM_CHAT_ID   = os.getenv("TELEGRAM_CHAT_ID", "")
+
 # ─── Filtro de remitentes — correos que nunca se procesan ─────────────────────
 EMAIL_BLACKLIST_CONTAINS = [
     "@telefacil.com",

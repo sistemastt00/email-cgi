@@ -80,15 +80,33 @@ async def add_timeline_comment(
 
 # ─── Actividades / Email binding ──────────────────────────────────────────────
 
-async def find_email_activity(subject: str, from_email: str) -> int | None:
+async def find_email_activity(subject: str, from_email: str, contact_id: str | int | None = None) -> int | None:
     """
-    Busca la actividad de email (TYPE_ID=4) más reciente que coincida con el
-    asunto y el remitente. Devuelve el ID entero o None si no se encuentra.
+    Busca la actividad de email más reciente vinculada al contacto (si se conoce)
+    o que coincida con el asunto y el remitente.
+    Devuelve el ID entero o None si no se encuentra.
     """
+    # Búsqueda por contacto + asunto (más precisa)
+    if contact_id:
+        data = await api_call("crm.activity.list", {
+            "order":  {"ID": "DESC"},
+            "filter": {
+                "OWNER_TYPE_ID": 3,
+                "OWNER_ID":      int(contact_id),
+                "%SUBJECT":      subject,
+            },
+            "select": ["ID", "SUBJECT", "TYPE_ID", "COMMUNICATIONS"],
+            "start":  0,
+        })
+        results = data.get("result", [])
+        if results:
+            return int(results[0]["ID"])
+
+    # Fallback: búsqueda por asunto y remitente sin filtro de tipo
     data = await api_call("crm.activity.list", {
         "order":  {"ID": "DESC"},
-        "filter": {"TYPE_ID": 4, "%SUBJECT": subject},
-        "select": ["ID", "SUBJECT", "COMMUNICATIONS"],
+        "filter": {"%SUBJECT": subject},
+        "select": ["ID", "SUBJECT", "TYPE_ID", "COMMUNICATIONS"],
         "start":  0,
     })
     results = data.get("result", [])
@@ -96,7 +114,6 @@ async def find_email_activity(subject: str, from_email: str) -> int | None:
         for comm in act.get("COMMUNICATIONS", []):
             if comm.get("VALUE", "").lower() == from_email.lower():
                 return int(act["ID"])
-    # Fallback: primer resultado si coincide el asunto
     return int(results[0]["ID"]) if results else None
 
 

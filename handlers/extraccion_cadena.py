@@ -21,6 +21,7 @@ Retorna:
 """
 import logging
 from services import gmail, airtable, bitrix, openai_svc
+from handlers.extraccion_1er import _clean_body, _attachments_to_bitrix_files
 import config
 
 logger = logging.getLogger("email-cgi")
@@ -30,11 +31,14 @@ async def run(args: dict) -> dict:
     message_id = args["message_id"]
     thread_id  = args["thread_id"]
 
-    # 1. Email completo
-    email    = await gmail.get_email(message_id)
-    body_txt = email.get("fullTextBody") or email.get("htmlBody") or ""
+    # 1. Email completo + adjuntos
+    email      = await gmail.get_email(message_id)
+    adjuntos   = await gmail.get_attachments(message_id)
+    from_email = email.get("fromEmail", "")
+    subject    = email.get("subject", "")
+    body_txt   = email.get("fullTextBody") or email.get("htmlBody") or ""
 
-    logger.info(f"[1.2] message_id={message_id} | thread_id={thread_id}")
+    logger.info(f"[1.2] message_id={message_id} | thread_id={thread_id} | adjuntos={len(adjuntos)}")
 
     # 2. Extraer DNI con GPT-4.1
     extracted = await openai_svc.extract_structured_data(
@@ -81,7 +85,27 @@ async def run(args: dict) -> dict:
             entity_id=ticket_id,
             comment=f"DNI CORREGIDO {dni}",
         )
-        logger.info(f"[1.2] Timeline comment añadido | ticket_id={ticket_id}")
+        logger.info(f"[1.2] Timeline comment DNI | ticket_id={ticket_id}")
+
+    # 6. Adjuntos al timeline si los hay
+    if ticket_id and adjuntos:
+        n = len(adjuntos)
+        body_clean = _clean_body(body_txt)[:3000]
+        comment = (
+            f"📎 Correo de seguimiento con {n} adjunto(s)\n"
+            f"De: {from_email}\n"
+            f"Asunto: {subject}\n"
+            f"\n"
+            f"--- Mensaje ---\n"
+            f"{body_clean}"
+        )
+        await bitrix.add_timeline_comment(
+            entity_type="dynamic_1034",
+            entity_id=ticket_id,
+            comment=comment,
+            files=_attachments_to_bitrix_files(adjuntos),
+        )
+        logger.info(f"[1.2] Adjuntos subidos al timeline | ticket_id={ticket_id} | n={n}")
 
     fields = updated.get("fields", {})
     return {

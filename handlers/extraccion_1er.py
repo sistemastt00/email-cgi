@@ -19,6 +19,7 @@ Devuelve:
 """
 import asyncio
 import logging
+import re
 import config
 from services import gmail, airtable, bitrix, openai_svc
 
@@ -157,12 +158,34 @@ async def run(args: dict) -> dict:
         return await _without_contact(args, gpt_data, from_email, email_to, subject, has_attach, stage_id, body)
 
 
+def _clean_body(text: str) -> str:
+    """Limpia HTML y normaliza espacios/saltos de línea del cuerpo del correo."""
+    # Quitar etiquetas HTML
+    text = re.sub(r"<[^>]+>", " ", text)
+    # Decodificar entidades comunes
+    text = text.replace("&nbsp;", " ").replace("&amp;", "&") \
+               .replace("&lt;", "<").replace("&gt;", ">") \
+               .replace("&quot;", '"').replace("&#39;", "'")
+    # Colapsar espacios múltiples en cada línea
+    lines = [re.sub(r" {2,}", " ", line).strip() for line in text.splitlines()]
+    # Eliminar líneas vacías consecutivas (máx 1 en blanco seguida)
+    cleaned = []
+    prev_blank = False
+    for line in lines:
+        is_blank = line == ""
+        if is_blank and prev_blank:
+            continue
+        cleaned.append(line)
+        prev_blank = is_blank
+    return "\n".join(cleaned).strip()
+
+
 def _build_timeline_comment(from_email, subject, has_attach, gpt_data, nombre, apellido, body):
     adjuntos = "Sí" if has_attach else "No"
     telefono  = gpt_data.get("telefono", "")
     centro    = gpt_data.get("centro", "")
     prioridad = gpt_data.get("prioridad", "")
-    body_text = (body or "").strip()[:3000]
+    body_text = _clean_body(body or "")[:3000]
     return (
         f"📧 Correo recibido\n"
         f"De: {from_email}\n"

@@ -64,18 +64,21 @@ async def add_timeline_comment(
     entity_type: str,
     entity_id: str | int,
     comment: str,
+    files: list[list] = None,
 ) -> dict:
     """
     Añade un comentario al timeline de una entidad CRM.
     entity_type: "dynamic_1034" | "contact" | "deal"
+    files: [["nombre.ext", "base64content"], ...]
     """
-    return await api_call("crm.timeline.comment.add", {
-        "fields": {
-            "ENTITY_ID":   entity_id,
-            "ENTITY_TYPE": entity_type,
-            "COMMENT":     comment,
-        }
-    })
+    fields = {
+        "ENTITY_ID":   entity_id,
+        "ENTITY_TYPE": entity_type,
+        "COMMENT":     comment,
+    }
+    if files:
+        fields["FILES"] = files
+    return await api_call("crm.timeline.comment.add", {"fields": fields})
 
 
 # ─── Actividades / Email binding ──────────────────────────────────────────────

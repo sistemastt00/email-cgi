@@ -153,9 +153,22 @@ async def run(args: dict) -> dict:
     contact_found   = len(bitrix_contacts) > 0
 
     if contact_found:
-        return await _with_contact(args, gpt_data, from_email, email_to, subject, has_attach, bitrix_contacts[0], stage_id, body)
+        return await _with_contact(args, gpt_data, from_email, email_to, subject, adjuntos, bitrix_contacts[0], stage_id, body)
     else:
-        return await _without_contact(args, gpt_data, from_email, email_to, subject, has_attach, stage_id, body)
+        return await _without_contact(args, gpt_data, from_email, email_to, subject, adjuntos, stage_id, body)
+
+
+def _attachments_to_bitrix_files(adjuntos: list) -> list[list]:
+    """Convierte adjuntos de Gmail (base64url) al formato FILES de Bitrix [["nombre", "base64"]]."""
+    files = []
+    for att in adjuntos:
+        raw = att.get("data", "")
+        # base64url → base64 estándar
+        std = raw.replace("-", "+").replace("_", "/")
+        padding = (4 - len(std) % 4) % 4
+        std += "=" * padding
+        files.append([att.get("filename", "adjunto"), std])
+    return files
 
 
 def _clean_body(text: str) -> str:
@@ -180,8 +193,9 @@ def _clean_body(text: str) -> str:
     return "\n".join(cleaned).strip()
 
 
-def _build_timeline_comment(from_email, subject, has_attach, gpt_data, nombre, apellido, body):
-    adjuntos = "Sí" if has_attach else "No"
+def _build_timeline_comment(from_email, subject, adjuntos, gpt_data, nombre, apellido, body):
+    n_adj     = len(adjuntos) if adjuntos else 0
+    adj_str   = f"{n_adj} archivo(s)" if n_adj else "No"
     telefono  = gpt_data.get("telefono", "")
     centro    = gpt_data.get("centro", "")
     prioridad = gpt_data.get("prioridad", "")
@@ -190,7 +204,7 @@ def _build_timeline_comment(from_email, subject, has_attach, gpt_data, nombre, a
         f"📧 Correo recibido\n"
         f"De: {from_email}\n"
         f"Asunto: {subject}\n"
-        f"Adjuntos: {adjuntos}\n"
+        f"Adjuntos: {adj_str}\n"
         f"\n"
         f"Nombre: {nombre} {apellido}\n"
         f"Teléfono: {telefono}\n"
@@ -202,7 +216,7 @@ def _build_timeline_comment(from_email, subject, has_attach, gpt_data, nombre, a
     )
 
 
-async def _with_contact(args, gpt_data, from_email, email_to, subject, has_attach, contact, stage_id="DT1034_120:NEW", body=""):
+async def _with_contact(args, gpt_data, from_email, email_to, subject, adjuntos, contact, stage_id="DT1034_120:NEW", body=""):
     contact_id  = contact["ID"]
     nombre_bx   = contact.get("NAME", gpt_data.get("nombre", ""))
     apellido_bx = contact.get("LAST_NAME", gpt_data.get("apellido", ""))
@@ -226,7 +240,8 @@ async def _with_contact(args, gpt_data, from_email, email_to, subject, has_attac
     if ticket_id:
         await bitrix.add_timeline_comment(
             "dynamic_1034", ticket_id,
-            _build_timeline_comment(from_email, subject, has_attach, gpt_data, nombre_bx, apellido_bx, body),
+            _build_timeline_comment(from_email, subject, adjuntos, gpt_data, nombre_bx, apellido_bx, body),
+            files=_attachments_to_bitrix_files(adjuntos) if adjuntos else None,
         )
         try:
             await asyncio.sleep(60)
@@ -249,7 +264,7 @@ async def _with_contact(args, gpt_data, from_email, email_to, subject, has_attac
     }
 
 
-async def _without_contact(args, gpt_data, from_email, email_to, subject, has_attach, stage_id="DT1034_120:NEW", body=""):
+async def _without_contact(args, gpt_data, from_email, email_to, subject, adjuntos, stage_id="DT1034_120:NEW", body=""):
     contact_resp = await bitrix.create_contact({
         "NAME":        gpt_data.get("nombre", ""),
         "LAST_NAME":   gpt_data.get("apellido", ""),
@@ -282,7 +297,7 @@ async def _without_contact(args, gpt_data, from_email, email_to, subject, has_at
         await bitrix.add_timeline_comment(
             "dynamic_1034", ticket_id,
             _build_timeline_comment(
-                from_email, subject, has_attach, gpt_data,
+                from_email, subject, adjuntos, gpt_data,
                 gpt_data.get("nombre", ""), gpt_data.get("apellido", ""), body,
             ),
         )

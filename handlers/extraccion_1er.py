@@ -265,7 +265,8 @@ async def _without_contact(args, gpt_data, from_email, email_to, subject, has_at
         )
         try:
             await asyncio.sleep(60)
-            activity_id = await bitrix.find_email_activity(subject, from_email, contact_id)
+            # contact_id recién creado — Bitrix no lo tenía al llegar el email
+            activity_id = await bitrix.find_email_activity(subject, from_email, None)
             if activity_id:
                 await bitrix.bind_activity_to_item(activity_id, 1034, ticket_id)
                 logger.info(f"[1.1] Email activity {activity_id} vinculado al ticket {ticket_id}")

@@ -341,12 +341,20 @@ async def monitor(session: Optional[str] = Cookie(default=None)):
 @app.post("/eval-retroactive")
 async def eval_retroactive(
     background_tasks: BackgroundTasks,
+    request: Request,
     session: Optional[str] = Cookie(default=None),
 ):
     if not _auth_ok(session):
         return JSONResponse({"error": "unauthorized"}, status_code=401)
-    background_tasks.add_task(clasificacion.run_retroactive_eval, 50)
-    return JSONResponse({"status": "started", "message": "Evaluando hasta 50 registros en background"})
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+    month = body.get("month")
+    year  = body.get("year")
+    background_tasks.add_task(clasificacion.run_retroactive_eval, 50, month, year)
+    label = f"{year}/{month:02d}" if month and year else "sin filtro"
+    return JSONResponse({"status": "started", "message": f"Evaluando hasta 50 registros [{label}] en background"})
 
 
 def _render_monitor():
@@ -585,7 +593,12 @@ def _render_monitor():
       const btn = document.getElementById('btn-retro');
       btn.disabled = true; btn.textContent = '⏳ Evaluando...';
       try {{
-        const r = await fetch('/eval-retroactive', {{method: 'POST'}});
+        const now = new Date();
+        const r = await fetch('/eval-retroactive', {{
+          method: 'POST',
+          headers: {{'Content-Type': 'application/json'}},
+          body: JSON.stringify({{month: now.getMonth() + 1, year: now.getFullYear()}})
+        }});
         const d = await r.json();
         btn.textContent = d.error ? '❌ Error' : '✅ Iniciada';
       }} catch(e) {{ btn.textContent = '❌ Error'; }}

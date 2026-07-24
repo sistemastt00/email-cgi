@@ -856,8 +856,22 @@ async def _evaluar_pipeline(
         logger.warning(f"[eval] Error en evaluación pipeline: {exc}")
 
 
-async def run_retroactive_eval(limit: int = 50) -> dict:
+async def run_retroactive_eval(limit: int = 50, month: int = None, year: int = None) -> dict:
     """Evalúa registros de Clasificación que no tienen eval_clasif."""
+    import calendar as _cal
+    base_formula = 'AND({eval_clasif}="", {thread_id}!="")'
+    if month and year:
+        _, last_day = _cal.monthrange(year, month)
+        date_from = f"{year:04d}-{month:02d}-01T00:00:00.000Z"
+        date_to   = f"{year:04d}-{month:02d}-{last_day:02d}T23:59:59.000Z"
+        formula = (
+            f'AND({{eval_clasif}}="", {{thread_id}}!="", '
+            f'IS_AFTER(CREATED_TIME(), "{date_from}"), '
+            f'IS_BEFORE(CREATED_TIME(), "{date_to}"))'
+        )
+    else:
+        formula = base_formula
+
     # 1. Cargar ejemplos una sola vez
     definitions = [r["fields"] for r in await airtable.search_records(
         config.AT_TBL_DEFINICIONES, formula="", max_records=50,
@@ -879,7 +893,7 @@ async def run_retroactive_eval(limit: int = 50) -> dict:
     # 2. Buscar registros sin eval_clasif
     records = await airtable.search_records(
         config.AT_TBL_CLASIFICACION,
-        formula='AND({eval_clasif}="", {thread_id}!="")',
+        formula=formula,
         max_records=limit,
     )
 

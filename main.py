@@ -17,8 +17,83 @@ import signal
 import subprocess
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request, HTTPException, BackgroundTasks
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi import FastAPI, Request, HTTPException, BackgroundTasks, Cookie, Form
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+import bcrypt as _bcrypt, secrets as _secrets, time as _time, base64 as _base64
+from typing import Optional
+from pathlib import Path as _Path
+
+# ─── Auth compartida con Monitor Global ──────────────────────
+_AUTH_USERS_FILE = _Path("/opt/fastapi-monitor-global/users.json")
+_AUTH_SESSIONS: dict = {}
+_AUTH_ATTEMPTS: dict = {}
+_AUTH_MAX, _AUTH_WIN = 5, 600
+_AUTH_LOGO_URL = ""
+try:
+    _lp = _Path("/opt/fastapi-monitor-global/logo.png")
+    if _lp.exists():
+        _AUTH_LOGO_URL = "data:image/png;base64," + _base64.b64encode(_lp.read_bytes()).decode()
+except Exception:
+    pass
+_AUTH_MONITOR_NAME = "Email CGI"
+
+def _auth_load() -> dict:
+    if _AUTH_USERS_FILE.exists():
+        try: return json.loads(_AUTH_USERS_FILE.read_text(encoding="utf-8"))
+        except Exception: pass
+    return {}
+
+def _auth_ok(session) -> bool:
+    return bool(session and session in _AUTH_SESSIONS)
+
+def _auth_page(err: str = "") -> str:
+    if err == "2":
+        err_html = '<div class="error">🔒 Demasiados intentos. Espera 10 minutos.</div>'
+    elif err:
+        err_html = '<div class="error">⚠ Usuario o contraseña incorrectos</div>'
+    else:
+        err_html = ""
+    logo_html = f'<img src="{_AUTH_LOGO_URL}" alt="Tu Trastero">' if _AUTH_LOGO_URL else ""
+    return f"""<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{_AUTH_MONITOR_NAME} — Acceso</title>
+<style>
+*{{box-sizing:border-box;margin:0;padding:0}}
+body{{font-family:monospace;background:#0f0f1a;color:#e0e0e0;display:flex;align-items:center;justify-content:center;min-height:100vh}}
+.box{{background:#1a1a2e;border:1px solid #2a2a4a;border-radius:12px;padding:44px 40px;width:380px}}
+.logo-area{{text-align:center;margin-bottom:28px}}
+.logo-area img{{height:42px;max-width:100%;object-fit:contain;margin-bottom:14px;display:block;margin-left:auto;margin-right:auto}}
+h2{{color:#e94560;font-size:1.1em;text-align:center;letter-spacing:2px;text-transform:uppercase}}
+.sub{{color:#888;font-size:.75em;text-align:center;margin-top:4px;letter-spacing:1px}}
+.error{{background:#2a0c0c;border:1px solid #e74c3c;color:#e74c3c;padding:9px 14px;border-radius:6px;font-size:.82em;margin:18px 0 0;text-align:center}}
+.field{{margin-top:20px}}
+label{{display:block;color:#888;font-size:.75em;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}}
+input{{width:100%;background:#0f0f1a;border:1px solid #2a2a4a;color:#e0e0e0;padding:10px 14px;border-radius:6px;font-family:monospace;font-size:.95em;outline:none;transition:border-color .15s}}
+input:focus{{border-color:#e94560}}
+.btn{{width:100%;background:#e94560;border:none;color:#fff;padding:13px;border-radius:6px;font-family:monospace;font-size:.95em;font-weight:bold;cursor:pointer;letter-spacing:1px;margin-top:28px;transition:opacity .15s}}
+.btn:hover{{opacity:.88}}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="logo-area">
+    {logo_html}
+    <h2>{_AUTH_MONITOR_NAME}</h2>
+    <div class="sub">FastAPI · tutrastero.com</div>
+  </div>
+  {err_html}
+  <form method="post" action="/login">
+    <div class="field"><label>Usuario</label>
+      <input type="email" name="username" placeholder="usuario@dominio.com" autofocus required></div>
+    <div class="field"><label>Contraseña</label>
+      <input type="password" name="password" placeholder="········" required></div>
+    <button type="submit" class="btn">Acceder</button>
+  </form>
+</div>
+</body></html>"""
 
 import base64
 import config
@@ -217,8 +292,49 @@ async def _restart_after_delay():
     os.kill(os.getpid(), signal.SIGTERM)
 
 
+@app.get("/login", response_class=HTMLResponse)
+def _login_page(error: str = ""):
+    return _auth_page(error)
+
+
+@app.post("/login")
+async def _login_post(request: Request, username: str = Form(...), password: str = Form(...)):
+    ip = request.client.host if request.client else "unknown"
+    now = _time.time()
+    attempts = [t for t in _AUTH_ATTEMPTS.get(ip, []) if now - t < _AUTH_WIN]
+    if len(attempts) >= _AUTH_MAX:
+        _AUTH_ATTEMPTS[ip] = attempts
+        return RedirectResponse("/login?error=2", status_code=302)
+    users = _auth_load()
+    h = users.get(username)
+    ok = False
+    if h:
+        try: ok = _bcrypt.checkpw(password.encode(), h.encode())
+        except Exception: pass
+    if ok:
+        _AUTH_ATTEMPTS.pop(ip, None)
+        token = _secrets.token_hex(32)
+        _AUTH_SESSIONS[token] = username
+        resp = RedirectResponse("/monitor", status_code=302)
+        resp.set_cookie("session", token, httponly=True, samesite="lax", max_age=86400)
+        return resp
+    attempts.append(now)
+    _AUTH_ATTEMPTS[ip] = attempts
+    return RedirectResponse("/login?error=1" if len(attempts) < _AUTH_MAX else "/login?error=2", status_code=302)
+
+
+@app.get("/logout")
+def _logout(session: Optional[str] = Cookie(default=None)):
+    _AUTH_SESSIONS.pop(session or "", None)
+    resp = RedirectResponse("/login", status_code=302)
+    resp.delete_cookie("session")
+    return resp
+
+
 @app.get("/monitor", response_class=HTMLResponse)
-async def monitor():
+async def monitor(session: Optional[str] = Cookie(default=None)):
+    if not _auth_ok(session):
+        return RedirectResponse("/login", status_code=302)
     return _render_monitor()
 
 
@@ -283,13 +399,52 @@ def _render_monitor():
         if not log_rows:
             log_rows = '<tr><td colspan="3" style="color:#444;padding:8px 14px;font-size:.78em">Sin logs capturados</td></tr>'
 
+        # ── Eval row ──────────────────────────────────────────
+        def _chip(val, good="correcto", bad="incorrecto"):
+            if val == good:   return f'<span style="background:#0d3b1f;color:#2ecc71;padding:1px 7px;border-radius:4px;font-size:.75em">{val}</span>'
+            if val == bad:    return f'<span style="background:#3b0d0d;color:#e74c3c;padding:1px 7px;border-radius:4px;font-size:.75em">{val}</span>'
+            if val == "—":    return f'<span style="color:#444">{val}</span>'
+            return f'<span style="background:#1a1a3e;color:#9b59b6;padding:1px 7px;border-radius:4px;font-size:.75em">{val}</span>'
+
+        eval_clasif_v  = s.get("eval_clasif", "—")
+        razon_clasif_v = s.get("razon_eval_clasif", "—")
+        eval_tipo_v    = s.get("eval_tipo", "—")
+        razon_tipo_v   = s.get("razon_eval_tipo", "—")
+        eval_bh_v      = s.get("eval_bot_humano", "—")
+        razon_bh_v     = s.get("razon_eval_bot_humano", "—")
+        efect_v        = s.get("efectividad", "—")
+
+        def _razon_html(v):
+            return (f'<span style="color:#888;font-size:.75em;margin-left:6px">{v}</span>'
+                    if v and v != "—" else "")
+
+        EFECT_COLOR = {
+            "resuelto":    "#2ecc71",
+            "no_resuelto": "#e74c3c",
+            "escalado":    "#e67e22",
+            "sin_accion":  "#555",
+        }
+        efect_color = EFECT_COLOR.get(efect_v, "#555")
+        efect_suffix = (f' <span style="color:{efect_color};font-size:.78em;margin-left:6px">· {efect_v}</span>'
+                        if efect_v and efect_v != "—" else "")
+
+        eval_row = f"""
+              <tr style="background:#0d0d20;border-top:1px solid #1a1a3a">
+                <td style="padding:5px 14px;font-size:.75em;color:#555">eval clasif:</td>
+                <td style="padding:5px 4px;font-size:.78em" colspan="3">{_chip(eval_clasif_v)}{_razon_html(razon_clasif_v)}</td>
+                <td style="padding:5px 14px;font-size:.75em;color:#555">eval tipo:</td>
+                <td style="padding:5px 4px;font-size:.78em" colspan="3">{_chip(eval_tipo_v)}{_razon_html(razon_tipo_v)}</td>
+                <td style="padding:5px 14px;font-size:.75em;color:#555">eval bot/h:</td>
+                <td style="padding:5px 4px;font-size:.78em" colspan="3">{_chip(eval_bh_v)}{_razon_html(razon_bh_v)}</td>
+              </tr>"""
+
         bloques += f"""
         <tr class="sm-head" onclick="toggle({i})" title="Clic para expandir">
           <td class="ts">{s["time"]}</td>
           <td class="sm-arrow" id="arr-{i}">▶</td>
           <td class="sm-from-h">{from_display}<br><span class="sm-mail">{s["from_email"]}</span></td>
           <td class="sm-subj-h">{subj}</td>
-          <td style="color:{rc};white-space:nowrap">{icon} {s["resultado"]}</td>
+          <td style="color:{rc};white-space:nowrap">{icon} {s["resultado"]}{efect_suffix}</td>
         </tr>
         <tr class="sm-detail" id="det-{i}" style="display:none">
           <td colspan="5" style="padding:0;background:#0d0d1f">
@@ -308,6 +463,7 @@ def _render_monitor():
                 <td style="padding:5px 14px;font-size:.75em;color:#555">Lead:</td>
                 <td style="padding:5px 4px;font-size:.78em;color:#9b59b6">{lead_val}</td>
               </tr>
+              {eval_row}
               {log_rows}
             </table>
           </td>

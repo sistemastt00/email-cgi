@@ -249,3 +249,189 @@ async def classify_tipo(
         model=model,
     )
     return result.get("tipo", "informacion")
+
+
+# ─── Evaluación de clasificaciones ───────────────────────────────────────────
+
+async def eval_tipo(
+    email_body: str,
+    tipo: str,
+    examples_tipo: list[dict],
+) -> tuple[str, str]:
+    """Evalúa si tipo (accion/informacion) fue clasificado correctamente.
+    El evaluador primero clasifica independientemente y luego compara con el original.
+    Devuelve: ('correcto'|'incorrecto', razon)
+    """
+    examples_text = json.dumps(examples_tipo, ensure_ascii=False)
+    prompt = (
+        "Eres un evaluador experto de clasificaciones de correo para Tu Trastero "
+        "(empresa de self-storage).\n\n"
+        "PASO 1 — Clasifica TÚ MISMO este correo:\n"
+        "- 'accion': el cliente solicita o requiere una gestión concreta de la empresa\n"
+        "- 'informacion': el cliente solo aporta información o el correo no requiere gestión\n\n"
+        f"--- EJEMPLOS DE REFERENCIA ---\n{examples_text}\n\n"
+        f"PASO 2 — Compara tu clasificación con la clasificación original: \"{tipo}\"\n"
+        "- Si coinciden → evaluacion: correcto\n"
+        "- Si difieren  → evaluacion: incorrecto + razón breve de la discrepancia (máx 1 frase)"
+    )
+    result = await extract_structured_data(
+        text=email_body, prompt=prompt,
+        parameters=[
+            {
+                "name": "tipo_evaluado", "type": "string",
+                "description": "Tu propia clasificación del correo: accion o informacion", "isRequired": True,
+            },
+            {
+                "name": "evaluacion", "type": "string",
+                "description": "correcto o incorrecto (comparando tipo_evaluado con la clasificación original)", "isRequired": True,
+            },
+            {
+                "name": "razon", "type": "string",
+                "description": "Razón breve de la discrepancia (solo si incorrecto, máx 1 frase)", "isRequired": False,
+            },
+        ],
+        model="gpt-4o-mini",
+    )
+    tipo_eval = result.get("tipo_evaluado", "").lower().strip()
+    razon     = result.get("razon", "").strip()
+    # Forzar consistencia: si el evaluador clasificó igual que el original → siempre correcto
+    if tipo_eval in ("accion", "informacion"):
+        val = "correcto" if tipo_eval == tipo else "incorrecto"
+    else:
+        val = result.get("evaluacion", "").lower().strip()
+        val = val if val in ("correcto", "incorrecto") else "correcto"
+    return (val, razon)
+
+
+async def eval_clasif(
+    email_body: str,
+    subject: str,
+    categoria: str,
+    definitions: list[dict],
+    examples_clasif: list[dict],
+) -> tuple[str, str]:
+    """Evalúa si la categoría fue clasificada correctamente.
+    El evaluador primero clasifica independientemente y luego compara con el original.
+    Devuelve: ('correcto'|'incorrecto', razon)
+    """
+    defs_text     = json.dumps(definitions,    ensure_ascii=False)
+    examples_text = json.dumps(examples_clasif, ensure_ascii=False)
+    prompt = (
+        "Eres un evaluador experto de clasificaciones de correo para Tu Trastero "
+        "(empresa de self-storage).\n\n"
+        "PASO 1 — Clasifica TÚ MISMO la categoría de este correo usando las definiciones y ejemplos:\n\n"
+        f"--- DEFINICIONES ---\n{defs_text}\n\n"
+        f"--- EJEMPLOS ---\n{examples_text}\n\n"
+        f"PASO 2 — Compara tu categoría con la clasificación original: \"{categoria}\"\n"
+        "- Si coinciden → evaluacion: correcto\n"
+        "- Si difieren  → evaluacion: incorrecto + razón breve de la discrepancia (máx 1 frase)"
+    )
+    result = await extract_structured_data(
+        text=subject + "\n" + email_body, prompt=prompt,
+        parameters=[
+            {
+                "name": "categoria_evaluada", "type": "string",
+                "description": "Tu propia clasificación de la categoría del correo", "isRequired": True,
+            },
+            {
+                "name": "evaluacion", "type": "string",
+                "description": "correcto o incorrecto (comparando categoria_evaluada con la clasificación original)", "isRequired": True,
+            },
+            {
+                "name": "razon", "type": "string",
+                "description": "Razón breve de la discrepancia (solo si incorrecto, máx 1 frase)", "isRequired": False,
+            },
+        ],
+        model="gpt-4o-mini",
+    )
+    cat_eval = result.get("categoria_evaluada", "").strip()
+    razon    = result.get("razon", "").strip()
+    # Forzar consistencia: si el evaluador clasificó igual que el original → siempre correcto
+    if cat_eval:
+        val = "correcto" if cat_eval.lower() == categoria.lower() else "incorrecto"
+    else:
+        val = result.get("evaluacion", "").lower().strip()
+        val = val if val in ("correcto", "incorrecto") else "correcto"
+    return (val, razon)
+
+
+async def eval_bot_humano(
+    email_body: str,
+    categoria: str,
+    bot_humano: str,
+    examples_bh: list[dict],
+) -> tuple[str, str]:
+    """Evalúa si la decisión bot/humano fue correcta.
+    El evaluador primero decide independientemente y luego compara con el original.
+    Devuelve: ('correcto'|'incorrecto', razon)
+    """
+    examples_text = json.dumps(examples_bh, ensure_ascii=False)
+    prompt = (
+        "Eres un evaluador experto de clasificaciones de correo para Tu Trastero "
+        "(empresa de self-storage).\n\n"
+        "PASO 1 — Decide TÚ MISMO si este correo (categoría: \"{categoria}\") debe ir a 'bot' o 'humano':\n"
+        "- 'bot': puede gestionarse automáticamente\n"
+        "- 'humano': requiere intervención de un agente humano\n\n"
+        f"--- EJEMPLOS DE REFERENCIA ---\n{{examples_text}}\n\n"
+        f"PASO 2 — Compara tu decisión con la decisión original: \"{bot_humano}\"\n"
+        "- Si coinciden → evaluacion: correcto\n"
+        "- Si difieren  → evaluacion: incorrecto + razón breve de la discrepancia (máx 1 frase)"
+    ).format(categoria=categoria, examples_text=examples_text, bot_humano=bot_humano)
+    result = await extract_structured_data(
+        text=email_body, prompt=prompt,
+        parameters=[
+            {
+                "name": "bh_evaluado", "type": "string",
+                "description": "Tu propia decisión: bot o humano", "isRequired": True,
+            },
+            {
+                "name": "evaluacion", "type": "string",
+                "description": "correcto o incorrecto (comparando bh_evaluado con la decisión original)", "isRequired": True,
+            },
+            {
+                "name": "razon", "type": "string",
+                "description": "Razón breve de la discrepancia (solo si incorrecto, máx 1 frase)", "isRequired": False,
+            },
+        ],
+        model="gpt-4o-mini",
+    )
+    bh_eval = result.get("bh_evaluado", "").lower().strip()
+    razon   = result.get("razon", "").strip()
+    # Forzar consistencia: si el evaluador decidió igual que el original → siempre correcto
+    if bh_eval in ("bot", "humano"):
+        val = "correcto" if bh_eval == bot_humano else "incorrecto"
+    else:
+        val = result.get("evaluacion", "").lower().strip()
+        val = val if val in ("correcto", "incorrecto") else "correcto"
+    return (val, razon)
+
+
+async def eval_efectividad(
+    email_body: str,
+    categoria: str,
+    plantilla_enviada: str,
+) -> str:
+    """Evalúa si la plantilla enviada fue adecuada para resolver la consulta.
+    Devuelve: 'resuelto' | 'no_resuelto'
+    """
+    prompt = (
+        "Eres un evaluador experto de respuestas automáticas para Tu Trastero "
+        "(empresa de self-storage).\n\n"
+        "Determina si la respuesta automática enviada fue adecuada para resolver "
+        "la consulta del cliente.\n\n"
+        f"Categoría identificada: \"{categoria}\"\n"
+        f"Respuesta/plantilla enviada: \"{plantilla_enviada}\"\n\n"
+        "Responde ÚNICAMENTE:\n"
+        "- resuelto: la respuesta era adecuada para la consulta\n"
+        "- no_resuelto: la respuesta no era adecuada o el cliente no obtendría lo que necesita"
+    )
+    result = await extract_structured_data(
+        text=email_body, prompt=prompt,
+        parameters=[{
+            "name": "efectividad", "type": "string",
+            "description": "resuelto o no_resuelto", "isRequired": True,
+        }],
+        model="gpt-4o-mini",
+    )
+    val = result.get("efectividad", "").lower().strip()
+    return val if val in ("resuelto", "no_resuelto") else "resuelto"

@@ -53,6 +53,9 @@ POLL_INTERVAL_BACKUP = 300   # segundos — ciclo de respaldo cuando Pub/Sub est
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_CHAT_ID   = os.getenv("TELEGRAM_CHAT_ID", "")
 
+# ─── Bitly — acortador de URLs ────────────────────────────────────────────────
+BITLY_TOKEN = os.getenv("BITLY_TOKEN", "")
+
 # ─── Filtro de remitentes — correos que nunca se procesan ─────────────────────
 EMAIL_BLACKLIST_CONTAINS = [
     "@telefacil.com",

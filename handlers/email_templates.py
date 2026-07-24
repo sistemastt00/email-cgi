@@ -1,5 +1,8 @@
 """handlers/email_templates.py — Blueprint-exact branded email HTML builder."""
+import json
+import os
 import re
+import urllib.request
 from pathlib import Path
 
 _CDN  = "https://holcqv.stripocdn.email/content/guids/"
@@ -27,6 +30,27 @@ _LOGO        = _C919 + "tutrasterologocabeceraemail_Xa3.jpg"
 _P  = 'style="Margin:0;mso-line-height-rule:exactly;font-family:arial,\'helvetica neue\',helvetica,sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px;text-align:justify"'
 _PL = 'style="Margin:0;mso-line-height-rule:exactly;font-family:arial,\'helvetica neue\',helvetica,sans-serif;line-height:21px;letter-spacing:0;color:#333333;font-size:14px"'
 _PT = 'style="Margin:0;mso-line-height-rule:exactly;font-family:arial,\'helvetica neue\',helvetica,sans-serif;line-height:27px;letter-spacing:0;color:#333333;font-size:14px"'
+
+
+def shorten_url(url: str) -> str:
+    """Acorta una URL via Bitly. Si falla, devuelve la URL original."""
+    token = os.getenv("BITLY_TOKEN", "")
+    if not token:
+        return url
+    try:
+        data = json.dumps({"long_url": url}).encode()
+        req = urllib.request.Request(
+            "https://api-ssl.bitly.com/v4/shorten",
+            data=data,
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Content-Type": "application/json",
+            },
+        )
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            return json.loads(resp.read())["link"]
+    except Exception:
+        return url
 
 
 def dark_btn(url: str, text: str) -> str:
@@ -408,6 +432,8 @@ def _load_template(filename: str, **kwargs) -> tuple:
     cta_m = re.search(r'<!--\s*cta-(dark|light):\s*(.+?)\s*\|\s*(.+?)\s*-->', content)
     if cta_m:
         style, url, text = cta_m.group(1), cta_m.group(2).strip(), cta_m.group(3).strip()
+        if "BOTON_EMAIL" in url:
+            url = shorten_url(url)
         cta = dark_btn(url, text) if style == "dark" else light_btn(url, text)
     else:
         cta = ""
@@ -462,9 +488,36 @@ def mudanza_email(nombre: str) -> str:
                    nombre=nombre or "cliente")
 
 
+def mudanza_sofia_email(nombre: str, email: str) -> str:
+    return _render("mudanza_sofia.html", "CGI Mudanza - tutrastero", BANNER_MUDANZA_IMG,
+                   nombre=nombre or "cliente", email=email)
+
+
 def materiales_email(nombre: str) -> str:
     return _render("materiales.html", "CGI Materiales Embalaje - tutrastero", BANNER_MUDANZA_IMG,
                    nombre=nombre or "cliente")
+
+
+def materiales_sofia_email(nombre: str, email: str) -> str:
+    return _render("materiales_sofia.html", "CGI Materiales Embalaje - tutrastero", BANNER_MUDANZA_IMG,
+                   nombre=nombre or "cliente", email=email)
+
+
+def otros_sofia_email(nombre: str, email: str) -> str:
+    return _render("otros_sofia.html", "CGI Otros - tutrastero", BANNER_AREA_CLI,
+                   nombre=nombre or "cliente", email=email)
+
+
+def visita_sofia_email(nombre: str, email: str, categoria: str) -> str:
+    accion  = "cancelar" if "cancelar" in categoria.lower() else "modificar"
+    motivo  = categoria.lower()
+    return _render("visita_sofia.html", "CGI Visita - tutrastero", BANNER_AGENDAR,
+                   nombre=nombre or "cliente", email=email, accion=accion, motivo=motivo)
+
+
+def aviso_salida_sofia_email(nombre: str, email: str) -> str:
+    return _render("aviso_salida_sofia.html", "CGI Aviso Salida - tutrastero", BANNER_AREA_CLI,
+                   nombre=nombre or "cliente", email=email)
 
 
 def moroso_email(nombre: str) -> str:

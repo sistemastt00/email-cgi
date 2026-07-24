@@ -338,6 +338,17 @@ async def monitor(session: Optional[str] = Cookie(default=None)):
     return _render_monitor()
 
 
+@app.post("/eval-retroactive")
+async def eval_retroactive(
+    background_tasks: BackgroundTasks,
+    session: Optional[str] = Cookie(default=None),
+):
+    if not _auth_ok(session):
+        return JSONResponse({"error": "unauthorized"}, status_code=401)
+    background_tasks.add_task(clasificacion.run_retroactive_eval, 50)
+    return JSONResponse({"status": "started", "message": "Evaluando hasta 50 registros en background"})
+
+
 def _render_monitor():
     handlers_list = "".join(f"<code>{h}</code>" for h in _HANDLERS)
 
@@ -519,6 +530,7 @@ def _render_monitor():
       <button class="btn btn-tab active" id="tab-sum" onclick="collapseAll()">⊟ Summary</button>
       <button class="btn btn-pause"  id="btn-pausar"  onclick="pauseRefresh()">⏸ Pausar</button>
       <button class="btn btn-resume" id="btn-retomar" onclick="resumeRefresh()" disabled>▶ Retomar</button>
+      <button class="btn" id="btn-retro" onclick="runRetroEval()" style="background:#1a4a6b;color:#7ec8e3;border:1px solid #2a6a9b">⚡ Eval retroactiva</button>
       <span id="ticker">5 s</span>
     </div>
   </div>
@@ -568,6 +580,16 @@ def _render_monitor():
       document.getElementById('btn-pausar').disabled = false;
       document.getElementById('btn-retomar').disabled = true;
       startTimers();
+    }}
+    async function runRetroEval() {{
+      const btn = document.getElementById('btn-retro');
+      btn.disabled = true; btn.textContent = '⏳ Evaluando...';
+      try {{
+        const r = await fetch('/eval-retroactive', {{method: 'POST'}});
+        const d = await r.json();
+        btn.textContent = d.error ? '❌ Error' : '✅ Iniciada';
+      }} catch(e) {{ btn.textContent = '❌ Error'; }}
+      setTimeout(() => {{ btn.disabled = false; btn.textContent = '⚡ Eval retroactiva'; }}, 4000);
     }}
     startTimers();
   </script>

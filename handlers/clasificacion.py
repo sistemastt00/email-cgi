@@ -856,6 +856,103 @@ async def _evaluar_pipeline(
         logger.warning(f"[eval] Error en evaluación pipeline: {exc}")
 
 
+async def run_retroactive_eval(limit: int = 50) -> dict:
+    """Evalúa registros de Clasificación que no tienen eval_clasif."""
+    # 1. Cargar ejemplos una sola vez
+    definitions = [r["fields"] for r in await airtable.search_records(
+        config.AT_TBL_DEFINICIONES, formula="", max_records=50,
+        fields=["Categoria", "Descripcion", "Enlace", "categoria_api"],
+    )]
+    examples_clasif = [r["fields"] for r in await airtable.search_records(
+        config.AT_TBL_EJEMPLOS_CLASIF, formula="", max_records=50,
+        fields=["Ejemplos", "Categoria Asignada"],
+    )]
+    examples_tipo = [r["fields"] for r in await airtable.search_records(
+        config.AT_TBL_EJEMPLOS_TIPO, formula="", max_records=50,
+        fields=["Fragmento de Correo", "Tipo de correo"],
+    )]
+    examples_bh = [r["fields"] for r in await airtable.search_records(
+        config.AT_TBL_EJEMPLOS_BOT_HUMANO, formula="", max_records=50,
+        fields=["Fragmento de Correo", "Bot o Humano"],
+    )]
+
+    # 2. Buscar registros sin eval_clasif
+    records = await airtable.search_records(
+        config.AT_TBL_CLASIFICACION,
+        formula='AND({eval_clasif}="", {thread_id}!="")',
+        max_records=limit,
+    )
+
+    processed = 0
+    skipped   = 0
+    for rec in records:
+        rec_id = rec["id"]
+        fields = rec.get("fields", {})
+        thread_id  = fields.get("thread_id", "") or fields.get("fldpuawV9XMHjYpSp", "")
+        tipo       = fields.get("tipo", "")        or fields.get("fldjXk8GniT6hO6oa", "")
+        categoria  = fields.get("categoria_api", "") or fields.get("fldX2vzDBKwrXmiGQ", "")
+        bot_humano_v = fields.get("bot_humano", "") or "bot"
+
+        if not thread_id or not tipo:
+            skipped += 1
+            continue
+
+        # 3. Cuerpo del email desde Gmail
+        try:
+            subject_r, email_body = await gmail.get_thread_body(thread_id)
+        except Exception as exc:
+            logger.warning(f"[retro-eval] No se pudo obtener thread {thread_id}: {exc}")
+            skipped += 1
+            continue
+
+        if not email_body:
+            skipped += 1
+            continue
+
+        # 4. Evaluar
+        try:
+            eval_clasif_val, razon_eval_clasif     = "—", "—"
+            eval_tipo_val,   razon_eval_tipo        = "—", "—"
+            eval_bh_val,     razon_eval_bot_humano  = "—", "—"
+
+            if tipo == "accion":
+                (eval_clasif_val, razon_eval_clasif), \
+                (eval_bh_val, razon_eval_bot_humano), \
+                (eval_tipo_val, razon_eval_tipo) = await asyncio.gather(
+                    openai_svc.eval_clasif(email_body, subject_r, categoria, definitions, examples_clasif),
+                    openai_svc.eval_bot_humano(email_body, categoria, bot_humano_v, examples_bh),
+                    openai_svc.eval_tipo(email_body, tipo, examples_tipo),
+                )
+                if bot_humano_v == "humano":
+                    efectividad_val = "escalado"
+                else:
+                    efectividad_val = "no_resuelto"
+            else:
+                (eval_clasif_val, razon_eval_clasif), \
+                (eval_tipo_val, razon_eval_tipo) = await asyncio.gather(
+                    openai_svc.eval_clasif(email_body, subject_r, categoria, definitions, examples_clasif),
+                    openai_svc.eval_tipo(email_body, tipo, examples_tipo),
+                )
+                efectividad_val = "sin_accion"
+
+            await airtable.update_record(config.AT_TBL_CLASIFICACION, rec_id, {
+                "eval_clasif":           eval_clasif_val,
+                "razon_eval_clasif":     razon_eval_clasif,
+                "eval_tipo":             eval_tipo_val,
+                "razon_eval_tipo":       razon_eval_tipo,
+                "eval_bot_humano":       eval_bh_val,
+                "razon_eval_bot_humano": razon_eval_bot_humano,
+                "efectividad":           efectividad_val,
+            })
+            logger.info(f"[retro-eval] {rec_id} | {eval_clasif_val}/{eval_tipo_val}/{eval_bh_val}/{efectividad_val}")
+            processed += 1
+        except Exception as exc:
+            logger.warning(f"[retro-eval] Error evaluando {rec_id}: {exc}")
+            skipped += 1
+
+    return {"processed": processed, "skipped": skipped, "total": len(records)}
+
+
 async def process_new_emails():
     """Lee emails nuevos no leídos y los procesa uno a uno."""
     if _lock.locked():

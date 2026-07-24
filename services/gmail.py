@@ -245,6 +245,26 @@ async def send_email(
     return await asyncio.to_thread(_send_email_sync, to, subject, body, body_type, attachments, bcc, thread_id)
 
 
+def _get_thread_body_sync(thread_id: str) -> tuple[str, str]:
+    """Devuelve (subject, body) del primer mensaje en un thread."""
+    svc = _build_service()
+    thread = svc.users().threads().get(userId="me", id=thread_id, format="full").execute()
+    messages = thread.get("messages", [])
+    if not messages:
+        return ("", "")
+    msg = messages[0]
+    headers = {h["name"]: h["value"] for h in msg.get("payload", {}).get("headers", [])}
+    subject = headers.get("Subject", "")
+    payload = msg.get("payload", {})
+    body = _extract_body(payload, "text/plain") or _extract_body(payload, "text/html") or ""
+    return (subject, body)
+
+
+async def get_thread_body(thread_id: str) -> tuple[str, str]:
+    """Devuelve (subject, body) del primer mensaje en un thread."""
+    return await asyncio.to_thread(_get_thread_body_sync, thread_id)
+
+
 async def mark_processed(message_id: str):
     """Añade la etiqueta CGI-Procesado (el email queda como no leído en el inbox)."""
     await asyncio.to_thread(_mark_processed_sync, message_id)

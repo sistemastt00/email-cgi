@@ -52,7 +52,7 @@ async def run(args: dict) -> dict:
         await gmail.send_email(
             to=[from_email], subject=ticket_subj,
             body=email_templates.cambio_trastero_email(nombre, ticket_id),
-            body_type="html", bcc=_BCC,
+            body_type="html", bcc=_BCC, thread_id=thread_id,
         )
 
         if ticket_id:
@@ -131,6 +131,7 @@ async def run(args: dict) -> dict:
         body=builder(nombre),
         body_type="html",
         bcc=_BCC,
+        thread_id=thread_id,
     )
     logger.info(f"[1.4] Email CTA enviado | to={from_email} | categoria={categoria!r}")
 

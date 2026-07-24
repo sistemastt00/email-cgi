@@ -14,13 +14,40 @@ Ciclo completo por cada email nuevo:
 import asyncio
 import collections
 import datetime
+import json
 import logging
+from pathlib import Path
 import config
 from services import gmail, airtable, bitrix, openai_svc, telegram
 from handlers import correo_clasif, extraccion_1er, extraccion_cadena, bot_humano, respuesta_general, email_templates
 
 _lock = asyncio.Lock()
 summaries: collections.deque = collections.deque(maxlen=100)
+
+_PERSIST_DIR  = Path(__file__).parent.parent / "data"
+_PERSIST_FILE = _PERSIST_DIR / "summaries.json"
+
+
+def _load_summaries() -> None:
+    if not _PERSIST_FILE.exists():
+        return
+    try:
+        data = json.loads(_PERSIST_FILE.read_text(encoding="utf-8"))
+        for entry in data:
+            summaries.append(entry)
+    except Exception as exc:
+        logger.warning(f"[persist] No se pudo cargar summaries: {exc}")
+
+
+def _save_summaries() -> None:
+    try:
+        _PERSIST_DIR.mkdir(parents=True, exist_ok=True)
+        _PERSIST_FILE.write_text(
+            json.dumps(list(summaries), ensure_ascii=False),
+            encoding="utf-8",
+        )
+    except Exception as exc:
+        logger.warning(f"[persist] No se pudo guardar summaries: {exc}")
 
 logger = logging.getLogger("email-cgi")
 
@@ -39,6 +66,8 @@ _capture_handler.setFormatter(logging.Formatter("%(message)s"))
 
 _BCC = ["iacgi@tutrastero.com", "sistemas@tutrastero.com"]
 
+_load_summaries()
+
 _AREA_GENERAL_CATS = {
     "agendar_visita", "reservar", "presupuesto", "autorizar_terceros",
     "incidencia", "actualizar_datos", "inventario", "valoración",
@@ -53,6 +82,7 @@ _AREA_CLIENTE_CATS = {
 _OTROS_SERVICIOS_CATS = {
     "mudanza", "materiales_embalaje", "otros", "resena_google",
     "moroso", "desestima_oferta", "foto_salida",
+    "modificar_visita", "cancelar_visita",
 }
 
 
@@ -98,7 +128,73 @@ async def _process_email_inner(msg_stub: dict):
             "error":      False,
             "logs":       list(_flow_logs),
         })
+        _save_summaries()
         return
+
+    # 1b. Reenvío especial: soporte@trasterone.com → Jaison (sale del pipeline)
+    if from_email.lower() == "soporte@trasterone.com":
+        fwd_body      = email.get("htmlBody") or email.get("fullTextBody") or subject
+        fwd_body_type = "html" if email.get("htmlBody") else "plain"
+        header = (
+            f"<p style='font-family:arial;font-size:13px;color:#555'>"
+            f"<b>De:</b> {email.get('fromName','')} &lt;{from_email}&gt;<br>"
+            f"<b>Asunto:</b> {subject}"
+            f"</p><hr>"
+        ) if fwd_body_type == "html" else f"De: {from_email}\nAsunto: {subject}\n\n"
+        await gmail.send_email(
+            to=["jaison.veliz@tutrastero.com"],
+            subject=f"Fwd: [{from_email}] {subject}",
+            body=header + fwd_body,
+            body_type=fwd_body_type,
+        )
+        await gmail.mark_processed(message_id)
+        logger.info(f"[1] Reenviado a Jaison (trasterone) | from={from_email}")
+        summaries.appendleft({
+            "time":       datetime.datetime.now().strftime("%d/%m %H:%M:%S"),
+            "from_email": from_email,
+            "from_name":  email.get("fromName", ""),
+            "subject":    subject,
+            "hilo":       "nuevo",
+            "categoria":  "—",
+            "tipo":       "—",
+            "bot_humano": "—",
+            "ticket_id":  "—",
+            "nombre":     "—",
+            "resultado":  "Reenviado a Jaison (trasterone)",
+            "error":      False,
+            "logs":       list(_flow_logs),
+        })
+        _save_summaries()
+        return
+
+    # 1c. Reenvío especial: @idealista.com con mensaje de nuevos mensajes → Jaison + Fanny
+    _is_idealista = "@idealista.com" in from_email.lower()
+    if _is_idealista:
+        fwd_body = email.get("htmlBody") or email.get("fullTextBody") or subject
+        fwd_body_type = "html" if email.get("htmlBody") else "plain"
+        header = (
+            f"<p style='font-family:arial;font-size:13px;color:#555'>"
+            f"<b>De:</b> {email.get('fromName','')} &lt;{from_email}&gt;<br>"
+            f"<b>Asunto:</b> {subject}"
+            f"</p><hr>"
+        ) if fwd_body_type == "html" else f"De: {from_email}\nAsunto: {subject}\n\n"
+        _IDEALISTA_MSG = "tienes nuevos mensajes que esperan tu respuesta"
+        if _IDEALISTA_MSG in (subject + " " + body).lower():
+            await gmail.send_email(
+                to=["jaison.veliz@tutrastero.com", "fanny.trejo@tutrastero.com"],
+                subject=f"Fwd: [{from_email}] {subject}",
+                body=header + fwd_body,
+                body_type=fwd_body_type,
+            )
+            logger.info(f"[1] Reenviado a Jaison+Fanny (idealista nuevos mensajes) | from={from_email}")
+        else:
+            await gmail.send_email(
+                to=["carlos.gutierrez@tutrastero.com"],
+                subject=f"Fwd: [{from_email}] {subject}",
+                body=header + fwd_body,
+                body_type=fwd_body_type,
+            )
+            logger.info(f"[1] Reenviado a Carlos (idealista) | from={from_email}")
 
     logger.info(f"[1] Procesando | from={from_email} | subject={subject!r}")
 
@@ -112,51 +208,63 @@ async def _process_email_inner(msg_stub: dict):
     is_new_thread   = len(existing) == 0
     existing_fields = existing[0]["fields"] if existing else {}
 
-    # 3. GPT: bot_humano
-    examples_bh = [
-        r["fields"] for r in await airtable.search_records(
-            config.AT_TBL_EJEMPLOS_BOT_HUMANO, formula="", max_records=50,
-            fields=["Fragmento de Correo", "Bot o Humano"],
+    # 3 & 4. Clasificación: fija para @idealista.com, GPT para el resto
+    if _is_idealista:
+        examples_bh     = []
+        examples_clasif = []
+        examples_tipo   = []
+        definitions     = []
+        bot_humano_result = "humano"
+        categoria         = "Otros"
+        categoria_api     = "otros"
+        tipo              = "informacion"
+        logger.info(f"[1] Idealista → clasificación fija: otros / informacion / humano")
+    else:
+        # GPT: bot_humano
+        examples_bh = [
+            r["fields"] for r in await airtable.search_records(
+                config.AT_TBL_EJEMPLOS_BOT_HUMANO, formula="", max_records=50,
+                fields=["Fragmento de Correo", "Bot o Humano"],
+            )
+        ]
+        bot_humano_result = await openai_svc.classify_bot_humano(
+            email_body=body,
+            examples=examples_bh,
         )
-    ]
-    bot_humano_result = await openai_svc.classify_bot_humano(
-        email_body=body,
-        examples=examples_bh,
-    )
-    logger.info(f"[1] bot_humano={bot_humano_result}")
+        logger.info(f"[1] bot_humano={bot_humano_result}")
 
-    # 4. GPT: categoria + tipo
-    definitions = [
-        r["fields"] for r in await airtable.search_records(
-            config.AT_TBL_DEFINICIONES, formula="", max_records=50,
-            fields=["Categoria", "Descripcion", "Enlace", "categoria_api"],
+        # GPT: categoria + tipo
+        definitions = [
+            r["fields"] for r in await airtable.search_records(
+                config.AT_TBL_DEFINICIONES, formula="", max_records=50,
+                fields=["Categoria", "Descripcion", "Enlace", "categoria_api"],
+            )
+        ]
+        examples_clasif = [
+            r["fields"] for r in await airtable.search_records(
+                config.AT_TBL_EJEMPLOS_CLASIF, formula="", max_records=50,
+                fields=["Ejemplos", "Categoria Asignada"],
+            )
+        ]
+        cat_result = await openai_svc.classify_categoria(
+            subject=subject, email_body=body,
+            definitions=definitions, examples_clasif=examples_clasif,
         )
-    ]
-    examples_clasif = [
-        r["fields"] for r in await airtable.search_records(
-            config.AT_TBL_EJEMPLOS_CLASIF, formula="", max_records=50,
-            fields=["Ejemplos", "Categoria Asignada"],
-        )
-    ]
-    cat_result = await openai_svc.classify_categoria(
-        subject=subject, email_body=body,
-        definitions=definitions, examples_clasif=examples_clasif,
-    )
-    categoria     = cat_result.get("categoria", "")
-    categoria_api = cat_result.get("categoria_api", "")
-    logger.info(f"[1] categoria={categoria} | categoria_api={categoria_api}")
+        categoria     = cat_result.get("categoria", "")
+        categoria_api = cat_result.get("categoria_api", "")
+        logger.info(f"[1] categoria={categoria} | categoria_api={categoria_api}")
 
-    examples_tipo = [
-        r["fields"] for r in await airtable.search_records(
-            config.AT_TBL_EJEMPLOS_TIPO, formula="", max_records=50,
-            fields=["Fragmento de Correo", "Tipo de correo"],
+        examples_tipo = [
+            r["fields"] for r in await airtable.search_records(
+                config.AT_TBL_EJEMPLOS_TIPO, formula="", max_records=50,
+                fields=["Fragmento de Correo", "Tipo de correo"],
+            )
+        ]
+        tipo = await openai_svc.classify_tipo(
+            subject=subject, email_body=body, from_email=from_email,
+            categoria=categoria, examples_clasif=examples_clasif, examples_tipo=examples_tipo,
         )
-    ]
-    tipo = await openai_svc.classify_tipo(
-        subject=subject, email_body=body, from_email=from_email,
-        categoria=categoria, examples_clasif=examples_clasif, examples_tipo=examples_tipo,
-    )
-    logger.info(f"[1] tipo={tipo}")
+        logger.info(f"[1] tipo={tipo}")
 
     # 5. Crear registro en Clasificación
     clasif_record = await airtable.create_record(
@@ -188,6 +296,8 @@ async def _process_email_inner(msg_stub: dict):
 
     # 7. Secuencia principal: solo si es hilo nuevo
     extrac_result = {}
+    is_req = False
+    cliente = False
     if is_new_thread:
         # 1.1 primero (devuelve ticket_id, nombre, Cliente)
         try:
@@ -245,6 +355,7 @@ async def _process_email_inner(msg_stub: dict):
                     await _send_area_cliente_email(
                         message_id=message_id, nombre=nombre, ticket_id=ticket_id,
                         clasif_id=clasif_record_id, categoria=categoria,
+                        thread_id=thread_id,
                     )
                     logger.info(f"[1] area_cliente email enviado | categoria={categoria}")
                 except Exception as exc:
@@ -259,9 +370,10 @@ async def _process_email_inner(msg_stub: dict):
                     categoria=categoria, categoria_api=categoria_api,
                     from_email=from_email, subject=subject,
                     nombre=nombre, ticket_id=ticket_id,
-                    clasif_id=clasif_record_id, message_id=message_id,
+                    clasif_id=clasif_record_id,
                     apellido=extrac_result.get("apellido", ""),
                     telefono=extrac_result.get("telefono", ""),
+                    thread_id=thread_id,
                 )
                 logger.info(f"[1] otros_servicios ok | categoria={categoria}")
             except Exception as exc:
@@ -319,36 +431,79 @@ async def _process_email_inner(msg_stub: dict):
     else:
         resultado = "Clasificado + correo clasificación enviado"
 
-    summaries.appendleft({
-        "time":       datetime.datetime.now().strftime("%d/%m %H:%M:%S"),
-        "from_email": from_email,
-        "from_name":  email.get("fromName", ""),
-        "subject":    subject,
-        "hilo":       "nuevo" if is_new_thread else "cadena",
-        "categoria":  categoria,
-        "tipo":       tipo,
-        "bot_humano": bot_humano_result,
-        "ticket_id":  _ticket_id,
-        "nombre":     _nombre,
-        "resultado":  resultado,
-        "error":      False,
-        "logs":       list(_flow_logs),
-    })
+    summary_entry = {
+        "time":            datetime.datetime.now().strftime("%d/%m %H:%M:%S"),
+        "from_email":      from_email,
+        "from_name":       email.get("fromName", ""),
+        "subject":         subject,
+        "hilo":            "nuevo" if is_new_thread else "cadena",
+        "categoria":       categoria,
+        "tipo":            tipo,
+        "bot_humano":      bot_humano_result,
+        "ticket_id":       _ticket_id,
+        "nombre":          _nombre,
+        "resultado":       resultado,
+        "error":           False,
+        "logs":            list(_flow_logs),
+        "eval_clasif":           "—",
+        "razon_eval_clasif":     "—",
+        "eval_tipo":             "—",
+        "razon_eval_tipo":       "—",
+        "eval_bot_humano":       "—",
+        "razon_eval_bot_humano": "—",
+        "efectividad":           "—",
+    }
+    summaries.appendleft(summary_entry)
+    _save_summaries()
+
+    # ── Evaluación pipeline (background) ─────────────────────────────────────
+    plantilla_enviada = _get_plantilla_enviada(categoria, bot_humano_result, is_req, cliente)
+    asyncio.create_task(_evaluar_pipeline(
+        clasif_id        = clasif_record_id,
+        email_body       = body,
+        subject          = subject,
+        tipo             = tipo,
+        bot_humano       = bot_humano_result,
+        categoria        = categoria,
+        plantilla_enviada= plantilla_enviada,
+        is_req           = is_req,
+        examples_tipo    = examples_tipo,
+        examples_bh      = examples_bh,
+        definitions      = definitions,
+        examples_clasif  = examples_clasif,
+        summary_entry    = summary_entry,
+    ))
 
 
 async def _send_area_cliente_email(
     message_id: str, nombre: str, ticket_id: str, clasif_id: str, categoria: str,
+    thread_id: str = "",
 ):
     email      = await gmail.get_email(message_id)
     from_email = email.get("fromEmail", "")
     subj       = email.get("subject", "")
 
+    if categoria == "aviso_salida":
+        body         = email_templates.aviso_salida_sofia_email(nombre, from_email)
+        timeline_msg = (
+            f"Respuesta automática EXITOSA.\n"
+            f"A la solicitud de {categoria} se derivó al cliente al chat Sofía."
+        )
+    else:
+        body         = email_templates.area_cliente_email(nombre)
+        timeline_msg = (
+            f"Respuesta automática EXITOSA.\n"
+            f"A la solicitud de {categoria} se generó la siguiente RESPUESTA AUTOMÁTICA: "
+            f"Enlace a {categoria} de la web Tu Trastero."
+        )
+
     await gmail.send_email(
         to=[from_email],
         subject=subj,
-        body=email_templates.area_cliente_email(nombre),
+        body=body,
         body_type="html",
         bcc=_BCC,
+        thread_id=thread_id,
     )
 
     if ticket_id:
@@ -357,12 +512,7 @@ async def _send_area_cliente_email(
             "title":        f"CGI - Respuesta EXITOSA: {categoria}",
             "stageId":      "DT1034_120:SUCCESS",
         })
-        await bitrix.add_timeline_comment(
-            "dynamic_1034", ticket_id,
-            f"Respuesta automática EXITOSA.\n"
-            f"A la solicitud de {categoria} se generó la siguiente RESPUESTA AUTOMÁTICA: "
-            f"Enlace a {categoria} de la web Tu Trastero.",
-        )
+        await bitrix.add_timeline_comment("dynamic_1034", ticket_id, timeline_msg)
 
     if clasif_id:
         await airtable.update_record(
@@ -377,8 +527,8 @@ async def _send_area_cliente_email(
 
 async def _send_otros_servicios_email(
     categoria: str, categoria_api: str, from_email: str, subject: str,
-    nombre: str, ticket_id: str, clasif_id: str, message_id: str,
-    apellido: str = "", telefono: str = "",
+    nombre: str, ticket_id: str, clasif_id: str,
+    apellido: str = "", telefono: str = "", thread_id: str = "",
 ):
     cat  = categoria.lower()
     capi = categoria_api.lower()
@@ -386,8 +536,8 @@ async def _send_otros_servicios_email(
     if "mudanza" in cat or capi == "mudanza":
         await gmail.send_email(
             to=[from_email], subject=subject,
-            body=email_templates.mudanza_email(nombre),
-            body_type="html", bcc=_BCC,
+            body=email_templates.mudanza_sofia_email(nombre, from_email),
+            body_type="html", bcc=_BCC, thread_id=thread_id,
         )
         if ticket_id:
             await bitrix.update_crm_item(1034, ticket_id, {
@@ -398,20 +548,19 @@ async def _send_otros_servicios_email(
             await bitrix.add_timeline_comment(
                 "dynamic_1034", ticket_id,
                 f"Respuesta automática EXITOSA.\n"
-                f"A la solicitud de {categoria} se generó la siguiente RESPUESTA AUTOMÁTICA: "
-                f"Enlace a {categoria} de la web Tu Trastero.",
+                f"A la solicitud de {categoria} se derivó al cliente al chat Sofía.",
             )
         if clasif_id:
             await airtable.update_record(config.AT_TBL_CLASIFICACION, clasif_id, {
-                "fldXQvHFuiY9ebvYa": "Se deriva con gestor",
-                "fldquQJeU5QJmNfBa": "humano",
+                "fldgj898WCeUM3QqV": "Enlace a web",
+                "fldquQJeU5QJmNfBa": "bot",
             })
 
     elif "materiales" in cat or capi == "tu_caja":
         await gmail.send_email(
             to=[from_email], subject=subject,
-            body=email_templates.materiales_email(nombre),
-            body_type="html", bcc=_BCC,
+            body=email_templates.materiales_sofia_email(nombre, from_email),
+            body_type="html", bcc=_BCC, thread_id=thread_id,
         )
         if ticket_id:
             await bitrix.update_crm_item(1034, ticket_id, {
@@ -422,8 +571,7 @@ async def _send_otros_servicios_email(
             await bitrix.add_timeline_comment(
                 "dynamic_1034", ticket_id,
                 f"CGI - Respuesta EXITOSA: Tu Caja.\n"
-                f"A la solicitud de {categoria} se generó la siguiente RESPUESTA AUTOMÁTICA: "
-                f"Enlace a {categoria} de la web Tu Caja.",
+                f"A la solicitud de {categoria} se derivó al cliente al chat Sofía.",
             )
         if clasif_id:
             await airtable.update_record(config.AT_TBL_CLASIFICACION, clasif_id, {
@@ -432,16 +580,26 @@ async def _send_otros_servicios_email(
             })
 
     elif cat == "otros" or capi == "otros":
-        ticket_subj = f"Número de Ticket # {ticket_id} - {subject}"
         await gmail.send_email(
-            to=[from_email], subject=ticket_subj,
-            body=email_templates.otros_ticket_email(nombre, ticket_id),
-            body_type="html", bcc=_BCC,
+            to=[from_email], subject=subject,
+            body=email_templates.otros_sofia_email(nombre, from_email),
+            body_type="html", bcc=_BCC, thread_id=thread_id,
         )
+        if ticket_id:
+            await bitrix.update_crm_item(1034, ticket_id, {
+                "assignedById": "6358",
+                "title":        "CGI - Respuesta EXITOSA: Otros",
+                "stageId":      "DT1034_120:SUCCESS",
+            })
+            await bitrix.add_timeline_comment(
+                "dynamic_1034", ticket_id,
+                f"Respuesta automática EXITOSA.\n"
+                f"A la solicitud de {categoria} se derivó al cliente al chat Sofía.",
+            )
         if clasif_id:
             await airtable.update_record(config.AT_TBL_CLASIFICACION, clasif_id, {
-                "fldXQvHFuiY9ebvYa": "Se deriva con gestor",
-                "fldquQJeU5QJmNfBa": "humano",
+                "fldgj898WCeUM3QqV": "Enlace a web",
+                "fldquQJeU5QJmNfBa": "bot",
             })
 
     elif "reseña" in cat or "resena" in capi or "google" in cat:
@@ -451,7 +609,7 @@ async def _send_otros_servicios_email(
         await gmail.send_email(
             to=[from_email], subject=ticket_subj,
             body=email_templates.resena_ticket_email(nombre, ticket_id),
-            body_type="html", bcc=_BCC,
+            body_type="html", bcc=_BCC, thread_id=thread_id,
         )
         if ticket_id:
             if contact_found:
@@ -477,7 +635,7 @@ async def _send_otros_servicios_email(
             to=[from_email],
             subject="Aviso importante sobre el estado de su servicio",
             body=email_templates.moroso_email(nombre),
-            body_type="html", bcc=_BCC,
+            body_type="html", bcc=_BCC, thread_id=thread_id,
         )
         if ticket_id:
             await bitrix.update_crm_item(1034, ticket_id, {
@@ -500,7 +658,7 @@ async def _send_otros_servicios_email(
             to=[from_email],
             subject="Agradecemos su interés y estaremos cuando nos necesite",
             body=email_templates.desestima_email(nombre),
-            body_type="html", bcc=_BCC,
+            body_type="html", bcc=_BCC, thread_id=thread_id,
         )
         if ticket_id:
             await bitrix.update_crm_item(1034, ticket_id, {
@@ -524,7 +682,7 @@ async def _send_otros_servicios_email(
             to=[from_email],
             subject=f"Número de Ticket #{ticket_id}",
             body=email_templates.foto_salida_ticket_email(nombre, ticket_id),
-            body_type="html", bcc=_BCC,
+            body_type="html", bcc=_BCC, thread_id=thread_id,
         )
         if ticket_id:
             if foto_contact_found:
@@ -552,7 +710,150 @@ async def _send_otros_servicios_email(
                 "fldquQJeU5QJmNfBa": "humano",
             })
 
+    elif "modificar_visita" in cat or "cancelar_visita" in cat or capi in ("modificar_visita", "cancelar_visita"):
+        await gmail.send_email(
+            to=[from_email], subject=subject,
+            body=email_templates.visita_sofia_email(nombre, from_email, categoria),
+            body_type="html", bcc=_BCC, thread_id=thread_id,
+        )
+        if ticket_id:
+            await bitrix.update_crm_item(1034, ticket_id, {
+                "assignedById": "6358",
+                "title":        f"CGI - Respuesta EXITOSA: {categoria}",
+                "stageId":      "DT1034_120:SUCCESS",
+            })
+            await bitrix.add_timeline_comment(
+                "dynamic_1034", ticket_id,
+                f"Respuesta automática EXITOSA.\n"
+                f"A la solicitud de {categoria} se derivó al cliente al chat Sofía.",
+            )
+        if clasif_id:
+            await airtable.update_record(config.AT_TBL_CLASIFICACION, clasif_id, {
+                "fldgj898WCeUM3QqV": "Enlace a web",
+                "fldquQJeU5QJmNfBa": "bot",
+            })
+
     logger.info(f"[otros] done | categoria={categoria!r} | from={from_email}")
+
+
+def _get_plantilla_enviada(
+    categoria: str, bot_humano: str, is_req: bool, cliente: bool,
+) -> str:
+    """Devuelve el nombre de la plantilla enviada según el routing real."""
+    if not (bot_humano == "bot" and (is_req or cliente)):
+        return ""
+    cat = categoria.lower()
+    if cat == "aviso_salida":
+        return "aviso_salida_sofia"
+    if "mudanza" in cat:
+        return "mudanza_sofia"
+    if "materiales" in cat:
+        return "materiales_sofia"
+    if cat == "otros":
+        return "otros_sofia"
+    if categoria in _AREA_GENERAL_CATS:
+        return "area_general_cta"
+    if categoria in _AREA_CLIENTE_CATS:
+        return "area_cliente"
+    if "reseña" in cat or "resena" in cat:
+        return "ticket_resena"
+    if "moroso" in cat:
+        return "moroso"
+    if "desestima" in cat:
+        return "desestima"
+    if "foto" in cat:
+        return "ticket_foto_salida"
+    if "modificar_visita" in cat or "cancelar_visita" in cat:
+        return "visita_sofia"
+    return ""
+
+
+async def _evaluar_pipeline(
+    clasif_id: str,
+    email_body: str,
+    subject: str,
+    tipo: str,
+    bot_humano: str,
+    categoria: str,
+    plantilla_enviada: str,
+    is_req: bool,
+    examples_tipo: list,
+    examples_bh: list,
+    definitions: list,
+    examples_clasif: list,
+    summary_entry: dict = None,
+) -> None:
+    """Evaluación en cascada (background). Escribe en Airtable y actualiza el monitor."""
+    eval_clasif_val        = "—"
+    razon_eval_clasif      = "—"
+    eval_tipo_val          = "—"
+    razon_eval_tipo        = "—"
+    eval_bh_val            = "—"
+    razon_eval_bot_humano  = "—"
+    efectividad_val        = "—"
+    try:
+        # Nivel 1: eval_clasif + eval_tipo + eval_bot_humano en paralelo
+        # eval_clasif y eval_bot_humano evalúan las decisiones de nivel 1 (categoria y bot_humano)
+        # eval_tipo evalúa la decisión de nivel 2 (tipo), pero no depende de las anteriores en eval
+        if tipo == "accion":
+            (eval_clasif_val, razon_eval_clasif), \
+            (eval_bh_val, razon_eval_bot_humano), \
+            (eval_tipo_val, razon_eval_tipo) = await asyncio.gather(
+                openai_svc.eval_clasif(email_body, subject, categoria, definitions, examples_clasif),
+                openai_svc.eval_bot_humano(email_body, categoria, bot_humano, examples_bh),
+                openai_svc.eval_tipo(email_body, tipo, examples_tipo),
+            )
+            logger.info(f"[eval] eval_bot_humano={eval_bh_val} | razon={razon_eval_bot_humano}")
+        else:
+            (eval_clasif_val, razon_eval_clasif), \
+            (eval_tipo_val, razon_eval_tipo) = await asyncio.gather(
+                openai_svc.eval_clasif(email_body, subject, categoria, definitions, examples_clasif),
+                openai_svc.eval_tipo(email_body, tipo, examples_tipo),
+            )
+        logger.info(f"[eval] eval_clasif={eval_clasif_val} | eval_tipo={eval_tipo_val}")
+
+        # Nivel 2: efectividad (solo si tipo==accion, depende de bot_humano y is_req)
+        if tipo == "accion":
+            if bot_humano == "humano":
+                efectividad_val = "escalado"
+            elif not is_req:
+                efectividad_val = "sin_accion"
+            elif plantilla_enviada:
+                efectividad_val = await openai_svc.eval_efectividad(
+                    email_body, categoria, plantilla_enviada,
+                )
+                logger.info(f"[eval] efectividad={efectividad_val}")
+            else:
+                efectividad_val = "no_resuelto"
+
+        if clasif_id:
+            await airtable.update_record(
+                config.AT_TBL_CLASIFICACION,
+                clasif_id,
+                {
+                    "eval_clasif":           eval_clasif_val,
+                    "razon_eval_clasif":     razon_eval_clasif,
+                    "eval_tipo":             eval_tipo_val,
+                    "razon_eval_tipo":       razon_eval_tipo,
+                    "eval_bot_humano":       eval_bh_val,
+                    "razon_eval_bot_humano": razon_eval_bot_humano,
+                    "efectividad":           efectividad_val,
+                },
+            )
+            logger.info(f"[eval] Airtable actualizado | {eval_clasif_val} / {eval_tipo_val} / {eval_bh_val} / {efectividad_val}")
+
+        if summary_entry is not None:
+            summary_entry["eval_clasif"]           = eval_clasif_val
+            summary_entry["razon_eval_clasif"]     = razon_eval_clasif
+            summary_entry["eval_tipo"]             = eval_tipo_val
+            summary_entry["razon_eval_tipo"]       = razon_eval_tipo
+            summary_entry["eval_bot_humano"]       = eval_bh_val
+            summary_entry["razon_eval_bot_humano"] = razon_eval_bot_humano
+            summary_entry["efectividad"]           = efectividad_val
+            _save_summaries()
+
+    except Exception as exc:
+        logger.warning(f"[eval] Error en evaluación pipeline: {exc}")
 
 
 async def process_new_emails():

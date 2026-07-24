@@ -63,10 +63,12 @@ async def run(args: dict) -> dict:
         body      = email_templates.ticket_email(nombre, ticket_id),
         body_type = "html",
         bcc       = _TICKET_BCC,
+        thread_id = thread_id,
     )
     logger.info(f"[1.5] Ticket enviado | subject={ticket_subject!r}")
 
-    # 4. Actualizar item SPA 1034
+    # 4. Actualizar item SPA 1034 (solo tickets CRM 1034, no franquicias CRM 169)
+    _is_franquicia = str(ticket_id).startswith("169_")
     item_fields = {
         "stageId":      "DT1034_120:CLIENT",
         "assignedById": assigned_by,
@@ -75,7 +77,7 @@ async def run(args: dict) -> dict:
     if contact_id:
         item_fields["contactId"] = contact_id
 
-    if ticket_id:
+    if ticket_id and not _is_franquicia:
         await bitrix.update_crm_item(1034, ticket_id, item_fields)
         logger.info(f"[1.5] Item 1034 actualizado | ticket_id={ticket_id} | contact_id={contact_id}")
 
@@ -85,6 +87,8 @@ async def run(args: dict) -> dict:
             f"Comunicarse con el cliente. No se atendió al requerimiento.\n"
             f"El emisor del correo solicita la comunicación con un HUMANO para {categoria}",
         )
+    elif _is_franquicia:
+        logger.info(f"[1.5] Franquicia (CRM 169) — sin actualización CRM 1034 | ticket_id={ticket_id}")
 
     # 6. Actualizar Clasificación
     clasif_id = row

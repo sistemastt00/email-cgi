@@ -152,6 +152,7 @@ def _send_email_sync(
     body_type: str = "html",        # "html" | "plain"
     attachments: list[dict] = None,
     bcc: list[str] = None,
+    thread_id: str = None,
 ) -> dict:
     """Envía un email y devuelve {threadId, messageId}."""
     svc = _build_service()
@@ -179,9 +180,12 @@ def _send_email_sync(
     if bcc:
         msg["Bcc"] = ", ".join(bcc)
 
-    raw    = base64.urlsafe_b64encode(msg.as_bytes()).decode()
+    raw       = base64.urlsafe_b64encode(msg.as_bytes()).decode()
+    send_body = {"raw": raw}
+    if thread_id:
+        send_body["threadId"] = thread_id
     result = svc.users().messages().send(
-        userId="me", body={"raw": raw}
+        userId="me", body=send_body
     ).execute()
     return {"threadId": result.get("threadId", ""), "messageId": result.get("id", "")}
 
@@ -235,9 +239,10 @@ async def send_email(
     body_type: str = "html",
     attachments: list[dict] = None,
     bcc: list[str] = None,
+    thread_id: str = None,
 ) -> dict:
     """Envía un email. Devuelve {threadId, messageId}."""
-    return await asyncio.to_thread(_send_email_sync, to, subject, body, body_type, attachments, bcc)
+    return await asyncio.to_thread(_send_email_sync, to, subject, body, body_type, attachments, bcc, thread_id)
 
 
 async def mark_processed(message_id: str):

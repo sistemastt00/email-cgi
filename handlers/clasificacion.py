@@ -417,6 +417,9 @@ async def _process_email_inner(msg_stub: dict):
             except Exception as exc:
                 logger.error(f"[1] Error en 1.2: {exc}", exc_info=True)
 
+        # Follow-up: reevaluar efectividad del registro bot anterior en este thread
+        asyncio.create_task(_check_follow_up(thread_id, body, clasif_record_id))
+
     # ── Summary ──────────────────────────────────────────────────────────────
     _nombre     = extrac_result.get("nombre", "") if is_new_thread else existing_fields.get("nombre", "")
     _ticket_id  = extrac_result.get("ticket_id", "") if is_new_thread else existing_fields.get("lead_id", "")
@@ -768,6 +771,43 @@ def _get_plantilla_enviada(
     return ""
 
 
+async def _check_follow_up(thread_id: str, follow_up_body: str, current_clasif_id: str) -> None:
+    """Si existe un registro bot-handled en este thread, reevalúa su efectividad con el follow-up."""
+    try:
+        formula = (
+            f'AND({{thread_id}}="{thread_id}", {{bot_humano}}="bot", '
+            f'OR({{efectividad}}="resuelto", {{efectividad}}="no_resuelto"))'
+        )
+        prev_records = await airtable.search_records(
+            config.AT_TBL_CLASIFICACION,
+            formula=formula,
+            max_records=1,
+        )
+        if not prev_records:
+            return
+        prev_id = prev_records[0]["id"]
+        if prev_id == current_clasif_id:
+            return
+        prev_fields = prev_records[0].get("fields", {})
+        prev_categoria = (
+            prev_fields.get("categoria_api", "")
+            or prev_fields.get("fldX2vzDBKwrXmiGQ", "")
+        )
+        prev_plantilla = _get_plantilla_enviada(prev_categoria, "bot", True, False)
+        template_content = email_templates.get_template_text(prev_plantilla, prev_categoria)
+        nueva_efectividad = await openai_svc.eval_follow_up(
+            follow_up_body=follow_up_body,
+            template_content=template_content,
+            categoria=prev_categoria,
+        )
+        await airtable.update_record(config.AT_TBL_CLASIFICACION, prev_id, {
+            "efectividad": nueva_efectividad,
+        })
+        logger.info(f"[follow-up] thread={thread_id} | prev={prev_id} → {nueva_efectividad}")
+    except Exception as exc:
+        logger.warning(f"[follow-up] Error en thread {thread_id}: {exc}")
+
+
 async def _evaluar_pipeline(
     clasif_id: str,
     email_body: str,
@@ -819,8 +859,9 @@ async def _evaluar_pipeline(
             elif not is_req:
                 efectividad_val = "sin_accion"
             elif plantilla_enviada:
+                template_content = email_templates.get_template_text(plantilla_enviada, categoria)
                 efectividad_val = await openai_svc.eval_efectividad(
-                    email_body, categoria, plantilla_enviada,
+                    email_body, categoria, plantilla_enviada, template_content,
                 )
                 logger.info(f"[eval] efectividad={efectividad_val}")
             else:

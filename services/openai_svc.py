@@ -410,17 +410,19 @@ async def eval_efectividad(
     email_body: str,
     categoria: str,
     plantilla_enviada: str,
+    template_content: str = "",
 ) -> str:
-    """Evalúa si la plantilla enviada fue adecuada para resolver la consulta.
+    """Evalúa si la respuesta automática fue adecuada para resolver la consulta.
     Devuelve: 'resuelto' | 'no_resuelto'
     """
+    content_desc = template_content or f"Plantilla: {plantilla_enviada}"
     prompt = (
         "Eres un evaluador experto de respuestas automáticas para Tu Trastero "
         "(empresa de self-storage).\n\n"
         "Determina si la respuesta automática enviada fue adecuada para resolver "
         "la consulta del cliente.\n\n"
         f"Categoría identificada: \"{categoria}\"\n"
-        f"Respuesta/plantilla enviada: \"{plantilla_enviada}\"\n\n"
+        f"Respuesta enviada al cliente:\n---\n{content_desc}\n---\n\n"
         "Responde ÚNICAMENTE:\n"
         "- resuelto: la respuesta era adecuada para la consulta\n"
         "- no_resuelto: la respuesta no era adecuada o el cliente no obtendría lo que necesita"
@@ -435,3 +437,34 @@ async def eval_efectividad(
     )
     val = result.get("efectividad", "").lower().strip()
     return val if val in ("resuelto", "no_resuelto") else "resuelto"
+
+
+async def eval_follow_up(
+    follow_up_body: str,
+    template_content: str,
+    categoria: str,
+) -> str:
+    """Evalúa si el cliente quedó satisfecho a partir de su respuesta al email automático.
+    Devuelve: 'resuelto' | 'no_resuelto' | 'escalado'
+    """
+    prompt = (
+        "Eres un evaluador de satisfacción de clientes para Tu Trastero (self-storage).\n\n"
+        f"El sistema envió esta respuesta automática al cliente (categoría: {categoria}):\n"
+        f"---\n{template_content}\n---\n\n"
+        "El cliente ha respondido con el mensaje que recibirás. "
+        "Determina si su consulta quedó resuelta o si sigue necesitando ayuda.\n\n"
+        "Responde ÚNICAMENTE:\n"
+        "- resuelto: el cliente confirma, agradece o no tiene más preguntas sobre el tema\n"
+        "- no_resuelto: el cliente insiste, tiene más dudas o no logró lo que necesitaba\n"
+        "- escalado: el cliente pide hablar con una persona o muestra frustración clara"
+    )
+    result = await extract_structured_data(
+        text=follow_up_body, prompt=prompt,
+        parameters=[{
+            "name": "efectividad", "type": "string",
+            "description": "resuelto, no_resuelto o escalado", "isRequired": True,
+        }],
+        model="gpt-4o-mini",
+    )
+    val = result.get("efectividad", "").lower().strip()
+    return val if val in ("resuelto", "no_resuelto", "escalado") else "no_resuelto"

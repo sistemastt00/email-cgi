@@ -444,6 +444,50 @@ def _load_template(filename: str, **kwargs) -> tuple:
     return body.strip(), cta, after, False
 
 
+_PLANTILLA_FILE = {
+    "mudanza_sofia":      "mudanza_sofia.html",
+    "materiales_sofia":   "materiales_sofia.html",
+    "otros_sofia":        "otros_sofia.html",
+    "aviso_salida_sofia": "aviso_salida_sofia.html",
+    "moroso":             "moroso.html",
+    "desestima":          "desestima.html",
+    "visita_sofia":       "visita_sofia.html",
+    "ticket_resena":      "resena_ticket.html",
+    "ticket_foto_salida": "foto_salida_ticket.html",
+    "area_cliente":       "area_cliente.html",
+}
+
+_CAT_FILE = {
+    "agendar_visita":        "agendar_visita.html",
+    "reservar":              "reservar_trastero.html",
+    "incidencia":            "notificar_incidencia.html",
+    "valoración":            "hacer_valoracion.html",
+    "inventario":            "hacer_inventario.html",
+    "autorizar_terceros":    "autorizar_terceros.html",
+    "actualizar_datos":      "actualizar_datos.html",
+    "presupuesto":           "presupuesto.html",
+    "cambio_titular_modulo": "cambio_trastero.html",
+}
+
+_TEMPLATE_DIR = Path(__file__).parent.parent / "templates" / "emails"
+
+
+def get_template_text(plantilla_name: str, categoria: str = "") -> str:
+    """Devuelve el texto plano de una plantilla para evaluación LLM."""
+    fname = _PLANTILLA_FILE.get(plantilla_name)
+    if not fname and plantilla_name == "area_general_cta":
+        fname = _CAT_FILE.get(categoria.lower())
+    if fname:
+        path = _TEMPLATE_DIR / fname
+        if path.exists():
+            html = path.read_text(encoding="utf-8")
+            text = re.sub(r"<!--.*?-->", "", html, flags=re.DOTALL)
+            text = re.sub(r"<[^>]+>", " ", text)
+            text = re.sub(r"\s+", " ", text).strip()
+            return text[:1500]
+    return f"Respuesta automática para categoría: {categoria or plantilla_name}"
+
+
 def _render(filename: str, title: str, banner: str, is_ticket: bool = False, **kwargs) -> str:
     """Load template and build email — works for both full HTML files and fragments."""
     body, cta, after, full = _load_template(filename, **kwargs)

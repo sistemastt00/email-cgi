@@ -576,7 +576,7 @@ def _render_monitor():
         document.getElementById('ticker').textContent = remaining + ' s';
         if (remaining <= 0) remaining = INTERVAL;
       }}, 1000);
-      reloader = setInterval(() => location.reload(), INTERVAL * 1000);
+      reloader = setInterval(softReload, INTERVAL * 1000);
     }}
     function pauseRefresh() {{
       clearInterval(countdown); clearInterval(reloader);
@@ -603,6 +603,18 @@ def _render_monitor():
         btn.textContent = d.error ? '❌ Error' : '✅ Iniciada';
       }} catch(e) {{ btn.textContent = '❌ Error'; }}
       setTimeout(() => {{ btn.disabled = false; btn.textContent = '⚡ Eval retroactiva'; }}, 4000);
+    }}
+    async function softReload() {{
+      try {{
+        const res = await fetch(window.location.href, {{cache:'no-store'}});
+        if (!res.ok) return;
+        const html = await res.text();
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const newBodyHTML = Array.from(doc.body.children).filter(el => el.tagName !== 'SCRIPT').map(el => el.outerHTML).join('');
+        document.body.style.transition = 'opacity 0.2s ease';
+        document.body.style.opacity = '0.4';
+        setTimeout(function() {{ document.body.innerHTML = newBodyHTML; document.body.style.opacity = '1'; }}, 180);
+      }} catch(e) {{ console.error('Soft reload error:', e); }}
     }}
     startTimers();
   </script>

@@ -852,20 +852,21 @@ async def _evaluar_pipeline(
             )
         logger.info(f"[eval] eval_clasif={eval_clasif_val} | eval_tipo={eval_tipo_val}")
 
-        # Nivel 2: efectividad (solo si tipo==accion, depende de bot_humano y is_req)
-        if tipo == "accion":
-            if bot_humano == "humano":
-                efectividad_val = "escalado"
-            elif not is_req:
-                efectividad_val = "sin_accion"
-            elif plantilla_enviada:
-                template_content = email_templates.get_template_text(plantilla_enviada, categoria)
-                efectividad_val = await openai_svc.eval_efectividad(
-                    email_body, categoria, plantilla_enviada, template_content,
-                )
-                logger.info(f"[eval] efectividad={efectividad_val}")
-            else:
-                efectividad_val = "no_resuelto"
+        # Nivel 2: efectividad
+        if tipo != "accion":
+            efectividad_val = "sin_accion"
+        elif bot_humano == "humano":
+            efectividad_val = "escalado"
+        elif not is_req:
+            efectividad_val = "sin_accion"
+        elif plantilla_enviada:
+            template_content = email_templates.get_template_text(plantilla_enviada, categoria)
+            efectividad_val = await openai_svc.eval_efectividad(
+                email_body, categoria, plantilla_enviada, template_content,
+            )
+            logger.info(f"[eval] efectividad={efectividad_val}")
+        else:
+            efectividad_val = "no_resuelto"
 
         if clasif_id:
             await airtable.update_record(

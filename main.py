@@ -566,6 +566,8 @@ def _render_monitor():
     .sm-inner td{{border:none;padding:5px 14px}}
   </style>
 <script>(function(){{var t=localStorage.getItem('monTheme')||'light';document.documentElement.setAttribute('data-theme',t);}})();</script>
+<style>.in-iframe .nav{{display:none!important}}</style>
+<script>if(window.self!==window.top)document.documentElement.classList.add('in-iframe');</script>
 </head>
 <body>
 <div class="nav">

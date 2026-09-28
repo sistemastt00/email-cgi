@@ -3,10 +3,13 @@ services/bitrix.py — Cliente asíncrono para la REST API de Bitrix24.
 Usa el webhook entrante configurado en BITRIX_URL.
 Permisos necesarios en el webhook: CRM, Tareas, Usuarios.
 """
+import datetime
 import httpx
+import pytz
 import config
 
 _TIMEOUT = 30
+_CREATED_BY_ID = 6358
 
 
 async def api_call(method: str, params: dict = None) -> dict:
@@ -126,4 +129,48 @@ async def bind_activity_to_item(activity_id: int, entity_type_id: int, entity_id
         "activityId":   activity_id,
         "entityTypeId": entity_type_id,
         "entityId":     int(entity_id),
+    })
+
+
+# ─── Tareas ───────────────────────────────────────────────────────────────────
+
+def next_business_day_deadline() -> str:
+    """
+    Devuelve el próximo día laboral (L-V) a las 09:00 hora de Madrid,
+    formateado para Bitrix24. Siempre es el día SIGUIENTE al actual,
+    saltando sábados y domingos.
+    """
+    madrid    = pytz.timezone("Europe/Madrid")
+    ahora     = datetime.datetime.now(madrid)
+    siguiente = ahora.date() + datetime.timedelta(days=1)
+    while siguiente.weekday() >= 5:
+        siguiente += datetime.timedelta(days=1)
+    deadline_dt = madrid.localize(datetime.datetime(siguiente.year, siguiente.month, siguiente.day, 9, 0, 0))
+    offset      = deadline_dt.strftime("%z")
+    offset_fmt  = f"{offset[:3]}:{offset[3:]}"
+    return deadline_dt.strftime(f"%Y-%m-%dT%H:%M:%S{offset_fmt}")
+
+
+async def create_task(
+    title: str,
+    responsible_id: str | int,
+    entity_type_id: int,
+    entity_id: str | int,
+    description: str = "",
+    deadline: str | None = None,
+) -> dict:
+    """
+    Crea una tarea (tasks.task.add) vinculada a un elemento CRM (SPA/deal/lead/contact).
+    entity_type_id: entityTypeId del pipeline SPA (p.ej. 1034 → binding "T40A_{id}").
+    deadline: ISO 8601 con offset; por defecto, próximo día laboral 09:00 Madrid.
+    """
+    return await api_call("tasks.task.add", {
+        "fields": {
+            "TITLE":          title,
+            "CREATED_BY":     _CREATED_BY_ID,
+            "RESPONSIBLE_ID": responsible_id,
+            "DESCRIPTION":    description,
+            "DEADLINE":       deadline or next_business_day_deadline(),
+            "UF_CRM_TASK":    [f"T{entity_type_id:X}_{entity_id}"],
+        }
     })

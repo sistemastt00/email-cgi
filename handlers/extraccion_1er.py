@@ -231,6 +231,15 @@ async def _with_contact(args, gpt_data, from_email, email_to, subject, adjuntos,
     })
     ticket_id = str(item_resp.get("result", {}).get("item", {}).get("id", ""))
 
+    if ticket_id:
+        await bitrix.create_task(
+            title=f"CGI - Respuesta automática: {args.get('categoria_correo', '')}",
+            responsible_id=assigned_by,
+            entity_type_id=1034,
+            entity_id=ticket_id,
+            description=_build_timeline_comment(from_email, subject, adjuntos, gpt_data, nombre_bx, apellido_bx, body),
+        )
+
     at_record = await airtable.create_record(
         config.AT_TBL_DATOS_EXTRAIDOS,
         _datos_extraidos_fields(args, gpt_data, ticket_id, from_email, email_to, subject),
@@ -286,6 +295,18 @@ async def _without_contact(args, gpt_data, from_email, email_to, subject, adjunt
         "assignedById": _ASSIGNED_BY_ID,
     })
     ticket_id = str(item_resp.get("result", {}).get("item", {}).get("id", ""))
+
+    if ticket_id:
+        await bitrix.create_task(
+            title=f"CGI - Respuesta automática: {args.get('categoria_correo', '')}",
+            responsible_id=_ASSIGNED_BY_ID,
+            entity_type_id=1034,
+            entity_id=ticket_id,
+            description=_build_timeline_comment(
+                from_email, subject, adjuntos, gpt_data,
+                gpt_data.get("nombre", ""), gpt_data.get("apellido", ""), body,
+            ),
+        )
 
     at_record = await airtable.create_record(
         config.AT_TBL_DATOS_EXTRAIDOS,

@@ -208,6 +208,41 @@ async def _process_email_inner(msg_stub: dict):
     is_new_thread   = len(existing) == 0
     existing_fields = existing[0]["fields"] if existing else {}
 
+    # 2b. Fallback — hilo roto: algunos clientes reescriben el asunto en cada
+    # respuesta (ej. anteponen texto a "Re: ..."), con lo que Gmail ya no lo
+    # agrupa en el mismo thread_id. Si no hubo match, buscamos su ticket
+    # "accion" más reciente por email dentro de una ventana corta para
+    # reutilizarlo en vez de crear un item 1034 duplicado.
+    if is_new_thread and from_email:
+        candidatos = await airtable.search_records(
+            config.AT_TBL_DATOS_EXTRAIDOS,
+            formula=f'AND({{from_email}}="{from_email}", {{tipo}}="accion")',
+            max_records=20,
+            fields=["thread_id", "nombre", "lead_id", "categoria_api", "tipo"],
+        )
+        limite = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=config.HILO_ROTO_VENTANA_HORAS)
+        candidatos = [
+            r for r in candidatos
+            if r["fields"].get("lead_id")
+            and datetime.datetime.fromisoformat(r["createdTime"].replace("Z", "+00:00")) >= limite
+        ]
+        if candidatos:
+            candidatos.sort(key=lambda r: r["createdTime"], reverse=True)
+            match = candidatos[0]
+            # Re-apuntamos el registro existente al thread_id nuevo para que
+            # 1.2 (extraccion_cadena) también lo encuentre y no cree un
+            # registro huérfano.
+            await airtable.update_record(
+                config.AT_TBL_DATOS_EXTRAIDOS, match["id"], {"thread_id": thread_id},
+            )
+            existing        = [match]
+            existing_fields = match["fields"]
+            is_new_thread   = False
+            logger.info(
+                f"[1] Hilo roto detectado | from={from_email} → reutiliza ticket_id="
+                f"{existing_fields.get('lead_id')} (asunto cambiado, thread_id original {match['fields'].get('thread_id')!r})"
+            )
+
     # 3 & 4. Clasificación: fija para @idealista.com, GPT para el resto
     if _is_idealista:
         examples_bh     = []
@@ -328,8 +363,9 @@ async def _process_email_inner(msg_stub: dict):
             try:
                 r15 = await bot_humano.run({
                     **args_base,
-                    "ticket_id": ticket_id,
-                    "nombre":    nombre,
+                    "ticket_id":   ticket_id,
+                    "nombre":      nombre,
+                    "es_respuesta": False,  # item recién creado en 1.1 — ya tiene tarea
                 })
                 logger.info(f"[1] 1.5 ok | {r15}")
             except Exception as exc:
@@ -397,6 +433,7 @@ async def _process_email_inner(msg_stub: dict):
                 "bot_humano":       bot_humano_result,
                 "subject":          subject,
                 "row":              clasif_record_id,
+                "es_respuesta":     True,  # cliente responde a un ticket ya existente
             })
             logger.info(f"[1] 1.5 (cadena) ok | {r89}")
         except Exception as exc:

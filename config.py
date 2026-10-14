@@ -56,6 +56,9 @@ TELEGRAM_CHAT_ID   = os.getenv("TELEGRAM_CHAT_ID", "")
 # ─── Bitly — acortador de URLs ────────────────────────────────────────────────
 BITLY_TOKEN = os.getenv("BITLY_TOKEN", "")
 
+# ─── Detección de hilo roto (asunto reescrito por el cliente) ────────────────
+HILO_ROTO_VENTANA_HORAS = int(os.getenv("HILO_ROTO_VENTANA_HORAS", "72"))
+
 # ─── Filtro de remitentes — correos que nunca se procesan ─────────────────────
 EMAIL_BLACKLIST_CONTAINS = [
     "@telefacil.com",

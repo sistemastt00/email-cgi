@@ -34,6 +34,7 @@ async def run(args: dict) -> dict:
     categoria  = args.get("categoria_correo", "")
     subject    = args.get("subject", "")
     row        = args.get("row", "")   # ID registro Clasificación
+    es_respuesta = args.get("es_respuesta", False)  # True si reabre un ticket ya existente
 
     if bot_humano != "humano":
         logger.info(f"[1.5] bot_humano={bot_humano!r} — sin acción")
@@ -87,6 +88,21 @@ async def run(args: dict) -> dict:
             f"Comunicarse con el cliente. No se atendió al requerimiento.\n"
             f"El emisor del correo solicita la comunicación con un HUMANO para {categoria}",
         )
+
+        # 5b. Nueva tarea — solo cuando el cliente responde reabriendo un
+        # ticket ya existente (la primera vez ya se crea en extraccion_1er)
+        if es_respuesta:
+            await bitrix.create_task(
+                title=f"CGI - Requiere HUMANO: {categoria}",
+                responsible_id=assigned_by,
+                entity_type_id=1034,
+                entity_id=ticket_id,
+                description=(
+                    f"El cliente respondió y requiere atención de un gestor para {categoria}.\n"
+                    f"Asunto: {subject}"
+                ),
+            )
+            logger.info(f"[1.5] Tarea creada (respuesta) | ticket_id={ticket_id}")
     elif _is_franquicia:
         logger.info(f"[1.5] Franquicia (CRM 169) — sin actualización CRM 1034 | ticket_id={ticket_id}")
 

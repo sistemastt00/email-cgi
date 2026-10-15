@@ -83,6 +83,31 @@ _PARAMS_FRANQUICIA = [
 ]
 
 
+_LEAD_WAIT_SECONDS = 180  # el email-tracker nativo de Bitrix tarda ~1-3 min en generar el lead
+
+
+async def _link_lead_en_background(contact_id: str, ticket_id: str) -> None:
+    """
+    El email-tracker nativo de Bitrix genera un lead aparte para el mismo correo,
+    pero puede tardar varios minutos. Se espera en segundo plano (sin bloquear la
+    respuesta del webhook) y, si aparece, se deja el enlace en el timeline del item 1034.
+    """
+    try:
+        await asyncio.sleep(_LEAD_WAIT_SECONDS)
+        lead_id = await bitrix.find_lead_by_contact(contact_id)
+        if lead_id:
+            link = f"{config.BITRIX_PORTAL_URL}/crm/lead/details/{lead_id}/"
+            await bitrix.add_timeline_comment(
+                "dynamic_1034", ticket_id,
+                f"🔗 Lead generado automáticamente por Bitrix: {link}",
+            )
+            logger.info(f"[1.1] Lead vinculado en comentario | ticket_id={ticket_id} | lead_id={lead_id}")
+        else:
+            logger.info(f"[1.1] No se encontró lead para vincular | ticket_id={ticket_id} | contact_id={contact_id}")
+    except Exception as exc:
+        logger.warning(f"[1.1] No se pudo vincular lead: {type(exc).__name__}: {exc!r}")
+
+
 def _datos_extraidos_fields(args: dict, gpt: dict, ticket_id: str,
                              from_email: str, email_to: str, subject: str) -> dict:
     return {
@@ -239,6 +264,7 @@ async def _with_contact(args, gpt_data, from_email, email_to, subject, adjuntos,
             entity_id=ticket_id,
             description=_build_timeline_comment(from_email, subject, adjuntos, gpt_data, nombre_bx, apellido_bx, body),
         )
+        asyncio.create_task(_link_lead_en_background(contact_id, ticket_id))
 
     at_record = await airtable.create_record(
         config.AT_TBL_DATOS_EXTRAIDOS,
@@ -307,6 +333,7 @@ async def _without_contact(args, gpt_data, from_email, email_to, subject, adjunt
                 gpt_data.get("nombre", ""), gpt_data.get("apellido", ""), body,
             ),
         )
+        asyncio.create_task(_link_lead_en_background(contact_id, ticket_id))
 
     at_record = await airtable.create_record(
         config.AT_TBL_DATOS_EXTRAIDOS,

@@ -123,6 +123,17 @@ async def find_email_activity(subject: str, from_email: str, contact_id: str | i
     return int(results[0]["ID"]) if results else None
 
 
+async def find_lead_by_contact(contact_id: str | int) -> int | None:
+    """Busca el lead más reciente vinculado a un contacto (crm.lead.list). None si no hay."""
+    data = await api_call("crm.lead.list", {
+        "order":  {"ID": "DESC"},
+        "filter": {"CONTACT_ID": int(contact_id)},
+        "select": ["ID"],
+    })
+    results = data.get("result", [])
+    return int(results[0]["ID"]) if results else None
+
+
 async def bind_activity_to_item(activity_id: int, entity_type_id: int, entity_id: str | int) -> dict:
     """Vincula una actividad existente a un item CRM (crm.activity.binding.add)."""
     return await api_call("crm.activity.binding.add", {

@@ -27,7 +27,8 @@ AT_TBL_EJEMPLOS_TIPO      = "tblUJTvQ8FWoYxkx5"   # BC_Ejemplos Tipo (tabla sepa
 AT_TBL_CENTROS            = "tbl2vbsg29v94Qjgf"   # BC_Centros
 
 # ─── Bitrix24 ──────────────────────────────────────────────────────────────────
-BITRIX_URL = os.getenv("BITRIX_URL", "")   # https://tutrastero.bitrix24.eu/rest/ID/TOKEN
+BITRIX_URL        = os.getenv("BITRIX_URL", "")   # https://tutrastero.bitrix24.eu/rest/ID/TOKEN
+BITRIX_PORTAL_URL = BITRIX_URL.split("/rest/")[0] if BITRIX_URL else ""   # https://tutrastero.bitrix24.eu
 
 # ─── OpenAI ───────────────────────────────────────────────────────────────────
 OPENAI_KEY   = os.getenv("OPENAI_KEY", "")
